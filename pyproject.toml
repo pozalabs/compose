@@ -8,6 +8,7 @@ authors = ["pozalabs <contact@pozalabs.com>"]
 python = "^3.9"
 pydantic = "^1.9.1"
 bson = "^0.5.10"
+pendulum = "^2.1.2"
 
 [tool.poetry.dev-dependencies]
 
