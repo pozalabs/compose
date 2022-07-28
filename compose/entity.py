@@ -17,6 +17,10 @@ class Entity(container.TimeStampedModel):
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
+
         fields = set(cls.__fields__.keys())
         if diff := set(cls.updatable_fields) - fields:
             raise ValueError(f"`updatable_fields` must be subset of {fields}, but got {diff}")
+
+        id_field = cls.__fields__.pop("id")
+        cls.__fields__ = dict(id=id_field) | cls.__fields__
