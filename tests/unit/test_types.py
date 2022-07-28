@@ -2,7 +2,7 @@ from compose.container import BaseModel
 from compose.types import PyObjectId
 
 
-def test_pyobject_id_schema_type_is_string():
+def test_py_object_id_schema_type_is_string():
     class TestModel(BaseModel):
         id: PyObjectId
 
