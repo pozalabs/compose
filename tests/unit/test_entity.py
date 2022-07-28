@@ -5,7 +5,7 @@ import pytest
 from compose.entity import Entity
 
 
-def test_entity_id_field_ordered_first():
+def test_entity_id_field_is_ordered_first():
     class TestEntity(Entity):
         field_a: str
         field_b: str
