@@ -1,8 +1,9 @@
 [tool.poetry]
-name = "compose"
+name = "pozalabs-compose"
 version = "0.1.0"
 description = ""
 authors = ["pozalabs <contact@pozalabs.com>"]
+packages = [{include = "compose"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
