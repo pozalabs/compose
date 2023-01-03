@@ -21,3 +21,16 @@ def test_validate(object_id: Union[bson.ObjectId, bytes], expected: PyObjectId):
     actual = PyObjectId.validate(object_id)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "object_id",
+    [b"invalid-id", "invalid-id"],
+    ids=(
+        "12자리가 아닌 bytes는 유효하지 않은 PyObjectId",
+        "24자리 hex digit이 아닌 문자열은 유효하지 않은 PyObjectId",
+    ),
+)
+def test_validate_invalid_id(object_id: Union[bytes, str]):
+    with pytest.raises(ValueError):
+        PyObjectId.validate(object_id)
