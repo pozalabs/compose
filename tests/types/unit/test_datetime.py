@@ -21,7 +21,7 @@ def model(request: pytest.FixtureRequest) -> Model:
 
 @pytest.fixture
 def expected(request: pytest.FixtureRequest) -> Model:
-    dt: DateTime = getattr(request, "param")
+    dt: Union[pendulum.DateTime, DateTime] = getattr(request, "param")
     return Model(created_at=dt)
 
 
