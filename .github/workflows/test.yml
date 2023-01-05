@@ -1,0 +1,14 @@
+name: Test
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-test:
+    uses: ./.github/workflows/unit-test.yml
+    secrets: inherit

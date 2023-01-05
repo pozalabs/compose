@@ -1,0 +1,20 @@
+name: Run unit tests
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup python
+        uses: ./.github/actions/setup-python
+
+      - name: Run unit tests
+        run: |
+          poetry run pytest -vv -s tests
+        env:
+          APP_ENV: test
