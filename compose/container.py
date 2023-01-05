@@ -1,10 +1,9 @@
-import datetime
 from typing import Any
 
 import bson
 from pydantic import BaseModel as PydanticBaseModel
 
-from . import field
+from . import field, types
 
 
 class BaseModel(PydanticBaseModel):
@@ -15,8 +14,8 @@ class BaseModel(PydanticBaseModel):
 
 
 class TimeStampedModel(BaseModel):
-    created_at: datetime.datetime = field.DateTimeField()
-    updated_at: datetime.datetime = field.DateTimeField()
+    created_at: types.DateTime = field.DateTimeField()
+    updated_at: types.DateTime = field.DateTimeField()
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
