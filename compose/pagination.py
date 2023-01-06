@@ -1,7 +1,7 @@
 import math
 from typing import Any, Optional
 
-from pydantic import conint
+from pydantic import Field, conint
 
 from . import container
 
@@ -11,7 +11,7 @@ class Pagination(container.BaseModel):
     total: int
     page: Optional[conint(ge=1)] = None
     per_page: Optional[conint(ge=1)] = None
-    extra: Optional[dict[str, Any]] = None
+    extra: dict[str, Any] = Field(default_factory=dict)
 
     @property
     def prev_page(self) -> Optional[int]:
