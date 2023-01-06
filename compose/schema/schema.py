@@ -1,5 +1,11 @@
+from typing import Generic, TypeVar
+
+from pydantic.generics import GenericModel
+
 from .. import container
 from . import extra
+
+ListItem = TypeVar("ListItem")
 
 
 class Schema(container.BaseModel):
@@ -9,3 +15,8 @@ class Schema(container.BaseModel):
 
 class TimeStampedSchema(container.TimeStampedModel, Schema):
     ...
+
+
+class ListSchema(Schema, GenericModel, Generic[ListItem]):
+    total: int
+    items: list[ListItem]
