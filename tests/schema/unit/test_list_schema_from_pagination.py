@@ -140,3 +140,29 @@ def test_from_pagination(
     actual = schema_type.from_pagination(pagination, **from_pagination_kwargs)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "schema_type, parser_name, pagination",
+    [
+        (
+            ListSchema[Item],
+            "undefined_parser",
+            "pagination_without_extra",
+        ),
+    ],
+    ids=("스키마에 정의되어 있지 않은 파서를 입력하면 오류가 발생",),
+)
+def test_from_pagination_with_undefined_parser(
+    schema_type: Type[ListSchema[Item]],
+    parser_name: str,
+    pagination: str,
+    request: pytest.FixtureRequest,
+):
+    pagination: Pagination = request.getfixturevalue(pagination)
+
+    with pytest.raises(AttributeError):
+        schema_type.from_pagination(
+            pagination=pagination,
+            parser_name=parser_name,
+        )
