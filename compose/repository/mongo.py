@@ -1,0 +1,54 @@
+from __future__ import annotations
+
+from typing import Any, ClassVar, Generic, Optional, TypeVar
+
+import pymongo
+from pymongo.collection import Collection
+from pymongo.database import Database
+
+from .. import types
+from ..entity import Entity
+from .base import BaseRepository
+
+EntityType = TypeVar("EntityType", bound=Entity)
+
+
+class MongoRepository(BaseRepository, Generic[EntityType]):
+    __collection_name__: ClassVar[str] = ""
+    __indexes__: ClassVar[Optional[list[pymongo.IndexModel]]] = None
+
+    def __init__(self, collection: Collection):
+        self.collection = collection
+
+    @classmethod
+    def create(cls, database: Database, **kwargs) -> MongoRepository:
+        collection = database.get_collection(cls.__collection_name__, **kwargs)
+        if cls.__indexes__ is not None:
+            collection.create_indexes(cls.__indexes__)
+        return cls(collection)
+
+    def add(self, entity: EntityType, **kwargs) -> None:
+        self.collection.insert_one(entity.dict(by_alias=True), **kwargs)
+
+    def add_many(self, entities: list[EntityType], **kwargs) -> None:
+        self.collection.insert_many([entity.dict(by_alias=True) for entity in entities], **kwargs)
+
+    def update(self, entity: EntityType, **kwargs) -> None:
+        self.collection.update_one(
+            {"_id": entity.id},
+            {"$set": entity.dict(by_alias=True)},
+            **kwargs,
+        )
+
+    def update_many(self, entities: list[EntityType], **kwargs) -> None:
+        for entity in entities:
+            self.update(entity, **kwargs)
+
+    def delete(self, entity_id: types.PyObjectId, **kwargs) -> None:
+        self.collection.delete_one({"_id": entity_id}, **kwargs)
+
+    def execute_raw(self, operation: str, **operation_kwargs) -> Any:
+        op = getattr(self.collection, operation, None)
+        if op is None:
+            raise ValueError(f"Unknown operation on collection: {operation}")
+        return op(**operation_kwargs)
