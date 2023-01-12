@@ -9,8 +9,8 @@ packages = [{include = "compose"}]
 [tool.poetry.dependencies]
 python = "^3.9"
 pydantic = "^1.10.2"
-bson = "^0.5.10"
 pendulum = "^2.1.2"
+pymongo = {extras = ["aws"], version = "^4.3.3"}
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.20.0"
