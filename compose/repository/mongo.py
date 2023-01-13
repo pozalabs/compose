@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, ClassVar, Generic, Optional, TypeVar
 
 import pymongo
+from pymongo import UpdateOne
 from pymongo.collection import Collection
 from pymongo.database import Database
 
@@ -43,8 +44,13 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         )
 
     def update_many(self, entities: list[EntityType], **kwargs) -> None:
-        for entity in entities:
-            self.update(entity, **kwargs)
+        self.collection.bulk_write(
+            requests=[
+                UpdateOne({"_id": entity.id}, {"$set": entity.dict(by_alias=True)})
+                for entity in entities
+            ],
+            **kwargs,
+        )
 
     def delete(self, entity_id: types.PyObjectId, **kwargs) -> None:
         self.collection.delete_one({"_id": entity_id}, **kwargs)
