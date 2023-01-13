@@ -30,6 +30,9 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
             collection.create_indexes(cls.__indexes__)
         return cls(collection)
 
+    def find_by_id(self, entity_id: types.PyObjectId, **kwargs) -> Optional[EntityType]:
+        return self.find_by({"_id": entity_id}, **kwargs)
+
     def find_by(self, filter_: dict[str, Any], **kwargs) -> Optional[EntityType]:
         """https://stackoverflow.com/a/73746554/9331155"""
         entity_type: EntityType = get_args(self.__class__.__orig_bases__[0])[0]
