@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, ClassVar, Generic, Optional, TypeVar
+from typing import Any, ClassVar, Generic, Optional, TypeVar, get_args
 
 import pymongo
 from pymongo import UpdateOne
@@ -30,12 +30,11 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
             collection.create_indexes(cls.__indexes__)
         return cls(collection)
 
-    def find_by_id(self, entity_id: types.PyObjectId, **kwargs) -> Optional[EntityType]:
-        return self.find_by({"_id": entity_id}, **kwargs)
-
     def find_by(self, filter_: dict[str, Any], **kwargs) -> Optional[EntityType]:
+        """https://stackoverflow.com/a/73746554/9331155"""
+        entity_type: EntityType = get_args(self.__class__.__orig_bases__[0])[0]
         result = self.collection.find_one(filter=filter_, **kwargs)
-        return result and EntityType.parse_obj(result)
+        return result and entity_type.parse_obj(result)
 
     def add(self, entity: EntityType, **kwargs) -> None:
         self.collection.insert_one(entity.dict(by_alias=True), **kwargs)
