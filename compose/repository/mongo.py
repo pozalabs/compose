@@ -30,6 +30,13 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
             collection.create_indexes(cls.__indexes__)
         return cls(collection)
 
+    def find_by_id(self, entity_id: types.PyObjectId, **kwargs) -> Optional[EntityType]:
+        return self.find_by({"_id": entity_id}, **kwargs)
+
+    def find_by(self, filter_: dict[str, Any], **kwargs) -> Optional[EntityType]:
+        result = self.collection.find_one(filter=filter_, **kwargs)
+        return result and EntityType.parse_obj(result)
+
     def add(self, entity: EntityType, **kwargs) -> None:
         self.collection.insert_one(entity.dict(by_alias=True), **kwargs)
 
