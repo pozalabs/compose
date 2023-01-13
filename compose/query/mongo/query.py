@@ -1,4 +1,3 @@
-import abc
 from typing import Any, Optional
 
 from pydantic import conint
@@ -6,7 +5,7 @@ from pydantic import conint
 from ..base import Query
 
 
-class MongoQuery(Query, abc.ABC):
+class MongoQuery(Query):
     def to_query(self) -> list[dict[str, Any]]:
         ...
 
