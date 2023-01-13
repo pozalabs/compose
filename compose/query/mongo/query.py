@@ -2,10 +2,10 @@ from typing import Any, Optional
 
 from pydantic import conint
 
-from ..base import Query
+from .. import base
 
 
-class MongoQuery(Query):
+class MongoQuery(base.Query):
     def to_query(self) -> list[dict[str, Any]]:
         ...
 
