@@ -8,12 +8,12 @@ from pymongo.database import Database
 
 from .. import types
 from ..entity import Entity
-from .base import BaseRepository
+from . import base
 
 EntityType = TypeVar("EntityType", bound=Entity)
 
 
-class MongoRepository(BaseRepository, Generic[EntityType]):
+class MongoRepository(base.BaseRepository, Generic[EntityType]):
     __collection_name__: ClassVar[str] = ""
     __indexes__: ClassVar[Optional[list[pymongo.IndexModel]]] = None
 
