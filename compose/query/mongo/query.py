@@ -12,8 +12,8 @@ class MongoQuery(Query, abc.ABC):
 
 
 class MongoFilterQuery(MongoQuery):
-    page: Optional[conint(gt=1)] = None
-    per_page: Optional[conint(gt=1)] = None
+    page: Optional[conint(ge=1)] = None
+    per_page: Optional[conint(ge=1)] = None
 
     @property
     def can_paginate(self) -> bool:
