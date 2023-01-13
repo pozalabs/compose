@@ -8,6 +8,8 @@ from pymongo.database import Database
 
 from .. import types
 from ..entity import Entity
+from ..pagination import Pagination
+from ..query.mongo import MongoFilterQuery
 from . import base
 
 EntityType = TypeVar("EntityType", bound=Entity)
@@ -52,3 +54,13 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         if op is None:
             raise ValueError(f"Unknown operation on collection: {operation}")
         return op(**operation_kwargs)
+
+    def filter(self, qry: MongoFilterQuery) -> Pagination:
+        result = self.collection.aggregate(qry.to_query())
+        result = next(result, None)
+        return Pagination(
+            total=(result["metadata"][0]["total"] if result["metadata"] else 0),
+            items=result["items"],
+            page=qry.page,
+            per_page=qry.per_page,
+        )
