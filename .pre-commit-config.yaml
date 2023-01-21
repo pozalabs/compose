@@ -1,8 +1,8 @@
 default_language_version:
   python: python3.9
 repos:
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
     hooks:
       - id: flake8
   - repo: https://github.com/psf/black
@@ -10,6 +10,6 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/isort
-    rev: 5.8.0
+    rev: 5.11.4
     hooks:
       - id: isort
