@@ -1,3 +1,3 @@
-from .schema import ListSchema, Schema, TimeStampedSchema
+from .schema import Error, ListSchema, Schema, TimeStampedSchema
 
-__all__ = ["Schema", "TimeStampedSchema", "ListSchema"]
+__all__ = ["Schema", "TimeStampedSchema", "ListSchema", "Error"]
