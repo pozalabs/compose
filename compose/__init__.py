@@ -1,4 +1,4 @@
-from . import entity, field, query, repository, schema, types
+from . import command, entity, event, field, query, repository, schema, types
 from .container import BaseModel, TimeStampedModel
 
 __all__ = [
@@ -10,4 +10,6 @@ __all__ = [
     "repository",
     "query",
     "types",
+    "command",
+    "event",
 ]
