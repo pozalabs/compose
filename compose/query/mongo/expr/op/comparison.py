@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Optional
+from typing import Any, Optional, Type, cast
 
 from ..base import Expression
 
@@ -20,20 +20,24 @@ class ComparisonOperator(Expression):
         raise NotImplementedError
 
 
-class Equal(ComparisonOperator):
-    def __init__(self, field: str, value: Optional[Any] = None, compare_none: bool = False):
-        super().__init__(field=field, value=value, compare_none=compare_none)
-
+def create_operator(name: str, mongo_operator: str) -> Type[ComparisonOperator]:
     def get_expression(self) -> dict[str, Any]:
-        return {self.field: self.value}
+        return {self.field: {mongo_operator: self.value}}
+
+    return cast(
+        Type[ComparisonOperator],
+        type(name, (ComparisonOperator,), {"get_expression": get_expression}),
+    )
 
 
-class In(ComparisonOperator):
-    def __init__(self, field: str, value: Optional[list[Any]] = None):
-        super().__init__(field=field, value=value, compare_none=False)
-
-    def get_expression(self) -> dict[str, Any]:
-        return {self.field: {"$in": self.value}}
+Eq = create_operator(name="Eq", mongo_operator="$eq")
+Ne = create_operator(name="Ne", mongo_operator="$ne")
+Gt = create_operator(name="Gt", mongo_operator="$gt")
+Gte = create_operator(name="Gte", mongo_operator="$gte")
+Lt = create_operator(name="Lt", mongo_operator="$lt")
+Lte = create_operator(name="Lte", mongo_operator="$lte")
+In = create_operator("In", mongo_operator="$in")
+Nin = create_operator("Nin", mongo_operator="$nin")
 
 
 class Regex(ComparisonOperator):
@@ -48,19 +52,3 @@ class Regex(ComparisonOperator):
 
     def get_expression(self) -> dict[str, Any]:
         return {self.field: {"$regex": self.value, "$options": self.options}}
-
-
-class Gte(ComparisonOperator):
-    def __init__(self, field: str, value: Optional[int] = None):
-        super().__init__(field=field, value=value, compare_none=False)
-
-    def get_expression(self) -> dict[str, Any]:
-        return {self.field: {"$gte": self.value}}
-
-
-class Lt(ComparisonOperator):
-    def __init__(self, field: str, value: Optional[int] = None):
-        super().__init__(field=field, value=value, compare_none=False)
-
-    def get_expression(self) -> dict[str, Any]:
-        return {self.field: {"$lt": self.value}}
