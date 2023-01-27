@@ -1,19 +1,54 @@
+from __future__ import annotations
+
 import abc
-from typing import Any, Optional, Type, cast
+from typing import Any, Optional, Type, TypeVar, Union, cast
 
 from ..base import Expression
 
 
-class ComparisonOperator(Expression):
-    def __init__(self, field: str, value: Optional[Any] = None, compare_none: bool = False):
-        self.field = field
+class EmptyType:
+    def __repr__(self) -> str:
+        return "EmptyType"
+
+    def __copy__(self) -> EmptyType:
+        return self
+
+    def __reduce__(self) -> str:
+        return "EmptyType"
+
+    def __deepcopy__(self, _: Any) -> EmptyType:
+        return self
+
+
+Empty = EmptyType()
+
+
+class Wrapped:
+    def __init__(self, value: Optional[Any] = None):
         self.value = value
-        self.compare_none = compare_none
+
+    def unwrap(self) -> Any:
+        return self.value
+
+
+class OptionalWrapped(Wrapped):
+    def __init__(self, value: Optional[Any] = None):
+        super().__init__(value=value)
+
+    def unwrap(self) -> Union[Empty, Any]:
+        return self.value if self.value is not None else Empty
+
+
+WrappedType = TypeVar("WrappedType", bound=Wrapped)
+
+
+class ComparisonOperator(Expression):
+    def __init__(self, field: str, value: WrappedType):
+        self.field = field
+        self.value = value.unwrap()
 
     def expression(self) -> dict[str, Any]:
-        if self.value is None and not self.compare_none:
-            return {}
-        return self.get_expression()
+        return self.get_expression() if self.value is not Empty else {}
 
     @abc.abstractmethod
     def get_expression(self) -> dict[str, Any]:
@@ -44,10 +79,10 @@ class Regex(ComparisonOperator):
     def __init__(
         self,
         field: str,
-        value: Optional[str] = None,
+        value: OptionalWrapped,
         options: str = "ms",
     ):
-        super().__init__(field=field, value=value, compare_none=False)
+        super().__init__(field=field, value=value)
         self.options = options
 
     def get_expression(self) -> dict[str, Any]:
