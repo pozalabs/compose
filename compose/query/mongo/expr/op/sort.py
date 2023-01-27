@@ -1,5 +1,3 @@
-from typing import Any
-
 from ..base import Expression
 
 
@@ -8,5 +6,5 @@ class SortBy(Expression):
         self.field = field
         self.direction = direction
 
-    def expression(self) -> dict[str, Any]:
+    def expression(self) -> dict[str, int]:
         return {self.field: self.direction}
