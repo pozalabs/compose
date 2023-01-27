@@ -11,7 +11,7 @@ class ComparisonOperator(Expression):
         self.compare_none = compare_none
 
     def expression(self) -> dict[str, Any]:
-        if self.value is None and self.compare_none:
+        if self.value is None and not self.compare_none:
             return {}
         return self.get_expression()
 
