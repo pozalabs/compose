@@ -36,8 +36,8 @@ Gt = create_operator(name="Gt", mongo_operator="$gt")
 Gte = create_operator(name="Gte", mongo_operator="$gte")
 Lt = create_operator(name="Lt", mongo_operator="$lt")
 Lte = create_operator(name="Lte", mongo_operator="$lte")
-In = create_operator("In", mongo_operator="$in")
-Nin = create_operator("Nin", mongo_operator="$nin")
+In = create_operator(name="In", mongo_operator="$in")
+Nin = create_operator(name="Nin", mongo_operator="$nin")
 
 
 class Regex(ComparisonOperator):
