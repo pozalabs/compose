@@ -1,10 +1,10 @@
 import abc
 from typing import Any, Optional
 
-from .base import Expression
+from ..base import Expression
 
 
-class Operator(Expression):
+class ComparisonOperator(Expression):
     def __init__(self, field: str, value: Optional[Any] = None, compare_none: bool = False):
         self.field = field
         self.value = value
@@ -20,7 +20,7 @@ class Operator(Expression):
         raise NotImplementedError
 
 
-class Equal(Operator):
+class Equal(ComparisonOperator):
     def __init__(self, field: str, value: Optional[Any] = None, compare_none: bool = False):
         super().__init__(field=field, value=value, compare_none=compare_none)
 
@@ -28,7 +28,7 @@ class Equal(Operator):
         return {self.field: self.value}
 
 
-class In(Operator):
+class In(ComparisonOperator):
     def __init__(self, field: str, value: Optional[list[Any]] = None):
         super().__init__(field=field, value=value, compare_none=False)
 
@@ -36,7 +36,7 @@ class In(Operator):
         return {self.field: {"$in": self.value}}
 
 
-class Regex(Operator):
+class Regex(ComparisonOperator):
     def __init__(
         self,
         field: str,
@@ -50,7 +50,7 @@ class Regex(Operator):
         return {self.field: {"$regex": self.value, "$options": self.options}}
 
 
-class Gte(Operator):
+class Gte(ComparisonOperator):
     def __init__(self, field: str, value: Optional[int] = None):
         super().__init__(field=field, value=value, compare_none=False)
 
@@ -58,7 +58,7 @@ class Gte(Operator):
         return {self.field: {"$gte": self.value}}
 
 
-class Lt(Operator):
+class Lt(ComparisonOperator):
     def __init__(self, field: str, value: Optional[int] = None):
         super().__init__(field=field, value=value, compare_none=False)
 
