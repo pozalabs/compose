@@ -20,7 +20,6 @@ class CustomExpression(Expression):
     [
         (operator.and_, [CustomExpression(field="field", value="value")], {"field": "value"}),
         (operator.and_, [Empty.dict(), CustomExpression(field="field", value="value")], {}),
-        # (operator.or_, [Empty.dict(), CustomExpression(field="field", value="value")], {}),
     ],
     ids=(
         "단일 표현식은 해당 표현식을 그대로 리턴",
