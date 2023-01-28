@@ -28,7 +28,7 @@ class Empty(Expression, Generic[T]):
     def expression(self) -> T:
         result = self.expression_factory()
         if result is None:
-            raise ValueError("None is not allows")
+            raise ValueError("None is not allowed")
         if result:
             raise ValueError("expression is not empty")
         return result
