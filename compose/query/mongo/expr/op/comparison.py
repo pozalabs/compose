@@ -1,67 +1,28 @@
 from __future__ import annotations
 
 import abc
-from typing import Any, Optional, Type, TypeVar, Union, cast
+from typing import Any, Optional, Type, cast
 
 from ..base import Expression
 
 
-class EmptyType:
-    def __repr__(self) -> str:
-        return "EmptyType"
-
-    def __copy__(self) -> EmptyType:
-        return self
-
-    def __reduce__(self) -> str:
-        return "EmptyType"
-
-    def __deepcopy__(self, _: Any) -> EmptyType:
-        return self
-
-
-Empty = EmptyType()
-
-
-class Value:
-    def __init__(self, value: Optional[Any] = None):
+class ComparisonOperator(Expression):
+    def __init__(self, field: str, value: Optional[Any] = None):
+        self.field = field
         self.value = value
 
-    def unwrap(self) -> Any:
-        return self.value
-
-
-class OptionalValue(Value):
-    def __init__(self, value: Optional[Any] = None):
-        super().__init__(value=value)
-
-    def unwrap(self) -> Union[Empty, Any]:
-        return self.value if self.value is not None else Empty
-
-
-ValueType = TypeVar("ValueType", bound=Value)
-
-
-class ComparisonOperator(Expression):
-    def __init__(self, field: str, value: ValueType):
-        self.field = field
-        self.value = value.unwrap()
-
-    def expression(self) -> dict[str, Any]:
-        return self.get_expression() if self.value is not Empty else {}
-
     @abc.abstractmethod
-    def get_expression(self) -> dict[str, Any]:
+    def expression(self) -> dict[str, Any]:
         raise NotImplementedError
 
 
 def create_operator(name: str, mongo_operator: str) -> Type[ComparisonOperator]:
-    def get_expression(self) -> dict[str, Any]:
+    def expression(self) -> dict[str, Any]:
         return {self.field: {mongo_operator: self.value}}
 
     return cast(
         Type[ComparisonOperator],
-        type(name, (ComparisonOperator,), {"get_expression": get_expression}),
+        type(name, (ComparisonOperator,), {"expression": expression}),
     )
 
 
@@ -79,11 +40,11 @@ class Regex(ComparisonOperator):
     def __init__(
         self,
         field: str,
-        value: OptionalValue,
+        value: Optional[Any] = None,
         options: str = "ms",
     ):
         super().__init__(field=field, value=value)
         self.options = options
 
-    def get_expression(self) -> dict[str, Any]:
+    def expression(self) -> dict[str, Any]:
         return {self.field: {"$regex": self.value, "$options": self.options}}
