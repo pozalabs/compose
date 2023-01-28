@@ -23,7 +23,7 @@ class EmptyType:
 Empty = EmptyType()
 
 
-class Wrapped:
+class Value:
     def __init__(self, value: Optional[Any] = None):
         self.value = value
 
@@ -31,7 +31,7 @@ class Wrapped:
         return self.value
 
 
-class OptionalWrapped(Wrapped):
+class OptionalValue(Value):
     def __init__(self, value: Optional[Any] = None):
         super().__init__(value=value)
 
@@ -39,11 +39,11 @@ class OptionalWrapped(Wrapped):
         return self.value if self.value is not None else Empty
 
 
-WrappedType = TypeVar("WrappedType", bound=Wrapped)
+ValueType = TypeVar("ValueType", bound=Value)
 
 
 class ComparisonOperator(Expression):
-    def __init__(self, field: str, value: WrappedType):
+    def __init__(self, field: str, value: ValueType):
         self.field = field
         self.value = value.unwrap()
 
@@ -79,7 +79,7 @@ class Regex(ComparisonOperator):
     def __init__(
         self,
         field: str,
-        value: OptionalWrapped,
+        value: OptionalValue,
         options: str = "ms",
     ):
         super().__init__(field=field, value=value)
