@@ -15,8 +15,8 @@ class Expr(Expression):
 
 
 class AEqual(ComparisonOperator):
-    def __init__(self, field: str, value: Optional[Any] = None, compare_none: bool = False):
-        super().__init__(field=field, value=value, compare_none=compare_none)
+    def __init__(self, field: str, value: Optional[Any] = None):
+        super().__init__(field=field, value=value)
 
-    def get_expression(self) -> dict[str, Any]:
+    def expression(self) -> dict[str, Any]:
         return {"$eq": [self.field, self.value]}
