@@ -35,6 +35,12 @@ class Empty(Expression, Generic[T]):
     def dict(cls) -> Empty[dict[str, Any]]:
         return cls(dict)
 
+    def __and__(self, other: Expression) -> Expression:
+        return self
+
+    def __or__(self, other: Expression) -> Expression:
+        return other
+
 
 class Composed(Expression):
     def __init__(
