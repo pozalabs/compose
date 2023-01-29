@@ -16,6 +16,14 @@ class ComparisonOperator(Expression):
         raise NotImplementedError
 
 
+class EmptyOnNull(Expression):
+    def __init__(self, op: ComparisonOperator):
+        self.op = op
+
+    def expression(self) -> dict[str, Any]:
+        return self.op.expression() if self.op.value is not None else {}
+
+
 def create_operator(name: str, mongo_operator: str) -> Type[ComparisonOperator]:
     def expression(self) -> dict[str, Any]:
         return {self.field: {mongo_operator: self.value}}
