@@ -25,6 +25,6 @@ class TestOp(ComparisonOperator):
     ),
 )
 def test_empty_on_null(op: ComparisonOperator, expected: dict[str, Any]):
-    expression = EmptyOnNull(op)
+    expression = EmptyOnNull(op).expression()
 
-    assert expression.expression() == expected
+    assert expression == expected
