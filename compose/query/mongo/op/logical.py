@@ -3,11 +3,11 @@ from __future__ import annotations
 import abc
 from typing import Any, cast
 
-from .base import Expression
+from .base import Operator
 from .comparison import ComparisonOperator
 
 
-class LogicalOperator(Expression):
+class LogicalOperator(Operator):
     def __init__(self, *ops: ComparisonOperator):
         self.ops = list(ops)
 

@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
-from .base import Expression
+from .base import Operator
 from .comparison import ComparisonOperator
 
 
-class Expr(Expression):
-    def __init__(self, op: Expression):
+class Expr(Operator):
+    def __init__(self, op: Operator):
         self.op = op
 
     def expression(self) -> dict[str, Any]:
