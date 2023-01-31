@@ -25,4 +25,4 @@ def create_operator(name: str, mongo_operator: str) -> type[LogicalOperator]:
 
 
 And = create_operator(name="And", mongo_operator="$and")
-Or = create_operator(name="or", mongo_operator="$or")
+Or = create_operator(name="Or", mongo_operator="$or")
