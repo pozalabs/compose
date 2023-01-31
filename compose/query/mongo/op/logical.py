@@ -19,7 +19,7 @@ class LogicalOperator(Operator):
 def create_operator(name: str, mongo_operator: str) -> type[LogicalOperator]:
     def expression(self) -> dict[str, list[dict[str, Any]]]:
         expressions = [expr for op in self.ops if (expr := op.expression())]
-        return expressions and {mongo_operator: expressions}
+        return {mongo_operator: expressions} if expressions else {}
 
     return cast(type[LogicalOperator], type(name, (LogicalOperator,), {"expression": expression}))
 
