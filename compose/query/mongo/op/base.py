@@ -4,7 +4,7 @@ import abc
 from typing import Any
 
 
-class Expression:
+class Operator:
     @abc.abstractmethod
     def expression(self) -> Any:
         raise NotImplementedError

@@ -1,7 +1,7 @@
-from ..base import Expression
+from .base import Operator
 
 
-class SortBy(Expression):
+class SortBy(Operator):
     def __init__(self, field: str, direction: int):
         self.field = field
         self.direction = direction

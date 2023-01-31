@@ -3,10 +3,10 @@ from __future__ import annotations
 import abc
 from typing import Any, Optional, Type, cast
 
-from ..base import Expression
+from .base import Operator
 
 
-class ComparisonOperator(Expression):
+class ComparisonOperator(Operator):
     def __init__(self, field: str, value: Optional[Any] = None):
         self.field = field
         self.value = value
@@ -16,7 +16,7 @@ class ComparisonOperator(Expression):
         raise NotImplementedError
 
 
-class EmptyOnNull(Expression):
+class EmptyOnNull(Operator):
     def __init__(self, op: ComparisonOperator):
         self.op = op
 
