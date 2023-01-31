@@ -2,7 +2,7 @@ from typing import Any, Optional
 
 import pytest
 
-from compose.query.mongo.expr.op import ComparisonOperator, EmptyOnNull
+from compose.query.mongo.op import ComparisonOperator, EmptyOnNull
 
 
 class TestOp(ComparisonOperator):

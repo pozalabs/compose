@@ -1,4 +1,4 @@
-from ..base import Expression
+from .base import Expression
 
 
 class SortBy(Expression):

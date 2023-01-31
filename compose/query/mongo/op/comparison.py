@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 from typing import Any, Optional, Type, cast
 
-from ..base import Expression
+from .base import Expression
 
 
 class ComparisonOperator(Expression):
