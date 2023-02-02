@@ -11,6 +11,7 @@ python = ">=3.9,<3.11"
 pydantic = "^1.10.2"
 pendulum = "^2.1.2"
 pymongo = {extras = ["aws"], version = "^4.3.3"}
+inflection = "^0.5.1"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.20.0"

@@ -3,7 +3,9 @@ from __future__ import annotations
 import abc
 import functools
 import operator
-from typing import Any, ClassVar, Union
+from typing import Any, ClassVar, Optional, Union
+
+import inflection
 
 from .base import Operator
 from .comparison import ComparisonOperator
@@ -94,3 +96,23 @@ class SubQueryLookup(BaseLookup):
         super().__init__(from_=from_, as_=as_)
         self.let = let
         self.pipeline = pipeline
+
+
+class Unwind(Stage):
+    def __init__(
+        self,
+        path: str,
+        include_array_index: Optional[str] = None,
+        preserve_null_and_empty_arrays: Optional[bool] = None,
+    ):
+        self.path = path
+        self.include_array_index = include_array_index
+        self.preserve_null_and_empty_arrays = preserve_null_and_empty_arrays
+
+    def expression(self) -> DictExpression:
+        return {
+            "$unwind": {
+                inflection.camelize(field, uppercase_first_letter=False): value
+                for field, value in self.__dict__.items()
+            }
+        }
