@@ -64,7 +64,7 @@ class Project(Stage):
         return {"$project": merged}
 
 
-class BaseLookup(Stage):
+class Lookup(Stage):
     alias: ClassVar[dict[str, str]] = {
         "from_": "from",
         "as_": "as",
@@ -84,14 +84,14 @@ class BaseLookup(Stage):
         }
 
 
-class MatchLookup(BaseLookup):
+class MatchLookup(Lookup):
     def __init__(self, from_: str, as_: str, local_field: str, foreign_field: str):
         super().__init__(from_=from_, as_=as_)
         self.local_field = local_field
         self.foreign_field = foreign_field
 
 
-class SubQueryLookup(BaseLookup):
+class SubQueryLookup(Lookup):
     def __init__(self, from_: str, as_: str, let: str, pipeline: ListExpression):
         super().__init__(from_=from_, as_=as_)
         self.let = let
