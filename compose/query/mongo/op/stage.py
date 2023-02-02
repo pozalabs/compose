@@ -3,6 +3,7 @@ from __future__ import annotations
 import abc
 import functools
 import operator
+from typing import Any, Union
 
 from .base import Operator
 from .comparison import ComparisonOperator
@@ -41,3 +42,21 @@ class Sort(Stage):
         if not merged:
             raise ValueError("Expression cannot be empty")
         return {"$sort": merged}
+
+
+class Specification(Operator):
+    def __init__(self, field: str, spec: Union[int, bool, str, dict[str, Any]] = 1):
+        self.field = field
+        self.spec = spec
+
+    def expression(self) -> DictExpression:
+        return {self.field: self.spec}
+
+
+class Project(Stage):
+    def __init__(self, *specs: Specification):
+        self.specs = list(specs)
+
+    def expression(self) -> DictExpression:
+        merged = functools.reduce(operator.or_, [spec.expression() for spec in self.specs])
+        return {"$project": merged}
