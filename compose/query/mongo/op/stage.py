@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import abc
-import functools
-import operator
 from typing import Any, Optional, Union
 
-from .base import Operator
+from .base import Merge, Operator
 from .comparison import ComparisonOperator
 from .logical import And, LogicalOperator, Or
 from .types import DictExpression, ListExpression, MongoKeyword
@@ -38,8 +36,7 @@ class Sort(Stage):
         self.ops = list(ops)
 
     def expression(self) -> DictExpression:
-        merged = functools.reduce(operator.or_, [op.expression() for op in self.ops])
-        if not merged:
+        if not (merged := Merge.dict(*self.ops).expression()):
             raise ValueError("Expression cannot be empty")
         return {"$sort": merged}
 
@@ -58,8 +55,7 @@ class Project(Stage):
         self.specs = list(specs)
 
     def expression(self) -> DictExpression:
-        merged = functools.reduce(operator.or_, [spec.expression() for spec in self.specs])
-        return {"$project": merged}
+        return {"$project": Merge.dict(*self.specs).expression()}
 
 
 class Lookup(Stage):
@@ -105,5 +101,4 @@ class Set(Stage):
         self.specs = list(specs)
 
     def expression(self) -> DictExpression:
-        merged = functools.reduce(operator.or_, [spec.expression() for spec in self.specs])
-        return {"$set": merged}
+        return {"$set": Merge.dict(*self.specs).expression()}
