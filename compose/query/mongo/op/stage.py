@@ -116,3 +116,12 @@ class Unwind(Stage):
                 for field, value in self.__dict__.items()
             }
         }
+
+
+class Set(Stage):
+    def __init__(self, *specs: Specification):
+        self.specs = list(specs)
+
+    def expression(self) -> DictExpression:
+        merged = functools.reduce(operator.or_, [spec.expression() for spec in self.specs])
+        return {"$set": merged}
