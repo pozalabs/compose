@@ -3,14 +3,12 @@ from __future__ import annotations
 import abc
 import functools
 import operator
-from typing import Any, ClassVar, Optional, Union
-
-import inflection
+from typing import Any, Optional, Union
 
 from .base import Operator
 from .comparison import ComparisonOperator
 from .logical import And, LogicalOperator, Or
-from .types import DictExpression, ListExpression
+from .types import DictExpression, ListExpression, MongoKeyword
 
 
 class Stage(Operator):
@@ -65,23 +63,12 @@ class Project(Stage):
 
 
 class Lookup(Stage):
-    alias: ClassVar[dict[str, str]] = {
-        "from_": "from",
-        "as_": "as",
-        "foreign_field": "foreignField",
-        "local_field": "localField",
-    }
-
     def __init__(self, from_: str, as_: str):
         self.from_ = from_
         self.as_ = as_
 
     def expression(self) -> DictExpression:
-        return {
-            "$lookup": {
-                self.alias.get(field, field): value for field, value in self.__dict__.items()
-            }
-        }
+        return {"$lookup": {MongoKeyword(field): value for field, value in self.__dict__.items()}}
 
 
 class MatchLookup(Lookup):
@@ -110,12 +97,7 @@ class Unwind(Stage):
         self.preserve_null_and_empty_arrays = preserve_null_and_empty_arrays
 
     def expression(self) -> DictExpression:
-        return {
-            "$unwind": {
-                inflection.camelize(field, uppercase_first_letter=False): value
-                for field, value in self.__dict__.items()
-            }
-        }
+        return {"$unwind": {MongoKeyword(field): value for field, value in self.__dict__.items()}}
 
 
 class Set(Stage):
