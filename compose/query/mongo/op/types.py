@@ -9,6 +9,16 @@ ListExpression = list[DictExpression]
 
 
 class MongoKeyword(str):
+    def __new__(cls, v: str):
+        if v != _camelize(v):
+            raise ValueError(f"Cannot interpret {v} as valid mongo keyword")
+
+        return super().__new__(cls, v)
+
     @classmethod
     def from_py(cls, v: str) -> MongoKeyword:
-        return cls(inflection.camelize(v.strip("_"), uppercase_first_letter=False))
+        return cls(_camelize(v))
+
+
+def _camelize(v: str) -> str:
+    return inflection.camelize(v.strip("_"), uppercase_first_letter=False)
