@@ -64,7 +64,11 @@ class Lookup(Stage):
         self.as_ = as_
 
     def expression(self) -> DictExpression:
-        return {"$lookup": {MongoKeyword(field): value for field, value in self.__dict__.items()}}
+        return {
+            "$lookup": {
+                MongoKeyword.from_py(field): value for field, value in self.__dict__.items()
+            }
+        }
 
 
 class MatchLookup(Lookup):
@@ -93,7 +97,11 @@ class Unwind(Stage):
         self.preserve_null_and_empty_arrays = preserve_null_and_empty_arrays
 
     def expression(self) -> DictExpression:
-        return {"$unwind": {MongoKeyword(field): value for field, value in self.__dict__.items()}}
+        return {
+            "$unwind": {
+                MongoKeyword.from_py(field): value for field, value in self.__dict__.items()
+            }
+        }
 
 
 class Set(Stage):
