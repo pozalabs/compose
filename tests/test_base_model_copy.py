@@ -20,17 +20,13 @@ def model() -> BaseModel:
 
 @pytest.fixture
 def child() -> BaseModel:
-    return Child(name="name", age=10)
+    return Child(name="name")
 
 
 @pytest.mark.parametrize(
     "update, expected",
-    [
-        (
-            dict(name="name", age=20),
-            Child(name="name", age=20),
-        )
-    ],
+    [(dict(name="name", age=20), Child(name="name", age=20))],
+    ids=("명시적으로 초기화하지 않은 필드가 있어도 필드 값 변경 가능",),
 )
 def test_copy_model_with_defaults(child: Child, update: dict[str, Any], expected: Child):
     assert child.copy(update=update) == expected
