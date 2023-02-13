@@ -4,7 +4,6 @@ import abc
 from typing import Any, Optional, Union
 
 from .base import Merge, Operator
-from .comparison import ComparisonOperator
 from .logical import And, LogicalOperator, Or
 from .types import DictExpression, ListExpression, MongoKeyword
 
@@ -23,11 +22,11 @@ class Match(Stage):
         return (expression := self.op.expression()) and {"$match": expression}
 
     @classmethod
-    def and_(cls, *ops: ComparisonOperator) -> Match:
+    def and_(cls, *ops: Operator) -> Match:
         return cls(And(*ops))
 
     @classmethod
-    def or_(cls, *ops: ComparisonOperator) -> Match:
+    def or_(cls, *ops: Operator) -> Match:
         return cls(Or(*ops))
 
 

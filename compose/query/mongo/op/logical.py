@@ -4,11 +4,10 @@ import abc
 from typing import Any, cast
 
 from .base import Operator
-from .comparison import ComparisonOperator
 
 
 class LogicalOperator(Operator):
-    def __init__(self, *ops: ComparisonOperator):
+    def __init__(self, *ops: Operator):
         self.ops = list(ops)
 
     @abc.abstractmethod
