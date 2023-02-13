@@ -18,7 +18,7 @@ class BaseModel(PydanticBaseModel):
         deep: bool = False,
         strict: bool = True,
     ) -> BaseModel:
-        if strict and (diff := set((update or {}).keys()) - self.__fields_set__):
+        if strict and (diff := set((update or {}).keys()) - set(self.__fields__.keys())):
             raise AttributeError(f"{self.__class__.__name__} has no attributes: {', '.join(diff)}")
 
         return super().copy(
