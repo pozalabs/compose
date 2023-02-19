@@ -7,13 +7,13 @@ runs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: ${{ inputs.python-version }}
 
     - name: Load cached poetry installation
       uses: actions/cache@v3
       with:
         path: ~/.local
-        key: poetry-39
+        key: poetry-${{ inputs.python-version }}
 
     - name: Install Poetry
       uses: snok/install-poetry@v1
@@ -27,7 +27,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: .venv
-        key: venv-${{ runner.os }}-39-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        key: venv-${{ inputs.python-version }}-${{ runner.os }}-39-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
