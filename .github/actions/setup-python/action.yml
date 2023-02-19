@@ -27,7 +27,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: .venv
-        key: venv-${{ inputs.python-version }}-${{ runner.os }}-39-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
