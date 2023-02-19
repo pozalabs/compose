@@ -1,7 +1,7 @@
 from typing import Optional
 
 from .base import Operator
-from .types import DictExpression
+from .types import DictExpression, ListExpression
 
 
 class Pagination(Operator):
@@ -21,13 +21,18 @@ class Pagination(Operator):
         self.can_paginate = self.page is not None and self.per_page is not None
 
     def expression(self) -> DictExpression:
-        pagination_stages = [
-            {"$skip": (self.page - 1) * self.per_page},
-            {"$limit": self.per_page},
-        ]
         return {
             "$facet": {
                 "metadata": [{"$count": "total"}, *[op.expression() for op in self.metadata_ops]],
-                "items": pagination_stages if self.can_paginate else [],
+                "items": self._pagination_expression(),
             }
         }
+
+    def _pagination_expression(self) -> ListExpression:
+        if not self.can_paginate:
+            return []
+
+        return [
+            {"$skip": (self.page - 1) * self.per_page},
+            {"$limit": self.per_page},
+        ]
