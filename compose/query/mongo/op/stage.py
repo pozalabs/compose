@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from .base import Merge, Operator
 from .logical import And, LogicalOperator, Or
@@ -41,7 +41,7 @@ class Sort(Stage):
 
 
 class Specification(Operator):
-    def __init__(self, field: str, spec: Union[int, bool, str, dict[str, Any]] = 1):
+    def __init__(self, field: str, spec: Any):
         self.field = field
         self.spec = spec
 
