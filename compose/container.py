@@ -1,20 +1,23 @@
 from __future__ import annotations
 
-from typing import Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 import bson
 from pydantic import BaseModel as PydanticBaseModel
 
 from . import field, types
 
+if TYPE_CHECKING:
+    from pydantic.typing import AbstractSetIntStr, DictStrAny, MappingIntStrAny
+
 
 class BaseModel(PydanticBaseModel):
     def copy(
         self,
         *,
-        include: Optional[Union[set[str], dict[str, Any]]] = None,
-        exclude: Optional[Union[set[str], dict[str, Any]]] = None,
-        update: Optional[dict[str, Any]] = None,
+        include: Optional[Union[AbstractSetIntStr, MappingIntStrAny]] = None,
+        exclude: Optional[Union[AbstractSetIntStr, MappingIntStrAny]] = None,
+        update: Optional[DictStrAny] = None,
         deep: bool = False,
         strict: bool = True,
     ) -> BaseModel:
