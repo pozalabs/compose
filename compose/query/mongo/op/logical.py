@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import abc
-from typing import Any, cast
+from collections.abc import Callable
 
+from . import utils
 from .base import Operator
+from .types import ListExpression
 
 
 class LogicalOperator(Operator):
@@ -11,17 +13,25 @@ class LogicalOperator(Operator):
         self.ops = list(ops)
 
     @abc.abstractmethod
-    def expression(self) -> dict[str, list[dict[str, Any]]]:
+    def expression(self) -> dict[str, ListExpression]:
         raise NotImplementedError
 
 
-def create_operator(name: str, mongo_operator: str) -> type[LogicalOperator]:
-    def expression(self) -> dict[str, list[dict[str, Any]]]:
+def _expression_factory(
+    mongo_operator: str,
+) -> Callable[[LogicalOperator], dict[str, ListExpression]]:
+    def expression(self: LogicalOperator) -> dict[str, ListExpression]:
         expressions = [expr for op in self.ops if (expr := op.expression())]
         return {mongo_operator: expressions} if expressions else {}
 
-    return cast(type[LogicalOperator], type(name, (LogicalOperator,), {"expression": expression}))
+    return expression
 
 
-And = create_operator(name="And", mongo_operator="$and")
-Or = create_operator(name="Or", mongo_operator="$or")
+def create_logical_operator(name: str, mongo_operator: str) -> type[LogicalOperator]:
+    return utils.create_operator(
+        name=name, base=(LogicalOperator,), expression_factory=_expression_factory(mongo_operator)
+    )
+
+
+And = create_logical_operator(name="And", mongo_operator="$and")
+Or = create_logical_operator(name="Or", mongo_operator="$or")
