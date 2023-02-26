@@ -33,6 +33,6 @@ class Pagination(Operator):
             return []
 
         return [
-            {"$skip": (self.page - 1) * self.per_page},
+            {"$skip": (self.page - 1) * self.per_page},  # type: ignore
             {"$limit": self.per_page},
         ]
