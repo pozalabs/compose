@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from pydantic import conint
+from pydantic import Field
 
 from .. import base
 
@@ -11,8 +11,8 @@ class MongoQuery(base.Query):
 
 
 class MongoFilterQuery(MongoQuery):
-    page: Optional[conint(ge=1)] = None
-    per_page: Optional[conint(ge=1)] = None
+    page: Optional[int] = Field(None, ge=1)
+    per_page: Optional[int] = Field(None, ge=1)
 
     @property
     def can_paginate(self) -> bool:
