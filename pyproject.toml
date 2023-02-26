@@ -54,6 +54,7 @@ line_length = 100
 python_version = "3.9"
 strict_optional = true
 plugins = ["pydantic.mypy"]
+exclude = 'tests/'
 
 [tool.pytest.ini_options]
 disable_test_id_escaping_and_forfeit_all_rights_to_community_support = true
