@@ -43,7 +43,7 @@ def create_comparison_operator(name: str, mongo_operator: str) -> type[Compariso
 
 
 Eq = create_comparison_operator(name="Eq", mongo_operator="$eq")
-Ne = create_comparison_operator(name="Eq", mongo_operator="$ne")
+Ne = create_comparison_operator(name="Ne", mongo_operator="$ne")
 Gt = create_comparison_operator(name="Gt", mongo_operator="$gt")
 Gte = create_comparison_operator(name="Gte", mongo_operator="$gte")
 Lt = create_comparison_operator(name="Lt", mongo_operator="$lt")
