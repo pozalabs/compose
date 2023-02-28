@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import abc
-from typing import Any, Optional, Type, cast
+from collections.abc import Callable
+from typing import Any, Optional
 
+from . import utils
 from .base import Operator
+from .types import DictExpression
 
 
 class ComparisonOperator(Operator):
@@ -24,24 +27,29 @@ class EmptyOnNull(Operator):
         return self.op.expression() if self.op.value is not None else {}
 
 
-def create_operator(name: str, mongo_operator: str) -> Type[ComparisonOperator]:
-    def expression(self) -> dict[str, Any]:
+def _expression_factory(mongo_operator: str) -> Callable[[ComparisonOperator], DictExpression]:
+    def expression(self: ComparisonOperator) -> DictExpression:
         return {self.field: {mongo_operator: self.value}}
 
-    return cast(
-        Type[ComparisonOperator],
-        type(name, (ComparisonOperator,), {"expression": expression}),
+    return expression
+
+
+def create_comparison_operator(name: str, mongo_operator: str) -> type[ComparisonOperator]:
+    return utils.create_operator(
+        name=name,
+        base=(ComparisonOperator,),
+        expression_factory=_expression_factory(mongo_operator),
     )
 
 
-Eq = create_operator(name="Eq", mongo_operator="$eq")
-Ne = create_operator(name="Ne", mongo_operator="$ne")
-Gt = create_operator(name="Gt", mongo_operator="$gt")
-Gte = create_operator(name="Gte", mongo_operator="$gte")
-Lt = create_operator(name="Lt", mongo_operator="$lt")
-Lte = create_operator(name="Lte", mongo_operator="$lte")
-In = create_operator(name="In", mongo_operator="$in")
-Nin = create_operator(name="Nin", mongo_operator="$nin")
+Eq = create_comparison_operator(name="Eq", mongo_operator="$eq")
+Ne = create_comparison_operator(name="Ne", mongo_operator="$ne")
+Gt = create_comparison_operator(name="Gt", mongo_operator="$gt")
+Gte = create_comparison_operator(name="Gte", mongo_operator="$gte")
+Lt = create_comparison_operator(name="Lt", mongo_operator="$lt")
+Lte = create_comparison_operator(name="Lte", mongo_operator="$lte")
+In = create_comparison_operator(name="In", mongo_operator="$in")
+Nin = create_comparison_operator(name="Nin", mongo_operator="$nin")
 
 
 class Regex(ComparisonOperator):

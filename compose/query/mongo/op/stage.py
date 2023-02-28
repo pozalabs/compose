@@ -19,7 +19,9 @@ class Match(Stage):
         self.op = op
 
     def expression(self) -> DictExpression:
-        return (expression := self.op.expression()) and {"$match": expression}
+        if not (expression := self.op.expression()):
+            return {}
+        return {"$match": expression}
 
     @classmethod
     def and_(cls, *ops: Operator) -> Match:

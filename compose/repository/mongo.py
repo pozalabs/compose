@@ -35,7 +35,7 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
 
     def find_by(self, filter_: dict[str, Any], **kwargs) -> Optional[EntityType]:
         """https://stackoverflow.com/a/73746554/9331155"""
-        entity_type: EntityType = get_args(self.__class__.__orig_bases__[0])[0]
+        entity_type: EntityType = get_args(self.__class__.__orig_bases__[0])[0]  # type: ignore
         result = self.collection.find_one(filter=filter_, **kwargs)
         return result and entity_type.parse_obj(result)
 
@@ -71,11 +71,13 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         return op(**operation_kwargs)
 
     def filter(self, qry: MongoFilterQuery) -> Pagination:
-        result = self.collection.aggregate(qry.to_query())
-        result = next(result, None)
+        query_result = self.collection.aggregate(qry.to_query())
+        if (unwrapped := next(query_result, None)) is None:
+            raise ValueError(f"{qry.__class__.__name__} returned nothing")
+
         return Pagination(
-            total=(result["metadata"][0]["total"] if result["metadata"] else 0),
-            items=result["items"],
+            total=(unwrapped["metadata"][0]["total"] if unwrapped["metadata"] else 0),
+            items=unwrapped["items"],
             page=qry.page,
             per_page=qry.per_page,
         )

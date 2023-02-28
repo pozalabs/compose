@@ -1,19 +1,21 @@
-from typing import Callable, Optional
+from collections.abc import Callable
+from typing import Any, Optional
 
 import pendulum
 from pydantic import Field
-from pydantic.fields import FieldInfo
+
+from . import types
 
 
 class _IdField:
-    def __call__(self, alias: Optional[str] = None, **kwargs) -> FieldInfo:
-        return Field(alias=alias or "_id", **kwargs)
+    def __call__(self, alias: Optional[str] = None, **kwargs) -> Any:
+        return Field(alias=alias or "_id", **kwargs)  # type: ignore
 
 
 class _DatetimeField:
-    def __call__(self, **kwargs) -> FieldInfo:
-        return Field(default_factory=pendulum.DateTime.utcnow, **kwargs)
+    def __call__(self, **kwargs) -> types.DateTime:
+        return Field(default_factory=pendulum.DateTime.utcnow, **kwargs)  # type: ignore
 
 
-IdField: Callable[..., FieldInfo] = _IdField()
-DateTimeField: Callable[..., FieldInfo] = _DatetimeField()
+IdField: Callable[..., Any] = _IdField()
+DateTimeField: Callable[..., types.DateTime] = _DatetimeField()
