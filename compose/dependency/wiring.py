@@ -20,6 +20,19 @@ def create_wirer(packages: Iterable[str]) -> Callable[..., None]:
 def resolve_dependency(
     type_: type[Any], container_cls: type[containers.Container]
 ) -> providers.Factory:
+    """
+    의존성 전체 등록 경로를 참조하지 않고 의존성을 해결합니다. 다른 패키지의 의존성을 참조하는 경우
+    의존 대상 선언 경로에 깊게 의존하는 것을 방지합니다. `container_cls`는 최상위 컨테이너일수도,
+    의존성이 등록된 컨테이너일수도 있습니다. 클래스 대상으로만 작동합니다.
+
+    >>> @inject
+    >>> def some_func(injected: Injected = Provide[resolve_dependency(Injected, Container)]):
+    >>>     injected.method()
+
+    :param type_: 의존성 해결 대상
+    :param container_cls: 의존성을 등록한 컨테이너 타입
+    :return: 의존성을 주입할 수 있는 `providers.Factory`
+    """
     if not inspect.isclass(type_):
         raise ValueError("Only class can be resolved")
 
