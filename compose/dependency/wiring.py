@@ -1,11 +1,8 @@
 import inspect
 from collections.abc import Callable
-from typing import Iterable, Optional, TypeVar
+from typing import Any, Iterable, Optional
 
 from dependency_injector import containers, providers
-from dependency_injector.wiring import Provide
-
-T = TypeVar("T")
 
 
 def create_wirer(packages: Iterable[str]) -> Callable[..., None]:
@@ -20,9 +17,11 @@ def create_wirer(packages: Iterable[str]) -> Callable[..., None]:
     return wire_container
 
 
-def provide(container_cls: type[containers.Container], t: type[T]) -> Provide[providers.Factory]:
-    if not inspect.isclass(t):
-        raise ValueError("`t` must be class")
+def resolve_dependency(
+    type_: type[Any], container_cls: type[containers.Container]
+) -> providers.Factory:
+    if not inspect.isclass(type_):
+        raise ValueError("Only class can be resolved")
 
     for provider in container_cls.traverse([providers.Factory]):
         provider_cls = provider.cls
@@ -30,7 +29,7 @@ def provide(container_cls: type[containers.Container], t: type[T]) -> Provide[pr
             continue
 
         cls = provider_cls.__self__ if inspect.ismethod(provider_cls) else provider_cls
-        if cls.__name__ == t.__name__:  # type: ignore
-            return Provide[provider]
+        if cls.__name__ == type_.__name__:  # type: ignore
+            return provider
 
-    raise ValueError(f"Cannot find {t.__name__} from given container")
+    raise ValueError(f"Cannot find {type_.__name__} from given container")
