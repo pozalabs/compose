@@ -1,5 +1,6 @@
 import inspect
-from typing import Any, Iterable, Optional, Protocol
+from collections.abc import Iterable
+from typing import Any, Optional, Protocol
 
 from dependency_injector import containers, providers
 
