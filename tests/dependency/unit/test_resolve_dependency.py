@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 import pytest
@@ -10,12 +12,19 @@ class Repository:
     ...
 
 
+class RepositoryWithFactoryMethod:
+    @classmethod
+    def create(cls) -> RepositoryWithFactoryMethod:
+        return cls()
+
+
 class NestedRepository:
     ...
 
 
 class NestedContainer(containers.DeclarativeContainer):
     repository = providers.Factory(NestedRepository)
+    repository_with_factory_method = providers.Factory(RepositoryWithFactoryMethod.create)
 
 
 class ApplicationContainer(containers.DeclarativeContainer):
@@ -30,11 +39,13 @@ class ApplicationContainer(containers.DeclarativeContainer):
         (Repository, ApplicationContainer, Repository),
         (NestedRepository, ApplicationContainer, NestedRepository),
         (NestedRepository, ApplicationContainer.nested, NestedRepository),
+        (RepositoryWithFactoryMethod, ApplicationContainer, RepositoryWithFactoryMethod),
     ],
     ids=(
         "최상위 컨테이너에서 최상위 의존성 해결",
         "최상위 컨테이너에서 중첩 의존성 해결",
         "중첩 컨테이너에서 해당 컨테이너에 선언된 의존성 해결",
+        "팩토리 메서드로 등록한 의존성 해결",
     ),
 )
 def test_resolve_dependency(
