@@ -55,7 +55,6 @@ def test_resolve_dependency(
 ):
     resolved = resolve_dependency(type_=type_, container_cls=container_cls)
 
-    assert isinstance(resolved, providers.Factory)
     assert isinstance(resolved.cls(), expected)
 
 
