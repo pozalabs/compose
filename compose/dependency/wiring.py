@@ -1,3 +1,4 @@
+import functools
 import inspect
 from collections.abc import Iterable
 from typing import Any, Optional, Protocol
@@ -27,6 +28,7 @@ def create_wirer(packages: Iterable[str]) -> Wirer:
     return wire_container
 
 
+@functools.lru_cache(1024)
 def resolve_dependency(
     type_: type[Any], container_cls: type[containers.Container]
 ) -> providers.Factory:
