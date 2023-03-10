@@ -1,3 +1,3 @@
-from .wiring import create_wirer
+from .wiring import create_wirer, provide
 
-__all__ = ["create_wirer"]
+__all__ = ["create_wirer", "provide"]
