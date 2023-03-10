@@ -1,13 +1,22 @@
 import inspect
-from collections.abc import Callable
-from typing import Any, Iterable, Optional
+from typing import Any, Iterable, Optional, Protocol
 
 from dependency_injector import containers, providers
 
 
-def create_wirer(packages: Iterable[str]) -> Callable[..., None]:
+class Wirer(Protocol):
+    def __call__(
+        self,
+        container: containers.Container,
+        modules: Optional[Iterable[str]] = None,
+        from_package: Optional[str] = None,
+    ) -> None:
+        ...
+
+
+def create_wirer(packages: Iterable[str]) -> Wirer:
     def wire_container(
-        container: containers.DeclarativeContainer,
+        container: containers.Container,
         modules: Optional[Iterable[str]] = None,
         from_package: Optional[str] = None,
     ) -> None:
