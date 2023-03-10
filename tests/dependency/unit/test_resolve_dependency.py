@@ -56,7 +56,7 @@ def test_resolve_dependency(
     ],
     ids=(
         "등록되지 않은 의존성은 해결할 수 없다",
-        "해당 컨테이너에 선언되지 않은 의존성은 해결할 수 없다",
+        "상위 컨테이너에 선언된 의존성은 해결할 수 없다",
     ),
 )
 def test_cannot_resolve_dependency(type_: type[Any], container_cls: type[containers.Container]):
