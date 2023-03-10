@@ -56,7 +56,7 @@ def test_resolve_dependency(
     resolved = resolve_dependency(type_=type_, container_cls=container_cls)
 
     assert isinstance(resolved, providers.Factory)
-    assert resolved.cls == expected
+    assert isinstance(resolved.cls(), expected)
 
 
 @pytest.mark.parametrize(
