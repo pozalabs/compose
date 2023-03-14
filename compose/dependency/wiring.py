@@ -28,7 +28,7 @@ def create_wirer(packages: Iterable[str]) -> Wirer:
     return wire_container
 
 
-@functools.lru_cache(1024)
+@functools.lru_cache(32)
 def resolve_dependency(
     type_: type[Any], container_cls: type[containers.Container]
 ) -> providers.Factory:
