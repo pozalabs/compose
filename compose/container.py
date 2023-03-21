@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Optional, Union
 
 import bson
@@ -29,6 +31,35 @@ class BaseModel(PydanticBaseModel):
             exclude=exclude,
             update=update,
             deep=deep,
+        )
+
+    def encode(
+        self,
+        *,
+        include: Optional[Union[AbstractSetIntStr, MappingIntStrAny]] = None,
+        exclude: Optional[Union[AbstractSetIntStr, MappingIntStrAny]] = None,
+        by_alias: bool = False,
+        skip_defaults: Optional[bool] = None,
+        exclude_unset: bool = False,
+        exclude_defaults: bool = False,
+        exclude_none: bool = False,
+        encoder: Optional[Callable[[Any], Any]] = None,
+        models_as_dict: bool = True,
+        **dumps_kwargs: Any,
+    ) -> dict[str, Any]:
+        return json.loads(
+            self.json(
+                include=include,
+                exclude=exclude,
+                by_alias=by_alias,
+                skip_defaults=skip_defaults,
+                exclude_unset=exclude_unset,
+                exclude_defaults=exclude_defaults,
+                exclude_none=exclude_none,
+                encoder=encoder,
+                models_as_dict=models_as_dict,
+                **dumps_kwargs,
+            )
         )
 
     class Config:
