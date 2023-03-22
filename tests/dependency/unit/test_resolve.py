@@ -53,7 +53,7 @@ def test_resolve_dependency(
     container_cls: type[containers.Container],
     expected: type[Any],
 ):
-    resolved = resolve_dependency(type_=type_, container_cls=container_cls)
+    resolved = resolve_dependency(type_=type_, container_cls=container_cls)  # type: ignore
 
     assert isinstance(resolved.cls(), expected)
 
@@ -71,4 +71,4 @@ def test_resolve_dependency(
 )
 def test_cannot_resolve_dependency(type_: type[Any], container_cls: type[containers.Container]):
     with pytest.raises(ValueError):
-        resolve_dependency(type_=type, container_cls=container_cls)
+        resolve_dependency(type_=type, container_cls=container_cls)  # type: ignore
