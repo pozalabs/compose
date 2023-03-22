@@ -71,4 +71,4 @@ def test_resolve(
 )
 def test_cannot_resolve(type_: type[Any], container_cls: type[containers.Container]):
     with pytest.raises(ValueError):
-        resolve(type_=type, container_cls=container_cls)  # type: ignore
+        resolve(type_=type_, container_cls=container_cls)  # type: ignore
