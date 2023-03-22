@@ -1,7 +1,7 @@
 import functools
 import inspect
-from collections.abc import Hashable, Iterable
-from typing import Optional, Protocol
+from collections.abc import Iterable
+from typing import Any, Optional, Protocol
 
 from dependency_injector import containers, providers
 
@@ -29,7 +29,7 @@ def create_wirer(packages: Iterable[str]) -> Wirer:
 
 
 @functools.lru_cache(32)
-def resolve(type_: type[Hashable], container_cls: type[containers.Container]) -> providers.Factory:
+def resolve(type_: type[Any], container_cls: type[containers.Container]) -> providers.Factory:
     """
     의존성 전체 등록 경로를 참조하지 않고 의존성을 해결합니다. 다른 패키지의 의존성을 참조하는 경우
     의존 대상 선언 경로에 깊게 의존하는 것을 방지합니다. `container_cls`는 최상위 컨테이너일수도,
