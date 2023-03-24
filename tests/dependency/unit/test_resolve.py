@@ -5,7 +5,7 @@ from typing import Any
 import pytest
 from dependency_injector import containers, providers
 
-from compose.dependency import resolve_dependency
+from compose.dependency import resolve
 
 
 class Repository:
@@ -48,12 +48,12 @@ class ApplicationContainer(containers.DeclarativeContainer):
         "팩토리 메서드로 등록한 의존성 해결",
     ),
 )
-def test_resolve_dependency(
+def test_resolve(
     type_: type[Any],
     container_cls: type[containers.Container],
     expected: type[Any],
 ):
-    resolved = resolve_dependency(type_=type_, container_cls=container_cls)
+    resolved = resolve(type_=type_, container_cls=container_cls)  # type: ignore
 
     assert isinstance(resolved.cls(), expected)
 
@@ -69,6 +69,6 @@ def test_resolve_dependency(
         "상위 컨테이너에 선언된 의존성은 해결할 수 없다",
     ),
 )
-def test_cannot_resolve_dependency(type_: type[Any], container_cls: type[containers.Container]):
+def test_cannot_resolve(type_: type[Any], container_cls: type[containers.Container]):
     with pytest.raises(ValueError):
-        resolve_dependency(type_=type, container_cls=container_cls)
+        resolve(type_=type_, container_cls=container_cls)  # type: ignore
