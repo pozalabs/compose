@@ -53,5 +53,5 @@ def resolve(type_: type[Any], container_cls: type[containers.Container]) -> prov
 
 
 resolve_dependency = deprecated(
-    "`resolve_dependence` is deprecated and will be removed in a future version."
+    "`resolve_dependency` is deprecated and will be removed in a future version."
 )(resolve)
