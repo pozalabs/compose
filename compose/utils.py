@@ -4,7 +4,7 @@ from collections.abc import Callable
 from typing import Any
 
 
-def deprecation_warning(message: str, stack_level: int = 1):
+def deprecated(message: str, stack_level: int = 1):
     def wrapper(func: Callable[..., Any]):
         @functools.wraps(func)
         def inner(*args, **kwargs):

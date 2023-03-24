@@ -5,7 +5,7 @@ from typing import Any, Optional, Protocol
 
 from dependency_injector import containers, providers
 
-from compose.utils import deprecation_warning
+from compose.utils import deprecated
 
 
 class Wirer(Protocol):
@@ -52,6 +52,6 @@ def resolve(type_: type[Any], container_cls: type[containers.Container]) -> prov
     raise ValueError(f"Cannot find {type_.__name__} from given container")
 
 
-resolve_dependency = deprecation_warning(
+resolve_dependency = deprecated(
     "`resolve_dependence` is deprecated and will be removed in a future version."
 )(resolve)
