@@ -1,11 +1,14 @@
 import functools
 import inspect
 from collections.abc import Iterable
-from typing import Any, Optional, Protocol
+from typing import Any, Optional, Protocol, TypeVar
 
 from dependency_injector import containers, providers
+from dependency_injector.wiring import Provide
 
 from compose.utils import deprecated
+
+T = TypeVar("T")
 
 
 class Wirer(Protocol):
@@ -56,3 +59,7 @@ resolve_dependency = deprecated(
     "`resolve_dependency` is deprecated and will be removed in a future version. "
     "Use `resolve` instead."
 )(resolve)
+
+
+def provide(type_: type[T], from_: type[containers.Container], /) -> Provide[T]:
+    return Provide[resolve(type_=type_, container_cls=from_)]  # type: ignore
