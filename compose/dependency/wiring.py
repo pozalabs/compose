@@ -61,5 +61,5 @@ resolve_dependency = deprecated(
 )(resolve)
 
 
-def provide(type_: type[T], container_cls: type[containers.Container], /) -> Provide[T]:
-    return Provide[resolve(type_=type_, container_cls=container_cls)]  # type: ignore
+def provide(type_: type[T], from_: type[containers.Container], /) -> Provide[T]:
+    return Provide[resolve(type_=type_, container_cls=from_)]  # type: ignore
