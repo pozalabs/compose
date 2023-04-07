@@ -25,10 +25,6 @@ class Merge(Operator):
     def dict(cls, *ops: Operator) -> Merge:
         return cls(*ops, initial={})
 
-    @classmethod
-    def list(cls, *ops: Operator) -> Merge:
-        return cls(*ops, initial=[])
-
 
 class Filter(Operator):
     def __init__(self, *ops: Operator, predicate: Callable[[Operator], bool]):
