@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 from typing import Any, Optional
 
-from .base import Merge, Operator
+from .base import Filter, Merge, Operator
 from .logical import And, LogicalOperator, Or
 from .types import DictExpression, ListExpression, MongoKeyword
 
@@ -111,3 +111,20 @@ class Set(Stage):
 
     def expression(self) -> DictExpression:
         return {"$set": Merge.dict(*self.specs).expression()}
+
+
+class FacetSpecification(Operator):
+    def __init__(self, output_field: str, stages: list[Stage]):
+        self.output_field = output_field
+        self.stages = stages
+
+    def expression(self) -> DictExpression:
+        return {self.output_field: Filter.non_empty(*self.stages).expression()}
+
+
+class Facet(Stage):
+    def __init__(self, *specs: FacetSpecification):
+        self.specs = list(specs)
+
+    def expression(self) -> DictExpression:
+        return {"$facet": Merge.dict(*self.specs).expression()}
