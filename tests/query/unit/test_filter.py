@@ -26,7 +26,7 @@ def expected() -> list[DictExpression]:
     return [{"$sort": {"a": pymongo.ASCENDING}}]
 
 
-def test_filter_non_empty(
+def test_filter_non_empty_expression(
     ops: list[Operator],
     expected: list[DictExpression],
 ):
