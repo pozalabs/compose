@@ -23,3 +23,7 @@ class Merge(Operator):
     @classmethod
     def dict(cls, *ops: Operator) -> Merge:
         return cls(*ops, initial={})
+
+    @classmethod
+    def list(cls, *ops: Operator) -> Merge:
+        return cls(*ops, initial=[])
