@@ -31,7 +31,7 @@ class Filter(Operator):
         self.ops = list(ops)
         self.predicate = predicate
 
-    def expression(self) -> Any:
+    def expression(self) -> list[Any]:
         return [op.expression() for op in self.ops if self.predicate(op)]
 
     @classmethod
