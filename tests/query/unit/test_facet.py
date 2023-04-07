@@ -48,8 +48,5 @@ def expected() -> DictExpression:
     }
 
 
-def test_expression(
-    specs: list[FacetSpecification],
-    expected: DictExpression,
-):
+def test_expression(specs: list[FacetSpecification], expected: DictExpression):
     assert Facet(*specs).expression() == expected
