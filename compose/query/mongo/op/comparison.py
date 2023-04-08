@@ -1,22 +1,11 @@
 from __future__ import annotations
 
-import abc
 from collections.abc import Callable
 from typing import Any, Optional
 
 from . import utils
-from .base import Operator
+from .base import ComparisonOperator, Operator
 from .types import DictExpression
-
-
-class ComparisonOperator(Operator):
-    def __init__(self, field: str, value: Optional[Any] = None):
-        self.field = field
-        self.value = value
-
-    @abc.abstractmethod
-    def expression(self) -> dict[str, Any]:
-        raise NotImplementedError
 
 
 class EmptyOnNull(Operator):

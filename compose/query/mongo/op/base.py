@@ -4,14 +4,33 @@ import abc
 import functools
 import operator
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Optional
 
-from .types import DictExpression
+from .types import DictExpression, ListExpression
 
 
 class Operator:
     @abc.abstractmethod
     def expression(self) -> Any:
+        raise NotImplementedError
+
+
+class ComparisonOperator(Operator):
+    def __init__(self, field: str, value: Optional[Any] = None):
+        self.field = field
+        self.value = value
+
+    @abc.abstractmethod
+    def expression(self) -> dict[str, Any]:
+        raise NotImplementedError
+
+
+class LogicalOperator(Operator):
+    def __init__(self, *ops: Operator):
+        self.ops = list(ops)
+
+    @abc.abstractmethod
+    def expression(self) -> dict[str, ListExpression]:
         raise NotImplementedError
 
 
