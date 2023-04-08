@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from .base import Merge, Operator, Stage
 from .logical import And, LogicalOperator, Or
@@ -138,3 +138,12 @@ class Limit(Stage):
 
     def expression(self) -> DictExpression:
         return {"$limit": self.limit}
+
+
+class TextSearchOperator(Operator):
+    def __init__(self, query: str, path: Union[str, list[str]]):
+        self.query = query
+        self.path = path
+
+    def expression(self) -> DictExpression:
+        return {"$text": {"query": self.query, "path": self.path}}
