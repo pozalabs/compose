@@ -122,3 +122,11 @@ class Facet(Stage):
 
     def expression(self) -> DictExpression:
         return {"$facet": Merge.dict(*self.pipelines).expression()}
+
+
+class Skip(Stage):
+    def __init__(self, skip: int):
+        self.skip = skip
+
+    def expression(self) -> DictExpression:
+        return {"$skip": self.skip}
