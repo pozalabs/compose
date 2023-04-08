@@ -1,7 +1,7 @@
 from typing import Optional
 
 from .base import Operator
-from .stage import Skip
+from .stage import Limit, Skip
 from .types import DictExpression, ListExpression
 
 
@@ -35,5 +35,5 @@ class Pagination(Operator):
 
         return [
             Skip((self.page - 1) * self.per_page).expression(),  # type: ignore
-            {"$limit": self.per_page},
+            Limit(self.per_page).expression(),  # type: ignore
         ]
