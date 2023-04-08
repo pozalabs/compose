@@ -146,7 +146,7 @@ class TextSearchOperator(Operator):
         self.path = path
 
     def expression(self) -> DictExpression:
-        return {"$text": {"query": self.query, "path": self.path}}
+        return {"text": {"query": self.query, "path": self.path}}
 
 
 class Search(Stage):
