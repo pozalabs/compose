@@ -113,7 +113,7 @@ class Set(Stage):
         return {"$set": Merge.dict(*self.specs).expression()}
 
 
-class FacetSpecification(Operator):
+class FacetSubPipeline(Operator):
     def __init__(self, output_field: str, stages: list[Stage]):
         self.output_field = output_field
         self.stages = stages
@@ -123,8 +123,8 @@ class FacetSpecification(Operator):
 
 
 class Facet(Stage):
-    def __init__(self, *specs: FacetSpecification):
-        self.specs = list(specs)
+    def __init__(self, *pipelines: FacetSubPipeline):
+        self.pipelines = list(pipelines)
 
     def expression(self) -> DictExpression:
-        return {"$facet": Merge.dict(*self.specs).expression()}
+        return {"$facet": Merge.dict(*self.pipelines).expression()}

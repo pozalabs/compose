@@ -1,28 +1,20 @@
 import pymongo
 import pytest
 
-from compose.query.mongo.op import (
-    DictExpression,
-    Eq,
-    Facet,
-    FacetSpecification,
-    Match,
-    Sort,
-    SortBy,
-)
+from compose.query.mongo.op import DictExpression, Eq, Facet, FacetSubPipeline, Match, Sort, SortBy
 
 
 @pytest.fixture
-def specs() -> list[FacetSpecification]:
+def specs() -> list[FacetSubPipeline]:
     return [
-        FacetSpecification(
+        FacetSubPipeline(
             output_field="output_field_1",
             stages=[
                 Match.and_(Eq(field="field_1", value="value_1")),
                 Sort(SortBy(field="field_1", direction=pymongo.ASCENDING)),
             ],
         ),
-        FacetSpecification(
+        FacetSubPipeline(
             stages=[
                 Match.and_(Eq(field="field_2", value="value_2")),
                 Sort(SortBy(field="field_2", direction=pymongo.ASCENDING)),
@@ -48,5 +40,5 @@ def expected() -> DictExpression:
     }
 
 
-def test_expression(specs: list[FacetSpecification], expected: DictExpression):
+def test_expression(specs: list[FacetSubPipeline], expected: DictExpression):
     assert Facet(*specs).expression() == expected
