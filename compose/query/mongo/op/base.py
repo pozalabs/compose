@@ -58,7 +58,7 @@ class Filter(Operator):
         self.ops = list(ops)
         self.predicate = predicate
 
-    def expression(self) -> list[Any]:
+    def expression(self) -> ListExpression:
         return [op.expression() for op in self.ops if self.predicate(op)]
 
     @classmethod
