@@ -1,7 +1,6 @@
 from typing import Any
 
-from .base import Filter, Operator
-from .stage import Stage
+from .base import Filter, Operator, Stage
 
 
 class Pipeline(Operator):

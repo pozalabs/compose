@@ -6,10 +6,18 @@ import operator
 from collections.abc import Callable
 from typing import Any
 
+from .types import DictExpression
+
 
 class Operator:
     @abc.abstractmethod
     def expression(self) -> Any:
+        raise NotImplementedError
+
+
+class Stage(Operator):
+    @abc.abstractmethod
+    def expression(self) -> DictExpression:
         raise NotImplementedError
 
 

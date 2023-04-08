@@ -1,7 +1,16 @@
 import pymongo
 import pytest
 
-from compose.query.mongo.op import DictExpression, Eq, Facet, FacetSubPipeline, Match, Sort, SortBy
+from compose.query.mongo.op import (
+    DictExpression,
+    Eq,
+    Facet,
+    FacetSubPipeline,
+    Match,
+    Pipeline,
+    Sort,
+    SortBy,
+)
 
 
 @pytest.fixture
@@ -9,17 +18,17 @@ def specs() -> list[FacetSubPipeline]:
     return [
         FacetSubPipeline(
             output_field="output_field_1",
-            stages=[
+            pipeline=Pipeline(
                 Match.and_(Eq(field="field_1", value="value_1")),
                 Sort(SortBy(field="field_1", direction=pymongo.ASCENDING)),
-            ],
+            ),
         ),
         FacetSubPipeline(
-            stages=[
+            output_field="output_field_2",
+            pipeline=Pipeline(
                 Match.and_(Eq(field="field_2", value="value_2")),
                 Sort(SortBy(field="field_2", direction=pymongo.ASCENDING)),
-            ],
-            output_field="output_field_2",
+            ),
         ),
     ]
 
