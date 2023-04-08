@@ -130,3 +130,11 @@ class Skip(Stage):
 
     def expression(self) -> DictExpression:
         return {"$skip": self.skip}
+
+
+class Limit(Stage):
+    def __init__(self, limit: int):
+        self.limit = limit
+
+    def expression(self) -> DictExpression:
+        return {"$limit": self.limit}
