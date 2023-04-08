@@ -23,7 +23,7 @@ def op(request: pytest.FixtureRequest) -> Operator:
             {
                 "$search": {
                     "index": "default",
-                    "$text": {"query": "q", "path": ["field_1", "field_2"]},
+                    "text": {"query": "q", "path": ["field_1", "field_2"]},
                 }
             },
         ),
