@@ -147,3 +147,12 @@ class TextSearchOperator(Operator):
 
     def expression(self) -> DictExpression:
         return {"$text": {"query": self.query, "path": self.path}}
+
+
+class Search(Stage):
+    def __init__(self, index: str, op: Operator):
+        self.index = index
+        self.op = op
+
+    def expression(self) -> DictExpression:
+        return {"$search": {"index": self.index} | self.op.expression()}
