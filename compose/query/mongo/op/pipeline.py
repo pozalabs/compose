@@ -1,7 +1,6 @@
 from typing import Any
 
-from .base import Operator
-from .stage import Stage
+from .base import Filter, Operator, Stage
 
 
 class Pipeline(Operator):
@@ -9,4 +8,4 @@ class Pipeline(Operator):
         self.stages = list(stages)
 
     def expression(self) -> list[dict[str, Any]]:
-        return [expression for stage in self.stages if (expression := stage.expression())]
+        return Filter.non_empty(*self.stages).expression()

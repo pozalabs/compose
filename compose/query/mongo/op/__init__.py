@@ -1,4 +1,5 @@
 from .aggregation import *  # noqa: F401, F403
+from .base import *  # noqa: F401, F403
 from .comparison import *  # noqa: F401, F403
 from .logical import *  # noqa: F401, F403
 from .pagination import *  # noqa: F401, F403

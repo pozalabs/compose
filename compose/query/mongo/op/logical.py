@@ -1,20 +1,10 @@
 from __future__ import annotations
 
-import abc
 from collections.abc import Callable
 
 from . import utils
-from .base import Operator
+from .base import LogicalOperator
 from .types import ListExpression
-
-
-class LogicalOperator(Operator):
-    def __init__(self, *ops: Operator):
-        self.ops = list(ops)
-
-    @abc.abstractmethod
-    def expression(self) -> dict[str, ListExpression]:
-        raise NotImplementedError
 
 
 def _expression_factory(

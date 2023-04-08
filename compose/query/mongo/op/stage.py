@@ -1,17 +1,11 @@
 from __future__ import annotations
 
-import abc
 from typing import Any, Optional
 
-from .base import Merge, Operator
+from .base import Merge, Operator, Stage
 from .logical import And, LogicalOperator, Or
+from .pipeline import Pipeline
 from .types import DictExpression, ListExpression, MongoKeyword
-
-
-class Stage(Operator):
-    @abc.abstractmethod
-    def expression(self) -> DictExpression:
-        raise NotImplementedError
 
 
 class Match(Stage):
@@ -111,3 +105,20 @@ class Set(Stage):
 
     def expression(self) -> DictExpression:
         return {"$set": Merge.dict(*self.specs).expression()}
+
+
+class FacetSubPipeline(Operator):
+    def __init__(self, output_field: str, pipeline: Pipeline):
+        self.output_field = output_field
+        self.pipeline = pipeline
+
+    def expression(self) -> DictExpression:
+        return {self.output_field: self.pipeline.expression()}
+
+
+class Facet(Stage):
+    def __init__(self, *pipelines: FacetSubPipeline):
+        self.pipelines = list(pipelines)
+
+    def expression(self) -> DictExpression:
+        return {"$facet": Merge.dict(*self.pipelines).expression()}
