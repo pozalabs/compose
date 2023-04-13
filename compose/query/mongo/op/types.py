@@ -25,6 +25,8 @@ def _camelize(v: str) -> str:
 
 
 class AggVar(str):
+    """https://www.mongodb.com/docs/manual/reference/aggregation-variables/"""
+
     prefix: ClassVar[str] = "$"
 
     def __new__(cls, v: Union[str, AggVar]):
