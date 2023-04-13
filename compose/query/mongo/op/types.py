@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from typing import Any, ClassVar, Union
 
 import inflection
@@ -30,7 +31,14 @@ class AggVar(str):
     prefix: ClassVar[str] = "$"
 
     def __new__(cls, v: Union[str, AggVar]):
-        num_prefixes = v.count(cls.prefix)
+        num_prefixes = 0
+        prefix_removed = not v.startswith(cls.prefix)
+        copied = copy.deepcopy(v)
+        while not prefix_removed:
+            copied = copied[1:]
+            num_prefixes += 1
+            prefix_removed = not copied.startswith(cls.prefix)
+
         if num_prefixes not in (1, 2):
             raise ValueError(f"Cannot interpret {v} as valid aggregation variable")
 
