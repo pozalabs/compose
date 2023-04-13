@@ -5,7 +5,7 @@ from typing import Any, Optional, Union
 from .base import Merge, Operator, Stage
 from .logical import And, LogicalOperator, Or
 from .pipeline import Pipeline
-from .types import DictExpression, ListExpression, MongoKeyword
+from .types import DictExpression, MongoKeyword
 
 
 class Match(Stage):
@@ -61,7 +61,10 @@ class Lookup(Stage):
     def expression(self) -> DictExpression:
         return {
             "$lookup": {
-                MongoKeyword.from_py(field): value for field, value in self.__dict__.items()
+                MongoKeyword.from_py(field): (
+                    value.expression() if isinstance(value, Operator) else value
+                )
+                for field, value in self.__dict__.items()
             }
         }
 
@@ -73,8 +76,14 @@ class MatchLookup(Lookup):
         self.foreign_field = foreign_field
 
 
-class SubQueryLookup(Lookup):
-    def __init__(self, from_: str, as_: str, let: str, pipeline: ListExpression):
+class SubqueryLookup(Lookup):
+    def __init__(
+        self,
+        from_: str,
+        as_: str,
+        let: Operator,
+        pipeline: Pipeline,
+    ):
         super().__init__(from_=from_, as_=as_)
         self.let = let
         self.pipeline = pipeline
