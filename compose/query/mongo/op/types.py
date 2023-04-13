@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar, Union
 
 import inflection
 
@@ -22,3 +22,25 @@ class MongoKeyword(str):
 
 def _camelize(v: str) -> str:
     return inflection.camelize(v.strip("_"), uppercase_first_letter=False)
+
+
+class AggVar(str):
+    prefix: ClassVar[str] = "$"
+
+    def __new__(cls, v: Union[str, AggVar]):
+        num_prefixes = v.count(cls.prefix)
+        if num_prefixes > 2:
+            raise ValueError(f"Cannot interpret {v} as valid aggregation variable")
+
+        if not v.startswith(cls.prefix):
+            v = f"{cls.prefix * 2}{v}"
+
+        return super().__new__(cls, v)
+
+    @classmethod
+    def current(cls, value: str) -> AggVar:
+        return AggVar(f"{cls.prefix}{value}")
+
+    @classmethod
+    def root(cls) -> AggVar:
+        return cls.current("ROOT")
