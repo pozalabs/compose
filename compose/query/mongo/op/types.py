@@ -31,13 +31,17 @@ class AggVar(str):
 
     def __new__(cls, v: Union[str, AggVar]):
         num_prefixes = v.count(cls.prefix)
-        if num_prefixes > 2:
+        if num_prefixes not in (1, 2):
             raise ValueError(f"Cannot interpret {v} as valid aggregation variable")
 
-        if not v.startswith(cls.prefix):
-            v = f"{cls.prefix * 2}{v}"
-
         return super().__new__(cls, v)
+
+    @classmethod
+    def from_(cls, v: str) -> AggVar:
+        if v.startswith(cls.prefix):
+            raise ValueError(f"`v` must not start with `{cls.prefix}`")
+
+        return cls(f"{cls.prefix * 2}{v}")
 
     @classmethod
     def current(cls, v: str) -> AggVar:
