@@ -45,6 +45,9 @@ class Specification(Operator):
         return {self.field: self.spec}
 
 
+Spec = Specification
+
+
 class Project(Stage):
     def __init__(self, *specs: Specification):
         self.specs = list(specs)
