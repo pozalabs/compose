@@ -1,13 +1,13 @@
 import pytest
 
-from compose.query.mongo.op import DictExpression, Pipeline, Project, Specification, SubQueryLookup
+from compose.query.mongo.op import DictExpression, Pipeline, Project, Specification, SubqueryLookup
 
 
 @pytest.mark.parametrize(
     "op, expected",
     [
         (
-            SubQueryLookup(
+            SubqueryLookup(
                 from_="from_field",
                 as_="as_field",
                 let=Specification(field="let_field", spec="$let_field"),
@@ -24,5 +24,5 @@ from compose.query.mongo.op import DictExpression, Pipeline, Project, Specificat
         ),
     ],
 )
-def test_expression(op: SubQueryLookup, expected: DictExpression):
+def test_expression(op: SubqueryLookup, expected: DictExpression):
     assert op.expression() == expected

@@ -76,7 +76,7 @@ class MatchLookup(Lookup):
         self.foreign_field = foreign_field
 
 
-class SubQueryLookup(Lookup):
+class SubqueryLookup(Lookup):
     def __init__(
         self,
         from_: str,
