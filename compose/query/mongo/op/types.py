@@ -38,8 +38,11 @@ class AggVar(str):
         return super().__new__(cls, v)
 
     @classmethod
-    def current(cls, value: str) -> AggVar:
-        return AggVar(f"{cls.prefix}{value}")
+    def current(cls, v: str) -> AggVar:
+        if v.startswith(cls.prefix):
+            raise ValueError(f"`v` must not start with `{cls.prefix}`")
+
+        return AggVar(f"{cls.prefix}{v}")
 
     @classmethod
     def root(cls) -> AggVar:
