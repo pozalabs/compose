@@ -5,7 +5,7 @@ from typing import Any, Optional, Union
 from .base import Merge, Operator, Stage
 from .logical import And, LogicalOperator, Or
 from .pipeline import Pipeline
-from .types import DictExpression, Input, MongoKeyword
+from .types import DictExpression, MongoKeyword
 
 
 class Match(Stage):
@@ -61,7 +61,9 @@ class Lookup(Stage):
     def expression(self) -> DictExpression:
         return {
             "$lookup": {
-                MongoKeyword.from_py(field): Input(value).unwrap()
+                MongoKeyword.from_py(field): (
+                    value.expression() if isinstance(value, Operator) else value
+                )
                 for field, value in self.__dict__.items()
             }
         }

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Protocol, runtime_checkable
+from typing import Any
 
 import inflection
 
@@ -22,20 +22,3 @@ class MongoKeyword(str):
 
 def _camelize(v: str) -> str:
     return inflection.camelize(v.strip("_"), uppercase_first_letter=False)
-
-
-@runtime_checkable
-class Expressionable(Protocol):
-    def expression(self) -> Any:
-        ...
-
-
-class Input:
-    def __init__(self, value: Any):
-        self.value = value
-
-    def unwrap(self) -> Any:
-        if isinstance(self.value, Input):
-            return self.value.unwrap()
-
-        return self.value.expression() if isinstance(self.value, Expressionable) else self.value
