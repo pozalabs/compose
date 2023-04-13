@@ -94,7 +94,9 @@ class Unwind(Stage):
     def expression(self) -> DictExpression:
         return {
             "$unwind": {
-                MongoKeyword.from_py(field): value for field, value in self.__dict__.items()
+                MongoKeyword.from_py(field): value
+                for field, value in self.__dict__.items()
+                if value is not None
             }
         }
 
