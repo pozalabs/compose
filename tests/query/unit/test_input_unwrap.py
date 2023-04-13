@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 
 from compose.query.mongo.op import Specification
-from compose.types import Input
+from compose.query.mongo.op.types import Input
 
 
 @pytest.mark.parametrize(
