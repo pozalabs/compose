@@ -23,3 +23,9 @@ class SortBy(Operator):
     @classmethod
     def desc(cls, field: str) -> SortBy:
         return cls(field=field, direction=pymongo.DESCENDING)
+
+    @classmethod
+    def from_(cls, key: str) -> SortBy:
+        if key.startswith("-"):
+            return cls.desc(field=key[1:])
+        return cls.asc(field=key)
