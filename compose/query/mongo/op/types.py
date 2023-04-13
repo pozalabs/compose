@@ -35,4 +35,7 @@ class Input:
         self.value = value
 
     def unwrap(self) -> Any:
+        if isinstance(self.value, Input):
+            return self.value.unwrap()
+
         return self.value.expression() if isinstance(self.value, Expressionable) else self.value
