@@ -81,7 +81,7 @@ class SubQueryLookup(Lookup):
         self,
         from_: str,
         as_: str,
-        let: Union[str, Operator],
+        let: Operator,
         pipeline: Pipeline,
     ):
         super().__init__(from_=from_, as_=as_)
