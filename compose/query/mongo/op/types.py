@@ -31,9 +31,9 @@ class AggVar(str):
     prefix: ClassVar[str] = "$"
 
     def __new__(cls, v: Union[str, AggVar]):
+        copied = copy.deepcopy(v)
         num_prefixes = 0
         prefix_removed = not v.startswith(cls.prefix)
-        copied = copy.deepcopy(v)
         while not prefix_removed:
             copied = copied[1:]
             num_prefixes += 1
