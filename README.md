@@ -1,6 +1,6 @@
 # compose
 
-Backend Components used in POZAlabs 
+POZAlabs에서 사용하는 백엔드 컴포넌트
 
 ## MongoDB Query DSL
 
