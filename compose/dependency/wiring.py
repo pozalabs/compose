@@ -40,13 +40,14 @@ def resolve_by_name_from_container_provider(
         raise ValueError("`name` must be string")
 
     for provider_name, provider in container.providers.items():
-        if name == provider_name:
+        if not isinstance(provider, (providers.Container, providers.Factory)):
+            continue
+
+        if provider_name == name:
             return provider
 
         if isinstance(provider, providers.Container):
             return resolve_by_name_from_container_provider(name=name, container=container)
-
-    raise ValueError(f"Cannot find {name} from given container")
 
 
 def resolve_by_name(
@@ -60,11 +61,13 @@ def resolve_by_name(
         if not isinstance(provider, (providers.Container, providers.Factory)):
             continue
 
-        if name == provider_name:
+        if provider_name == name:
             return provider
 
         if isinstance(provider, providers.Container):
-            return resolve_by_name_from_container_provider(name=name, container=provider)
+            result = resolve_by_name_from_container_provider(name=name, container=provider)
+            if result is not None:
+                return result
 
     raise ValueError(f"Cannot find {name} from given container")
 
