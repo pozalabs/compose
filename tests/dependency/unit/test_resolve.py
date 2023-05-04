@@ -18,6 +18,14 @@ class RepositoryWithFactoryMethod:
         return cls()
 
 
+def adder(a: int, b: int) -> int:
+    return a + b
+
+
+def id_generator(length: int) -> str:
+    return "ABCDEF"[:length]
+
+
 class NestedRepository:
     ...
 
@@ -25,12 +33,14 @@ class NestedRepository:
 class NestedContainer(containers.DeclarativeContainer):
     repository = providers.Factory(NestedRepository)
     repository_with_factory_method = providers.Factory(RepositoryWithFactoryMethod.create)
+    id_generator = providers.Factory(id_generator, length=3)
 
 
 class ApplicationContainer(containers.DeclarativeContainer):
     repository = providers.Factory(Repository)
 
     nested = providers.Container(NestedContainer)
+    adder = providers.Factory(adder, a=1, b=2)
 
 
 @pytest.mark.parametrize(
@@ -40,12 +50,18 @@ class ApplicationContainer(containers.DeclarativeContainer):
         (NestedRepository, ApplicationContainer, NestedRepository),
         (NestedRepository, ApplicationContainer.nested, NestedRepository),
         (RepositoryWithFactoryMethod, ApplicationContainer, RepositoryWithFactoryMethod),
+        ("repository", ApplicationContainer, Repository),
+        ("repository", ApplicationContainer.nested, NestedRepository),
+        ("repository_with_factory_method", ApplicationContainer, RepositoryWithFactoryMethod),
     ],
     ids=(
         "최상위 컨테이너에서 최상위 의존성 해결",
         "최상위 컨테이너에서 중첩 의존성 해결",
         "중첩 컨테이너에서 해당 컨테이너에 선언된 의존성 해결",
         "팩토리 메서드로 등록한 의존성 해결",
+        "의존성 등록 이름으로 의존성 해결",
+        "중첩 컨테이너에서 의존성 등록 이름으로 의존성 해결",
+        "의존성 등록 이름으로 팩토리 메서드 의존성 해결",
     ),
 )
 def test_resolve(
@@ -56,6 +72,29 @@ def test_resolve(
     resolved = resolve(type_=type_, container_cls=container_cls)  # type: ignore
 
     assert isinstance(resolved.cls(), expected)
+
+
+@pytest.mark.parametrize(
+    "name, container_cls, expected",
+    [
+        ("adder", ApplicationContainer, 3),
+        ("id_generator", ApplicationContainer, "ABC"),
+        ("id_generator", ApplicationContainer.nested, "ABC"),
+    ],
+    ids=(
+        "최상위 컨테이너에서 최상위 의존성 해결",
+        "최상위 컨테이너에서 중첩 의존성 해결",
+        "중첩 컨테이너에서 해당 컨테이너에 선언된 의존성 해결",
+    ),
+)
+def test_resolve_func_by_name(
+    name: str,
+    container_cls: type[containers.Container],
+    expected: Any,
+):
+    resolved = resolve(name, container_cls)  # type: ignore
+
+    assert resolved() == expected
 
 
 @pytest.mark.parametrize(
