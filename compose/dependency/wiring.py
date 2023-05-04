@@ -1,7 +1,7 @@
 import functools
 import inspect
 from collections.abc import Iterable
-from typing import Any, Optional, Protocol, TypeVar
+from typing import Any, Optional, Protocol, TypeVar, Union
 
 from dependency_injector import containers, providers
 from dependency_injector.wiring import Provide
@@ -33,15 +33,56 @@ def create_wirer(packages: Iterable[str]) -> Wirer:
     return wire_container
 
 
+def resolve_by_name_from_container_provider(
+    name: str, container: providers.Container
+) -> providers.Factory:
+    if not isinstance(name, str):
+        raise ValueError("`name` must be string")
+
+    for provider_name, provider in container.providers.items():
+        if name == provider_name:
+            return provider
+
+        if isinstance(provider, providers.Container):
+            return resolve_by_name_from_container_provider(name=name, container=container)
+
+    raise ValueError(f"Cannot find {name} from given container")
+
+
+def resolve_by_name(
+    name: str,
+    container_cls: type[containers.Container],
+) -> providers.Factory:
+    if not isinstance(name, str):
+        raise ValueError("`name` must be string")
+
+    for provider_name, provider in container_cls.providers.items():
+        if not isinstance(provider, (providers.Container, providers.Factory)):
+            continue
+
+        if name == provider_name:
+            return provider
+
+        if isinstance(provider, providers.Container):
+            return resolve_by_name_from_container_provider(name=name, container=provider)
+
+    raise ValueError(f"Cannot find {name} from given container")
+
+
 @functools.lru_cache(32)
-def resolve(type_: type[Any], container_cls: type[containers.Container]) -> providers.Factory:
+def resolve(
+    type_: Union[type[Any], str], container_cls: type[containers.Container]
+) -> providers.Factory:
     """
     의존성 전체 등록 경로를 참조하지 않고 의존성을 해결합니다. 다른 패키지의 의존성을 참조하는 경우
     의존 대상 선언 경로에 깊게 의존하는 것을 방지합니다. `container_cls`는 최상위 컨테이너일수도,
     의존성이 등록된 (하위) 컨테이너일수도 있습니다. 클래스 대상으로만 작동합니다.
     """
-    if not inspect.isclass(type_):
-        raise ValueError("Only class can be resolved")
+    if not (inspect.isclass(type_) or isinstance(type_, str)):
+        raise ValueError("Only class or string can be resolved")
+
+    if isinstance(type_, str):
+        return resolve_by_name(name=type_, container_cls=container_cls)
 
     for provider in container_cls.traverse([providers.Factory]):
         provider_cls = provider.cls
