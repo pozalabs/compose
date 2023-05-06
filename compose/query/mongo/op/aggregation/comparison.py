@@ -1,19 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
 
 from .. import DictExpression, utils
-from ..base import Operator
 from ..comparison import ComparisonOperator
-
-
-class Expr(Operator):
-    def __init__(self, op: Operator):
-        self.op = op
-
-    def expression(self) -> dict[str, Any]:
-        return {"$expr": self.op.expression()}
 
 
 def _expression_factory(mongo_operator: str) -> Callable[[ComparisonOperator], DictExpression]:
