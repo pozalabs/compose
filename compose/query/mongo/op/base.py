@@ -4,7 +4,7 @@ import abc
 import functools
 import operator
 from collections.abc import Callable
-from typing import Any, Optional
+from typing import Any, ClassVar, Optional
 
 from .types import DictExpression, ListExpression
 
@@ -32,6 +32,16 @@ class LogicalOperator(Operator):
     @abc.abstractmethod
     def expression(self) -> dict[str, ListExpression]:
         raise NotImplementedError
+
+
+class GeneralAggregationOperator(Operator):
+    mongo_operator: ClassVar[str] = ""
+
+    def __init__(self, *args: Any):
+        self.args = list(args)
+
+    def expression(self) -> DictExpression:
+        return {self.mongo_operator: self.args}
 
 
 class Stage(Operator):

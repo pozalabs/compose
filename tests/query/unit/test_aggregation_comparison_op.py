@@ -21,12 +21,12 @@ def test_op_name(op: type[Operator], expected: str):
 @pytest.mark.parametrize(
     "op, expected",
     [
-        (AEq(field="field", value="value"), {"$eq": ["field", "value"]}),
-        (ANe(field="field", value="value"), {"$ne": ["field", "value"]}),
-        (AGt(field="field", value=1), {"$gt": ["field", 1]}),
-        (AGte(field="field", value=1), {"$gte": ["field", 1]}),
-        (ALt(field="field", value=1), {"$lt": ["field", 1]}),
-        (ALte(field="field", value=1), {"$lte": ["field", 1]}),
+        (AEq("$field", "value"), {"$eq": ["$field", "value"]}),
+        (ANe("$field", "value"), {"$ne": ["$field", "value"]}),
+        (AGt("$field", 1), {"$gt": ["$field", 1]}),
+        (AGte("$field", 1), {"$gte": ["$field", 1]}),
+        (ALt("$field", 1), {"$lt": ["$field", 1]}),
+        (ALte("$field", 1), {"$lte": ["$field", 1]}),
     ],
 )
 def test_expression(op: Operator, expected: DictExpression):
