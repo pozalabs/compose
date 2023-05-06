@@ -39,3 +39,12 @@ class AEqual(ComparisonOperator):
 
     def expression(self) -> dict[str, Any]:
         return {"$eq": [self.field, self.value]}
+
+
+AEq = create_aggregation_comparison_operator(name="AEq", mongo_operator="$eq")
+ANe = create_aggregation_comparison_operator(name="ANe", mongo_operator="$ne")
+AGt = create_aggregation_comparison_operator(name="AGt", mongo_operator="$gt")
+AGte = create_aggregation_comparison_operator(name="AGte", mongo_operator="$gte")
+ALt = create_aggregation_comparison_operator(name="ALt", mongo_operator="$lt")
+ALte = create_aggregation_comparison_operator(name="ALte", mongo_operator="$lte")
+AIn = create_aggregation_comparison_operator(name="AIn", mongo_operator="$in")
