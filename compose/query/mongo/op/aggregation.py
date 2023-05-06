@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any, Optional
 
+from . import DictExpression, utils
 from .base import Operator
 from .comparison import ComparisonOperator
 
@@ -12,6 +14,23 @@ class Expr(Operator):
 
     def expression(self) -> dict[str, Any]:
         return {"$expr": self.op.expression()}
+
+
+def _expression_factory(mongo_operator: str) -> Callable[[ComparisonOperator], DictExpression]:
+    def expression(self: ComparisonOperator) -> DictExpression:
+        return {mongo_operator: [self.field, self.value]}
+
+    return expression
+
+
+def create_aggregation_comparison_operator(
+    name: str, mongo_operator: str
+) -> type[ComparisonOperator]:
+    return utils.create_operator(
+        name=name,
+        base=(ComparisonOperator,),
+        expression_factory=_expression_factory(mongo_operator),
+    )
 
 
 class AEqual(ComparisonOperator):
