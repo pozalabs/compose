@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from .. import DictExpression, utils
-from ..comparison import ComparisonOperator
+from .. import utils
+from ..base import ComparisonOperator
+from ..types import DictExpression
 
 
 def _expression_factory(mongo_operator: str) -> Callable[[ComparisonOperator], DictExpression]:
