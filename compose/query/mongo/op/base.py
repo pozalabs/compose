@@ -37,11 +37,11 @@ class LogicalOperator(Operator):
 class GeneralAggregationOperator(Operator):
     mongo_operator: ClassVar[str] = ""
 
-    def __init__(self, *args: Any):
-        self.args = list(args)
+    def __init__(self, *expressions: Any):
+        self.expressions = list(expressions)
 
     def expression(self) -> DictExpression:
-        return {self.mongo_operator: self.args}
+        return {self.mongo_operator: self.expressions}
 
 
 class Stage(Operator):
