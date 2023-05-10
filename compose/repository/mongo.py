@@ -43,6 +43,10 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         query_result = self.collection.aggregate(qry.to_query(), **kwargs)
         return next(query_result, None)
 
+    def list_by_query(self, qry: MongoQuery, **kwargs) -> list[EntityType]:
+        query_result = self.collection.aggregate(qry.to_query(), **kwargs)
+        return list(query_result)
+
     def add(self, entity: EntityType, **kwargs) -> None:
         self.collection.insert_one(entity.dict(by_alias=True), **kwargs)
 
