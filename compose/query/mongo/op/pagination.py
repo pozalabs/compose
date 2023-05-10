@@ -1,11 +1,11 @@
 from typing import Optional
 
-from .base import Operator
+from .base import Operator, Stage
 from .stage import Limit, Skip
 from .types import DictExpression, ListExpression
 
 
-class Pagination(Operator):
+class Pagination(Stage):
     def __init__(
         self,
         page: Optional[int] = None,
