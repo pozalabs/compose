@@ -10,7 +10,7 @@ from pymongo.database import Database
 from .. import types
 from ..entity import Entity
 from ..pagination import Pagination
-from ..query.mongo import MongoFilterQuery
+from ..query.mongo import MongoFilterQuery, MongoQuery
 from . import base
 
 EntityType = TypeVar("EntityType", bound=Entity)
@@ -38,6 +38,10 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         entity_type: EntityType = get_args(self.__class__.__orig_bases__[0])[0]  # type: ignore
         result = self.collection.find_one(filter=filter_, **kwargs)
         return result and entity_type.parse_obj(result)
+
+    def find_by_query(self, qry: MongoQuery, **kwargs) -> Optional[EntityType]:
+        query_result = self.collection.aggregate(qry.to_query(), **kwargs)
+        return next(query_result, None)
 
     def add(self, entity: EntityType, **kwargs) -> None:
         self.collection.insert_one(entity.dict(by_alias=True), **kwargs)
