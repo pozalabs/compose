@@ -39,11 +39,11 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         result = self.collection.find_one(filter=filter_, **kwargs)
         return result and entity_type.parse_obj(result)
 
-    def find_by_query(self, qry: MongoQuery, **kwargs) -> Optional[EntityType]:
+    def find_by_query(self, qry: MongoQuery, **kwargs) -> Optional[dict[str, Any]]:
         query_result = self.collection.aggregate(qry.to_query(), **kwargs)
         return next(query_result, None)
 
-    def list_by_query(self, qry: MongoQuery, **kwargs) -> list[EntityType]:
+    def list_by_query(self, qry: MongoQuery, **kwargs) -> list[dict[str, Any]]:
         query_result = self.collection.aggregate(qry.to_query(), **kwargs)
         return list(query_result)
 
