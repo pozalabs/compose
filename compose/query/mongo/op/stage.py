@@ -5,7 +5,7 @@ from typing import Any, Optional, Union
 from .base import Merge, Operator, Stage
 from .logical import And, LogicalOperator, Or
 from .pipeline import Pipeline
-from .types import DictExpression, ListExpression, MongoKeyword
+from .types import DictExpression, ListExpression, MongoKeyword, UnwindPath
 
 
 class Match(Stage):
@@ -99,7 +99,7 @@ class Unwind(Stage):
         include_array_index: Optional[str] = None,
         preserve_null_and_empty_arrays: Optional[bool] = None,
     ):
-        self.path = path
+        self.path = UnwindPath(path)
         self.include_array_index = include_array_index
         self.preserve_null_and_empty_arrays = preserve_null_and_empty_arrays
 
