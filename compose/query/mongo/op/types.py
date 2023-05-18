@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import copy
-from typing import Any, ClassVar, Union
+from typing import Any, ClassVar, TypeVar, Union
 
 import inflection
 
 DictExpression = dict[str, Any]
 ListExpression = list[DictExpression]
+Expression = TypeVar("Expression", DictExpression, ListExpression)
 
 
 class MongoKeyword(str):
