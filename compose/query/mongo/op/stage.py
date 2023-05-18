@@ -112,6 +112,14 @@ class Unwind(Stage):
             }
         }
 
+    @classmethod
+    def preserve_missing(cls, path: str, include_array_index: Optional[str] = None) -> Unwind:
+        return cls(
+            path=path,
+            include_array_index=include_array_index,
+            preserve_null_and_empty_arrays=True,
+        )
+
 
 class Set(Stage):
     def __init__(self, *specs: Specification):
