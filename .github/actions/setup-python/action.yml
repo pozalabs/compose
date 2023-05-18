@@ -1,6 +1,11 @@
 name: Setup python
 description: Setup python environment for test
 
+inputs:
+  python-version:
+    description: Python version to use
+    required: true
+
 runs:
   using: composite
   steps:

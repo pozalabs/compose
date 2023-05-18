@@ -61,3 +61,11 @@ class AggVar(str):
     @classmethod
     def root(cls) -> AggVar:
         return cls.current("ROOT")
+
+
+class UnwindPath(str):
+    def __new__(cls, v: str):
+        if not v.startswith("$"):
+            raise ValueError("path must be prefixed with $")
+
+        return super().__new__(cls, v)
