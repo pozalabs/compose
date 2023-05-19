@@ -44,6 +44,14 @@ class Specification(Operator):
     def expression(self) -> DictExpression:
         return {self.field: self.spec}
 
+    @classmethod
+    def include(cls, field: str) -> Specification:
+        return cls(field=field, spec=1)
+
+    @classmethod
+    def exclude(cls, field: str) -> Specification:
+        return cls(field=field, spec=0)
+
 
 Spec = Specification
 
