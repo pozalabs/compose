@@ -17,8 +17,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup python
-        uses: ./.github/actions/setup-python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Load python cache
+        uses: ./.github/actions/load-python-cache
         with:
           python-version: ${{ matrix.python-version }}
 
