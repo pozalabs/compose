@@ -1,6 +1,6 @@
 import pytest
 
-from compose.query.mongo.op import DictExpression, Pipeline, Project, Specification, SubqueryLookup
+from compose.query.mongo.op import DictExpression, Pipeline, Project, Spec, SubqueryLookup
 
 
 @pytest.mark.parametrize(
@@ -10,8 +10,8 @@ from compose.query.mongo.op import DictExpression, Pipeline, Project, Specificat
             SubqueryLookup(
                 from_="from_field",
                 as_="as_field",
-                let=Specification(field="let_field", spec="$let_field"),
-                pipeline=Pipeline(Project(Specification("_id", 1))),
+                let=Spec(field="let_field", spec="$let_field"),
+                pipeline=Pipeline(Project(Spec("_id", 1))),
             ),
             {
                 "$lookup": {

@@ -2,7 +2,7 @@ from typing import Optional
 
 import pytest
 
-from compose.query.mongo.op import DictExpression, Pagination, Set, Specification
+from compose.query.mongo.op import DictExpression, Pagination, Set, Spec
 
 
 @pytest.mark.parametrize(
@@ -25,7 +25,7 @@ from compose.query.mongo.op import DictExpression, Pagination, Set, Specificatio
             Pagination(
                 page=1,
                 per_page=10,
-                metadata_ops=[Set(Specification(field="field", spec="value"))],
+                metadata_ops=[Set(Spec(field="field", spec="value"))],
             ),
             {
                 "$facet": {

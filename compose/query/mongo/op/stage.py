@@ -36,7 +36,7 @@ class Sort(Stage):
         return {"$sort": merged}
 
 
-class Specification(Operator):
+class Spec(Operator):
     def __init__(self, field: str, spec: Any):
         self.field = field
         self.spec = spec
@@ -44,12 +44,20 @@ class Specification(Operator):
     def expression(self) -> DictExpression:
         return {self.field: self.spec}
 
+    @classmethod
+    def include(cls, field: str) -> Spec:
+        return cls(field=field, spec=1)
 
-Spec = Specification
+    @classmethod
+    def exclude(cls, field: str) -> Spec:
+        return cls(field=field, spec=0)
+
+
+Specification = Spec
 
 
 class Project(Stage):
-    def __init__(self, *specs: Specification):
+    def __init__(self, *specs: Spec):
         self.specs = list(specs)
 
     def expression(self) -> DictExpression:
@@ -122,7 +130,7 @@ class Unwind(Stage):
 
 
 class Set(Stage):
-    def __init__(self, *specs: Specification):
+    def __init__(self, *specs: Spec):
         self.specs = list(specs)
 
     def expression(self) -> DictExpression:
