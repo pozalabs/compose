@@ -1,4 +1,4 @@
-name: Update cache
+name: Update Python Cache
 
 on:
   push:
