@@ -22,18 +22,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Load cached poetry installation
-        uses: actions/cache@v3
+      - name: Load python cache
+        uses: ./.github/actions/load-python-cache
         with:
-          path: ~/.local
-          key: poetry-${{ matrix.python-version }}
-
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          python-version: ${{ matrix.python-version }}
 
       - name: Run unit tests
         run: |
