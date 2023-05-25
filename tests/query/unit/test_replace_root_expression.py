@@ -1,20 +1,18 @@
-from typing import Any
-
 import pytest
 
 from compose.query.mongo.op import DictExpression, Raw, ReplaceRoot
 
 
 @pytest.mark.parametrize(
-    "new_root, expected",
+    "op, expected",
     [
-        ("$field", {"$replaceRoot": {"newRoot": "$field"}}),
+        (ReplaceRoot("$field"), {"$replaceRoot": {"newRoot": "$field"}}),
         (
-            {"$mergeObjects": ["$root", "$$ROOT"]},
+            ReplaceRoot({"$mergeObjects": ["$root", "$$ROOT"]}),
             {"$replaceRoot": {"newRoot": {"$mergeObjects": ["$root", "$$ROOT"]}}},
         ),
         (
-            Raw({"$mergeObjects": ["$root", "$$ROOT"]}),
+            ReplaceRoot(Raw({"$mergeObjects": ["$root", "$$ROOT"]})),
             {"$replaceRoot": {"newRoot": {"$mergeObjects": ["$root", "$$ROOT"]}}},
         ),
     ],
@@ -24,5 +22,5 @@ from compose.query.mongo.op import DictExpression, Raw, ReplaceRoot
         "`Operator`를 입력하면 생성된 표현식을 사용한다.",
     ),
 )
-def test_expression(new_root: Any, expected: DictExpression):
-    assert ReplaceRoot(new_root).expression() == expected
+def test_expression(op: ReplaceRoot, expected: DictExpression):
+    assert op.expression() == expected

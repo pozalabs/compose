@@ -74,3 +74,11 @@ class Filter(Operator):
     @classmethod
     def non_empty(cls, *ops: Operator) -> Filter:
         return cls(*ops, predicate=lambda op: op.expression())
+
+
+class Evaluable(Operator):
+    def __init__(self, op: Any):
+        self.op = op
+
+    def expression(self) -> Any:
+        return self.op.expression() if isinstance(self.op, Operator) else self.op

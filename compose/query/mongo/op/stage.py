@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Optional, Union
 
-from .base import Merge, Operator, Stage
+from .base import Evaluable, Merge, Operator, Stage
 from .logical import And, LogicalOperator, Or
 from .pipeline import Pipeline
 from .types import DictExpression, ListExpression, MongoKeyword, UnwindPath
@@ -42,7 +42,7 @@ class Spec(Operator):
         self.spec = spec
 
     def expression(self) -> DictExpression:
-        return {self.field: self.spec}
+        return {self.field: Evaluable(self.spec).expression()}
 
     @classmethod
     def include(cls, field: str) -> Spec:
@@ -72,9 +72,7 @@ class Lookup(Stage):
     def expression(self) -> DictExpression:
         return {
             "$lookup": {
-                MongoKeyword.from_py(field): (
-                    value.expression() if isinstance(value, Operator) else value
-                )
+                MongoKeyword.from_py(field): Evaluable(value).expression()
                 for field, value in self.__dict__.items()
             }
         }
@@ -227,12 +225,22 @@ class ReplaceRoot(Stage):
         self.new_root = new_root
 
     def expression(self) -> DictExpression:
+        return {"$replaceRoot": {"newRoot": Evaluable(self.new_root).expression()}}
+
+
+class Group(Stage):
+    def __init__(self, *ops: Operator, key: Optional[Any]):
+        self.ops = list(ops)
+        self.key = key
+
+    def expression(self) -> DictExpression:
         return {
-            "$replaceRoot": {
-                "newRoot": (
-                    self.new_root.expression()
-                    if isinstance(self.new_root, Operator)
-                    else self.new_root
-                )
+            "$group": {
+                "_id": Evaluable(self.key).expression(),
+                **Merge.dict(*self.ops).expression(),
             }
         }
+
+    @classmethod
+    def by_null(cls, *ops: Operator) -> Group:
+        return cls(*ops, key=None)
