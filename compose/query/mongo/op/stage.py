@@ -39,7 +39,7 @@ class Sort(Stage):
 class Spec(Operator):
     def __init__(self, field: str, spec: Any):
         self.field = field
-        self.spec = spec
+        self.spec = spec.expression() if isinstance(spec, Operator) else spec
 
     def expression(self) -> DictExpression:
         return {self.field: self.spec}
@@ -236,3 +236,21 @@ class ReplaceRoot(Stage):
                 )
             }
         }
+
+
+class Group(Stage):
+    def __init__(self, *ops: Operator, key: Optional[Any]):
+        self.ops = list(ops)
+        self.key = key and (key.expression() if isinstance(key, Operator) else key)
+
+    def expression(self) -> DictExpression:
+        return {
+            "$group": {
+                "_id": self.key,
+                **Merge.dict(*self.ops).expression(),
+            }
+        }
+
+    @classmethod
+    def null(cls, *ops: Operator) -> Group:
+        return cls(*ops, key=None)
