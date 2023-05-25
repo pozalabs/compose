@@ -75,7 +75,7 @@ from compose.query.mongo.op import DictExpression, Group, Spec
         "표현식을 그룹 키로 사용",
         "`Operator`를 그룹 키로 사용",
         "`None`을 그룹 키로 사용",
-        "`by_null()` 메서드를 사용하면 `None`을 키로 사용한다.",
+        "`by_null()` 메서드를 사용하면 `None`을 그룹 키로 사용한다.",
     ),
 )
 def test_expression(op: Group, expected: DictExpression):
