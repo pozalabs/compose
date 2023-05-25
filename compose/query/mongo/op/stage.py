@@ -252,5 +252,5 @@ class Group(Stage):
         }
 
     @classmethod
-    def null(cls, *ops: Operator) -> Group:
+    def by_null(cls, *ops: Operator) -> Group:
         return cls(*ops, key=None)
