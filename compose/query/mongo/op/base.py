@@ -80,5 +80,5 @@ class Evaluable(Operator):
     def __init__(self, op: Any):
         self.op = op
 
-    def expression(self) -> DictExpression:
+    def expression(self) -> Any:
         return self.op.expression() if isinstance(self.op, Operator) else self.op
