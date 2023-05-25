@@ -220,3 +220,19 @@ class Pagination(Stage):
             Skip((self.page - 1) * self.per_page).expression(),  # type: ignore
             Limit(self.per_page).expression(),  # type: ignore
         ]
+
+
+class ReplaceRoot(Stage):
+    def __init__(self, new_root: Any):
+        self.new_root = new_root
+
+    def expression(self) -> DictExpression:
+        return {
+            "$replaceRoot": {
+                "newRoot": (
+                    self.new_root.expression()
+                    if isinstance(self.new_root, Operator)
+                    else self.new_root
+                )
+            }
+        }
