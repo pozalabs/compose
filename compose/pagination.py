@@ -32,3 +32,7 @@ class Pagination(container.BaseModel):
     @property
     def pages(self) -> int:
         return math.ceil(self.total / self.per_page) if self.per_page is not None else 1
+
+    @property
+    def is_empty(self) -> bool:
+        return not self.total
