@@ -150,6 +150,10 @@ def test_next_page(
         (Pagination(total=0, items=[]), True),
         (Pagination(total=1, items=["item"]), False),
     ],
+    ids=(
+        "페이지네이션 목록이 비어 있으면 `True`를 리턴한다.",
+        "페이지네이션 목록이 비어 있지 않으면 `False`를 리턴한다.",
+    ),
 )
 def test_is_empty(pagination: Pagination, expected: bool):
     assert pagination.is_empty is expected
