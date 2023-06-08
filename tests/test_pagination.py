@@ -142,3 +142,14 @@ def test_next_page(
     pagination = pagination_factory(**pagination_params)
 
     assert pagination.next_page == expected
+
+
+@pytest.mark.parametrize(
+    "pagination, expected",
+    [
+        (Pagination(total=0, items=[]), True),
+        (Pagination(total=1, items=["item"]), False),
+    ],
+)
+def test_is_empty(pagination: Pagination, expected: bool):
+    assert pagination.is_empty is expected
