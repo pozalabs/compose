@@ -50,6 +50,11 @@ class Stage(Operator):
         raise NotImplementedError
 
 
+class EmptyStage(Stage):
+    def expression(self) -> DictExpression:
+        return {}
+
+
 class Merge(Operator):
     def __init__(self, *ops: Operator, initial: Any):
         self.ops = list(ops)
@@ -61,6 +66,10 @@ class Merge(Operator):
     @classmethod
     def dict(cls, *ops: Operator) -> Merge:
         return cls(*ops, initial={})
+
+    @classmethod
+    def list(cls, *ops: Operator) -> Merge:
+        return cls(*ops, initial=[])
 
 
 class Filter(Operator):

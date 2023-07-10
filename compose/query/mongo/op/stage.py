@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, cast
 
-from .base import Evaluable, Merge, Operator, Stage
+from . import Raw
+from .base import EmptyStage, Evaluable, Merge, Operator, Stage
 from .logical import And, LogicalOperator, Or
 from .pipeline import Pipeline
-from .types import DictExpression, ListExpression, MongoKeyword, UnwindPath
+from .types import DictExpression, MongoKeyword, UnwindPath
 
 
 class Match(Stage):
@@ -191,7 +192,8 @@ class Pagination(Stage):
         self,
         page: Optional[int] = None,
         per_page: Optional[int] = None,
-        metadata_ops: Optional[list[Operator]] = None,
+        metadata_ops: Optional[list[Stage]] = None,
+        optimize_count: bool = False,
     ):
         if not ((page is not None and per_page is not None) or (page is None and per_page is None)):
             raise ValueError("`page` and `per_page` are mutual inclusive")
@@ -199,25 +201,40 @@ class Pagination(Stage):
         self.page = page
         self.per_page = per_page
         self.metadata_ops = metadata_ops or []
+        self.optimize_count = optimize_count
 
         self.can_paginate = self.page is not None and self.per_page is not None
 
     def expression(self) -> DictExpression:
-        return {
-            "$facet": {
-                "metadata": [{"$count": "total"}, *[op.expression() for op in self.metadata_ops]],
-                "items": self._pagination_expression(),
-            }
-        }
+        return Facet(
+            FacetSubPipeline(output_field="metadata", pipeline=self._count_pipeline()),
+            FacetSubPipeline(
+                output_field="items",
+                pipeline=self._pagination_pipeline(),
+            ),
+        ).expression()
 
-    def _pagination_expression(self) -> ListExpression:
+    def _count_pipeline(self) -> Pipeline:
+        if not self.optimize_count:
+            return Pipeline(
+                cast(Stage, Raw({"$count": "total"})),
+                *self.metadata_ops,
+            )
+
+        return Pipeline(
+            Project(Spec.include("_id")),
+            Group(Raw({"total": {"$sum": 1}}), key=Spec.include("_id")),
+            *self.metadata_ops,
+        )
+
+    def _pagination_pipeline(self) -> Pipeline:
         if not self.can_paginate:
-            return []
+            return Pipeline(EmptyStage())
 
-        return [
-            Skip((self.page - 1) * self.per_page).expression(),  # type: ignore
-            Limit(self.per_page).expression(),  # type: ignore
-        ]
+        return Pipeline(
+            Skip((self.page - 1) * self.per_page),  # type: ignore
+            Limit(self.per_page),  # type: ignore
+        )
 
 
 class ReplaceRoot(Stage):
