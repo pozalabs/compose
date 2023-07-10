@@ -223,7 +223,8 @@ class Pagination(Stage):
 
         return Pipeline(
             Project(Spec.include("_id")),
-            Group(Raw({"total": {"$sum": 1}}), key=Spec.include("_id")),
+            Group(Raw({"total": {"$sum": 1}}), key=1),
+            Project(Spec.exclude("_id")),
             *self.metadata_ops,
         )
 
