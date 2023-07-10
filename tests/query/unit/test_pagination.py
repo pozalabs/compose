@@ -34,11 +34,25 @@ from compose.query.mongo.op import DictExpression, Pagination, Set, Spec
                 }
             },
         ),
+        (
+            Pagination(optimize_count=True),
+            {
+                "$facet": {
+                    "metadata": [
+                        {"$project": {"_id": 1}},
+                        {"$group": {"_id": 1, "total": {"$sum": 1}}},
+                        {"$project": {"_id": 0}},
+                    ],
+                    "items": [],
+                }
+            },
+        ),
     ],
     ids=(
         "페이지네이션을 수행하는 경우",
         "페이지네이션을 수행하지 않는 경우",
         "metadata 필드에 추가 필드를 설정하는 경우",
+        "개수 연산을 최적화하는 경우",
     ),
 )
 def test_pagination_expression(pagination: Pagination, expected: DictExpression):
