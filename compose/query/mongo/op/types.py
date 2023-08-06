@@ -9,6 +9,8 @@ DictExpression = dict[str, Any]
 ListExpression = list[DictExpression]
 Expression = TypeVar("Expression", DictExpression, ListExpression)
 
+Id = "$_id"
+
 
 class MongoKeyword(str):
     def __new__(cls, v: str):
