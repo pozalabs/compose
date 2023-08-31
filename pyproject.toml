@@ -18,6 +18,7 @@ pydantic = "^2.3.0"
 pre-commit = "^2.20.0"
 mypy = "^1.0.1"
 pytest = "^7.3.1"
+bump-pydantic = "^0.6.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
