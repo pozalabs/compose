@@ -1,3 +1,4 @@
+import copy
 from typing import Any, ClassVar
 
 from . import container, field, types
@@ -18,9 +19,10 @@ class Entity(container.TimeStampedModel):
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
 
-        fields = set(cls.__fields__.keys())
+        fields = set(cls.model_fields.keys())
         if diff := set(cls.updatable_fields) - fields:
             raise ValueError(f"`updatable_fields` must be subset of {fields}, but got {diff}")
 
-        id_field = cls.__fields__.pop("id")
-        cls.__fields__ = dict(id=id_field) | cls.__fields__
+        model_fields = copy.deepcopy(cls.model_fields)
+        id_field = model_fields.pop("id")
+        cls.model_fields = dict(id=id_field) | model_fields
