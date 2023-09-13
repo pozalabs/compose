@@ -4,9 +4,8 @@ import copy
 import json
 from typing import Any, Optional, TypeVar, Union
 
-import bson
 from pydantic import BaseModel as PydanticBaseModel
-from pydantic import ConfigDict, Extra
+from pydantic import ConfigDict
 
 from . import field, types
 
@@ -57,10 +56,9 @@ class BaseModel(PydanticBaseModel):
     # TODO[pydantic]: The following keys were removed: `json_encoders`.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     model_config = ConfigDict(
-        json_encoders={bson.ObjectId: str},
         populate_by_name=True,
         validate_assignment=True,
-        extra=Extra.forbid,
+        extra="forbid",
     )
 
 
