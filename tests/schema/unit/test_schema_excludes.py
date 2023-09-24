@@ -23,13 +23,15 @@ def model_type() -> Type[BaseModel]:
 @pytest.fixture
 def expected() -> dict[str, Any]:
     return {
-        "additionalProperties": False,
-        "properties": {"name": {"title": "Name", "type": "string"}},
-        "required": ["name"],
+        "properties": {
+            "id": {"title": "Id", "type": "string"},
+            "name": {"title": "Name", "type": "string"},
+        },
+        "required": ["id", "name"],
         "title": "Model",
         "type": "object",
     }
 
 
-def test_schema_by_field_name(model_type: Type[BaseModel], expected: dict[str, Any]):
+def test_schema_excludes(model_type: Type[BaseModel], expected: dict[str, Any]):
     assert model_type.model_json_schema() == expected
