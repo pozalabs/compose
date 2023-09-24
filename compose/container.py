@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import json
 from typing import Any, Optional, TypeVar, Union
 
@@ -65,15 +64,3 @@ class BaseModel(PydanticBaseModel):
 class TimeStampedModel(BaseModel):
     created_at: types.DateTime = field.DateTimeField()
     updated_at: types.DateTime = field.DateTimeField()
-
-    def __init_subclass__(cls, **kwargs: Any) -> None:
-        super().__init_subclass__(**kwargs)
-
-        model_fields = copy.deepcopy(cls.model_fields)
-
-        created_at_field = model_fields.pop("created_at")
-        updated_at_field = model_fields.pop("updated_at")
-        cls.model_fields = model_fields | dict(
-            created_at=created_at_field,
-            updated_at=updated_at_field,
-        )
