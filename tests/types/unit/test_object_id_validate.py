@@ -2,6 +2,7 @@ from typing import Union
 
 import bson
 import pytest
+from pydantic import TypeAdapter
 
 from compose.types import PyObjectId
 
@@ -18,7 +19,7 @@ from compose.types import PyObjectId
     ),
 )
 def test_validate(object_id: Union[bson.ObjectId, bytes], expected: PyObjectId):
-    actual = PyObjectId.validate(object_id)
+    actual = TypeAdapter(PyObjectId).validate_python(object_id)
 
     assert actual == expected
 
@@ -33,4 +34,4 @@ def test_validate(object_id: Union[bson.ObjectId, bytes], expected: PyObjectId):
 )
 def test_validate_invalid_id(object_id: Union[bytes, str]):
     with pytest.raises(ValueError):
-        PyObjectId.validate(object_id)
+        TypeAdapter(PyObjectId).validate_python(object_id)
