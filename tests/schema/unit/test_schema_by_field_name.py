@@ -1,7 +1,7 @@
 from typing import Any, Type
 
 import pytest
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from compose.container import BaseModel
 from compose.schema.extra import schema_by_field_name
@@ -12,8 +12,7 @@ def model_type() -> Type[BaseModel]:
     class Model(BaseModel):
         name: str = Field(alias="username")
 
-        class Config:
-            schema_extra = schema_by_field_name()
+        model_config = ConfigDict(json_schema_extra=schema_by_field_name())
 
     return Model
 
@@ -29,4 +28,4 @@ def expected() -> dict[str, Any]:
 
 
 def test_schema_by_field_name(model_type: Type[BaseModel], expected: dict[str, Any]):
-    assert model_type.schema() == expected
+    assert model_type.model_json_schema() == expected
