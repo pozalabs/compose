@@ -8,13 +8,15 @@ from . import types
 
 
 class _IdField:
-    def __call__(self, alias: str = "_id", **kwargs) -> Any:
-        return Field(alias=alias, **kwargs)  # type: ignore
+    def __call__(self, **kwargs) -> Any:
+        default_kwargs = {"alias": "_id"}
+        return Field(**(default_kwargs | kwargs))  # type: ignore
 
 
 class _DatetimeField:
     def __call__(self, **kwargs) -> types.DateTime:
-        return Field(default_factory=pendulum.DateTime.utcnow, **kwargs)  # type: ignore
+        default_kwargs = {"default_factory": pendulum.DateTime.utcnow}
+        return Field(**(default_kwargs | kwargs))  # type: ignore
 
 
 IdField: Callable[..., Any] = _IdField()
