@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Any, Optional
+from typing import Any
 
 import pendulum
 from pydantic import Field
@@ -8,8 +8,8 @@ from . import types
 
 
 class _IdField:
-    def __call__(self, alias: Optional[str] = None, **kwargs) -> Any:
-        return Field(alias=alias or "_id", **kwargs)  # type: ignore
+    def __call__(self, alias: str = "_id", **kwargs) -> Any:
+        return Field(alias=alias, **kwargs)  # type: ignore
 
 
 class _DatetimeField:
