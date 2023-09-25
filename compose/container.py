@@ -18,8 +18,8 @@ class BaseModel(PydanticBaseModel):
     def copy(
         self,
         *,
-        include: AbstractSetIntStr | MappingIntStrAny | None = None,
-        exclude: AbstractSetIntStr | MappingIntStrAny | None = None,
+        include: Optional[Union[AbstractSetIntStr, MappingIntStrAny]] = None,
+        exclude: Optional[Union[AbstractSetIntStr, MappingIntStrAny]] = None,
         update: Optional[dict[str, Any]] = None,
         deep: bool = False,
     ) -> Model:
