@@ -42,7 +42,7 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         """https://stackoverflow.com/a/73746554/9331155"""
         entity_type: EntityType = get_args(self.__class__.__orig_bases__[0])[0]  # type: ignore
         result = self.collection.find_one(filter=filter_, **kwargs)
-        return result and entity_type.parse_obj(result)
+        return result and entity_type.model_validate(result)
 
     def find_by_query(self, qry: MongoQuery, **kwargs) -> Optional[dict[str, Any]]:
         query_result = self.collection.aggregate(qry.to_query(), **kwargs)
@@ -53,22 +53,22 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         return list(query_result)
 
     def add(self, entity: EntityType, **kwargs) -> None:
-        self.collection.insert_one(entity.dict(by_alias=True), **kwargs)
+        self.collection.insert_one(entity_to_schema(entity), **kwargs)
 
     def add_many(self, entities: list[EntityType], **kwargs) -> None:
-        self.collection.insert_many([entity.dict(by_alias=True) for entity in entities], **kwargs)
+        self.collection.insert_many([entity_to_schema(entity) for entity in entities], **kwargs)
 
     def update(self, entity: EntityType, **kwargs) -> None:
         self.collection.update_one(
             {"_id": entity.id},
-            {"$set": entity.dict(by_alias=True)},
+            {"$set": entity_to_schema(entity)},
             **kwargs,
         )
 
     def update_many(self, entities: list[EntityType], **kwargs) -> None:
         self.collection.bulk_write(
             requests=[
-                UpdateOne({"_id": entity.id}, {"$set": entity.dict(by_alias=True)})
+                UpdateOne({"_id": entity.id}, {"$set": entity_to_schema(entity)})
                 for entity in entities
             ],
             **kwargs,
