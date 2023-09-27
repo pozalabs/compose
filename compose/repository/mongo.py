@@ -16,7 +16,7 @@ from . import base
 EntityType = TypeVar("EntityType", bound=Entity)
 
 
-def entity_to_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
+def entity_to_mongo_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
     default_kwargs = {"by_alias": True}
     return entity.model_dump(**(default_kwargs | kwargs))
 
@@ -53,22 +53,24 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         return list(query_result)
 
     def add(self, entity: EntityType, **kwargs) -> None:
-        self.collection.insert_one(entity_to_schema(entity), **kwargs)
+        self.collection.insert_one(entity_to_mongo_schema(entity), **kwargs)
 
     def add_many(self, entities: list[EntityType], **kwargs) -> None:
-        self.collection.insert_many([entity_to_schema(entity) for entity in entities], **kwargs)
+        self.collection.insert_many(
+            [entity_to_mongo_schema(entity) for entity in entities], **kwargs
+        )
 
     def update(self, entity: EntityType, **kwargs) -> None:
         self.collection.update_one(
             {"_id": entity.id},
-            {"$set": entity_to_schema(entity)},
+            {"$set": entity_to_mongo_schema(entity)},
             **kwargs,
         )
 
     def update_many(self, entities: list[EntityType], **kwargs) -> None:
         self.collection.bulk_write(
             requests=[
-                UpdateOne({"_id": entity.id}, {"$set": entity_to_schema(entity)})
+                UpdateOne({"_id": entity.id}, {"$set": entity_to_mongo_schema(entity)})
                 for entity in entities
             ],
             **kwargs,
