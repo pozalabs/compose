@@ -16,6 +16,11 @@ from . import base
 EntityType = TypeVar("EntityType", bound=Entity)
 
 
+def entity_to_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
+    default_kwargs = {"by_alias": True}
+    return entity.model_dump(**(default_kwargs | kwargs))
+
+
 class MongoRepository(base.BaseRepository, Generic[EntityType]):
     __collection_name__: ClassVar[str] = ""
     __indexes__: ClassVar[Optional[list[pymongo.IndexModel]]] = None
