@@ -25,12 +25,11 @@ def schema_by_field_name() -> SchemaExtraCallable:
 
     def wrapper(schema: dict[str, Any], model_class: Type[PydanticBaseModel]) -> None:
         updated = dict()
-        for field in model_class.__fields__.values():
-            field_name = field.name
+        for field_name, field in model_class.model_fields.items():
             alias = field.alias or field_name
             prop = schema.get("properties", {}).get(alias)
             updated[field_name] = prop
 
-        schema.update({"properties": updated})
+        schema |= dict(properties=updated)
 
     return wrapper
