@@ -21,11 +21,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-#      - name: Run unit tests
-#        run: |
-#          poetry run pytest -vv -s tests
-
       - name: Run unit tests (pydantic v1)
         run: |
-#          poetry add pydantic<2
           poetry run pytest -vv -s tests
