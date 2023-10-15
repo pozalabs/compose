@@ -2,13 +2,13 @@ from typing import ClassVar
 
 import pytest
 
-from compose.entity import Entity
+import compose
 
 
 def test_cannot_declare_entity_mismatched_updatable_fields():
     with pytest.raises(ValueError):
 
-        class TestEntity(Entity):
+        class TestEntity(compose.entity.Entity):
             field_a: str
             field_b: str
 
