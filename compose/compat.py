@@ -17,3 +17,10 @@ def validate_obj(t: type[T], value: Any, /) -> T:
         return TypeAdapter(t).validate_python(value)
     else:
         return parse_obj_as(t, value)
+
+
+def model_schema(t: type[pydantic.BaseModel], **kwargs) -> dict[str, Any]:
+    if IS_PYDANTIC_V2:
+        return t.model_json_schema(**kwargs)
+    else:
+        return t.schema(**kwargs)

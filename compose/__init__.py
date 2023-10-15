@@ -19,4 +19,5 @@ __all__ = [
     "command",
     "event",
     "dependency",
+    "compat",
 ]
