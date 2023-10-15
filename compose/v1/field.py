@@ -2,7 +2,7 @@ from collections.abc import Callable
 from typing import Any, Optional
 
 import pendulum
-from pydantic.v1 import Field
+from pydantic import Field
 
 from . import types
 

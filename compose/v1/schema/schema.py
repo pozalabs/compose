@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Any, Generic, TypeVar, get_args
 
-from pydantic.v1 import ValidationError
-from pydantic.v1.generics import GenericModel
-from pydantic.v1.typing import get_origin, is_union
+from pydantic import ValidationError
+from pydantic.generics import GenericModel
+from pydantic.typing import get_origin, is_union
 
 from .. import container
 from ..pagination import Pagination

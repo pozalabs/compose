@@ -5,7 +5,7 @@ from collections.abc import Callable, Generator
 from typing import Any, Union
 
 import pendulum
-from pydantic.v1.datetime_parse import parse_datetime
+from pydantic.datetime_parse import parse_datetime
 
 
 class DateTime(pendulum.DateTime):

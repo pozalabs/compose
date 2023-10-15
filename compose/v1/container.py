@@ -5,12 +5,12 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 import bson
-from pydantic.v1 import BaseModel as PydanticBaseModel
+from pydantic import BaseModel as PydanticBaseModel
 
 from . import field, types
 
 if TYPE_CHECKING:
-    from pydantic.v1.typing import AbstractSetIntStr, DictStrAny, MappingIntStrAny
+    from pydantic.typing import AbstractSetIntStr, DictStrAny, MappingIntStrAny
 
 
 class BaseModel(PydanticBaseModel):

@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from typing import Any
 
-from pydantic.v1 import BaseModel as PydanticBaseModel
+from pydantic import BaseModel as PydanticBaseModel
 
 SchemaExtraCallable = Callable[[dict[str, Any], type[PydanticBaseModel]], None]
 

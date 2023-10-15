@@ -1,7 +1,7 @@
 import math
 from typing import Any
 
-from pydantic.v1 import Field
+from pydantic import Field
 
 from . import container
 
