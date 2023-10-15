@@ -5,12 +5,11 @@ import pendulum
 import pytest
 from pendulum.tz.timezone import Timezone
 
-from compose.container import BaseModel
-from compose.types import DateTime
+import compose
 
 
-class Model(BaseModel):
-    created_at: DateTime
+class Model(compose.BaseModel):
+    created_at: compose.types.DateTime
 
 
 @pytest.fixture
@@ -21,7 +20,7 @@ def model(request: pytest.FixtureRequest) -> Model:
 
 @pytest.fixture
 def expected(request: pytest.FixtureRequest) -> Model:
-    dt: Union[pendulum.DateTime, DateTime] = getattr(request, "param")
+    dt: Union[pendulum.DateTime, compose.types.DateTime] = getattr(request, "param")
     return Model(created_at=dt)
 
 
@@ -38,7 +37,7 @@ def expected(request: pytest.FixtureRequest) -> Model:
         ),
         (
             pendulum.datetime(2023, 1, 5, tz=pendulum.UTC),
-            DateTime(2023, 1, 5, tzinfo=pendulum.UTC),
+            compose.types.DateTime(2023, 1, 5, tzinfo=pendulum.UTC),
         ),
     ],
     ids=(

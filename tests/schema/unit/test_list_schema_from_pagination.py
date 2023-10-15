@@ -1,24 +1,23 @@
 from __future__ import annotations
 
-from typing import Any, Type
+from typing import Any
 
 import pytest
 
+import compose
 from compose.pagination import Pagination
-from compose.schema import ListSchema, Schema
-from compose.types import PyObjectId
 
 
-class Item(Schema):
-    id: PyObjectId
+class Item(compose.schema.Schema):
+    id: compose.types.PyObjectId
 
 
-class ListSchemaWithExtra(ListSchema[Item]):
+class ListSchemaWithExtra(compose.schema.ListSchema[Item]):
     extra_field: str
 
 
-class ItemWithCustomParser(Schema):
-    id: PyObjectId
+class ItemWithCustomParser(compose.schema.Schema):
+    id: compose.types.PyObjectId
     version: str
     is_legacy: bool
 
@@ -36,8 +35,8 @@ def pagination_without_extra() -> Pagination:
     return Pagination(
         total=2,
         items=[
-            dict(id=PyObjectId(b"test-id-0001")),
-            dict(id=PyObjectId(b"test-id-0002")),
+            dict(id=compose.types.PyObjectId(b"test-id-0001")),
+            dict(id=compose.types.PyObjectId(b"test-id-0002")),
         ],
     )
 
@@ -47,8 +46,8 @@ def pagination_with_extra() -> Pagination:
     return Pagination(
         total=2,
         items=[
-            dict(id=PyObjectId(b"test-id-0001")),
-            dict(id=PyObjectId(b"test-id-0002")),
+            dict(id=compose.types.PyObjectId(b"test-id-0001")),
+            dict(id=compose.types.PyObjectId(b"test-id-0002")),
         ],
         extra=dict(extra_field="extra_value"),
     )
@@ -59,19 +58,19 @@ def pagination_with_custom_parser() -> Pagination:
     return Pagination(
         total=2,
         items=[
-            dict(id=PyObjectId(b"test-id-0001"), version="v1"),
-            dict(id=PyObjectId(b"test-id-0002"), version="v2"),
+            dict(id=compose.types.PyObjectId(b"test-id-0001"), version="v1"),
+            dict(id=compose.types.PyObjectId(b"test-id-0002"), version="v2"),
         ],
     )
 
 
 @pytest.fixture
-def expected_without_extra() -> ListSchema[Item]:
-    return ListSchema[Item](
+def expected_without_extra() -> compose.schema.ListSchema[Item]:
+    return compose.schema.ListSchema[Item](
         total=2,
         items=[
-            Item(id=PyObjectId(b"test-id-0001")),
-            Item(id=PyObjectId(b"test-id-0002")),
+            Item(id=compose.types.PyObjectId(b"test-id-0001")),
+            Item(id=compose.types.PyObjectId(b"test-id-0002")),
         ],
     )
 
@@ -81,20 +80,24 @@ def expected_with_extra() -> ListSchemaWithExtra:
     return ListSchemaWithExtra(
         total=2,
         items=[
-            Item(id=PyObjectId(b"test-id-0001")),
-            Item(id=PyObjectId(b"test-id-0002")),
+            Item(id=compose.types.PyObjectId(b"test-id-0001")),
+            Item(id=compose.types.PyObjectId(b"test-id-0002")),
         ],
         extra_field="extra_value",
     )
 
 
 @pytest.fixture
-def expected_with_custom_parser() -> ListSchema[ItemWithCustomParser]:
-    return ListSchema[ItemWithCustomParser](
+def expected_with_custom_parser() -> compose.schema.ListSchema[ItemWithCustomParser]:
+    return compose.schema.ListSchema[ItemWithCustomParser](
         total=2,
         items=[
-            ItemWithCustomParser(id=PyObjectId(b"test-id-0001"), version="v1", is_legacy=True),
-            ItemWithCustomParser(id=PyObjectId(b"test-id-0002"), version="v2", is_legacy=False),
+            ItemWithCustomParser(
+                id=compose.types.PyObjectId(b"test-id-0001"), version="v1", is_legacy=True
+            ),
+            ItemWithCustomParser(
+                id=compose.types.PyObjectId(b"test-id-0002"), version="v2", is_legacy=False
+            ),
         ],
     )
 
@@ -103,7 +106,7 @@ def expected_with_custom_parser() -> ListSchema[ItemWithCustomParser]:
     "schema_type, from_pagination_kwargs, pagination, expected",
     [
         (
-            ListSchema[Item],
+            compose.schema.ListSchema[Item],
             {},
             "pagination_without_extra",
             "expected_without_extra",
@@ -115,7 +118,7 @@ def expected_with_custom_parser() -> ListSchema[ItemWithCustomParser]:
             "expected_with_extra",
         ),
         (
-            ListSchema[ItemWithCustomParser],
+            compose.schema.ListSchema[ItemWithCustomParser],
             dict(parser_name="from_"),
             "pagination_with_custom_parser",
             "expected_with_custom_parser",
@@ -128,14 +131,14 @@ def expected_with_custom_parser() -> ListSchema[ItemWithCustomParser]:
     ),
 )
 def test_from_pagination(
-    schema_type: Type[ListSchema[Item]],
+    schema_type: type[compose.schema.ListSchema[Item]],
     from_pagination_kwargs: dict[str, Any],
     pagination: str,
     expected: str,
     request: pytest.FixtureRequest,
 ):
     pagination: Pagination = request.getfixturevalue(pagination)
-    expected: ListSchema[Item] = request.getfixturevalue(expected)
+    expected: compose.schema.ListSchema[Item] = request.getfixturevalue(expected)
 
     actual = schema_type.from_pagination(pagination, **from_pagination_kwargs)
 
@@ -146,7 +149,7 @@ def test_from_pagination(
     "schema_type, parser_name, pagination",
     [
         (
-            ListSchema[Item],
+            compose.schema.ListSchema[Item],
             "undefined_parser",
             "pagination_without_extra",
         ),
@@ -154,7 +157,7 @@ def test_from_pagination(
     ids=("스키마에 정의되어 있지 않은 파서를 입력하면 오류가 발생",),
 )
 def test_from_pagination_with_undefined_parser(
-    schema_type: Type[ListSchema[Item]],
+    schema_type: type[compose.schema.ListSchema[Item]],
     parser_name: str,
     pagination: str,
     request: pytest.FixtureRequest,
