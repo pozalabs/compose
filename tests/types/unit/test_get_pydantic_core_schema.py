@@ -1,10 +1,14 @@
 from typing import Any
 
+import pytest
 from pydantic import GetCoreSchemaHandler, TypeAdapter
-from pydantic.v1.validators import str_validator
+from pydantic.validators import str_validator
 from pydantic_core import core_schema
 
-from compose.types import get_pydantic_core_schema
+from compose import compat
+
+if compat.IS_PYDANTIC_V2:
+    from compose.types import get_pydantic_core_schema
 
 
 class StrippedStr(str):
@@ -24,6 +28,7 @@ class StrippedStr(str):
         return get_pydantic_core_schema(cls, handler(str))
 
 
+@pytest.mark.skipif(not compat.IS_PYDANTIC_V2)
 def test_get_pydantic_core_schema():
     validated_type = TypeAdapter(StrippedStr).validate_python(" test ")
 

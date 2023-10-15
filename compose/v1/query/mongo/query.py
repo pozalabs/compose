@@ -1,7 +1,7 @@
 import abc
 from typing import Any, Optional
 
-from pydantic.v1 import Field
+from pydantic import Field
 
 from .. import base
 
