@@ -29,7 +29,7 @@ class StrippedStr(str):
         return get_pydantic_core_schema(cls, handler(str))
 
 
-@pytest.mark.skipif(not compat.IS_PYDANTIC_V2)
+@pytest.mark.skipif(not compat.IS_PYDANTIC_V2, reason="pydantic v2 only")
 def test_get_pydantic_core_schema():
     validated_type = TypeAdapter(StrippedStr).validate_python(" test ")
 
