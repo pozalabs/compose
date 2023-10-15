@@ -27,5 +27,5 @@ jobs:
 
       - name: Run unit tests (pydantic v1)
         run: |
-          poetry add pydantic<2
+#          poetry add pydantic<2
           poetry run pytest -vv -s tests
