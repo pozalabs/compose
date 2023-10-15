@@ -4,7 +4,6 @@ import pytest
 from pydantic import Field
 
 import compose
-from compose.schema.extra import schema_by_field_name
 
 if compose.compat.IS_PYDANTIC_V2:
     from pydantic import ConfigDict
@@ -16,11 +15,11 @@ def model_type() -> type[compose.BaseModel]:
         name: str = Field(alias="username")
 
         if compose.compat.IS_PYDANTIC_V2:
-            model_config = ConfigDict(json_schema_extra=schema_by_field_name())
+            model_config = ConfigDict(json_schema_extra=compose.schema.schema_by_field_name())
         else:
 
             class Config:
-                schema_extra = schema_by_field_name()
+                schema_extra = compose.schema.schema_by_field_name()
 
     return Model
 

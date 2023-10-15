@@ -3,7 +3,6 @@ from typing import Any
 import pytest
 
 import compose
-from compose.schema.extra import schema_excludes
 
 if compose.compat.IS_PYDANTIC_V2:
     from pydantic import ConfigDict
@@ -17,11 +16,11 @@ def model_type() -> type[compose.BaseModel]:
         age: int | None = None
 
         if compose.compat.IS_PYDANTIC_V2:
-            model_config = ConfigDict(json_schema_extra=schema_excludes("age"))
+            model_config = ConfigDict(json_schema_extra=compose.schema.schema_excludes("age"))
         else:
 
             class Config:
-                schema_extra = schema_excludes("age")
+                schema_extra = compose.schema.schema_excludes("age")
 
     return Model
 

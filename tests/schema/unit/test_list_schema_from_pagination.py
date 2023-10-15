@@ -5,7 +5,6 @@ from typing import Any
 import pytest
 
 import compose
-from compose.pagination import Pagination
 
 
 class Item(compose.schema.Schema):
@@ -31,8 +30,8 @@ class ItemWithCustomParser(compose.schema.Schema):
 
 
 @pytest.fixture
-def pagination_without_extra() -> Pagination:
-    return Pagination(
+def pagination_without_extra() -> compose.pagination.Pagination:
+    return compose.pagination.Pagination(
         total=2,
         items=[
             dict(id=compose.types.PyObjectId(b"test-id-0001")),
@@ -42,8 +41,8 @@ def pagination_without_extra() -> Pagination:
 
 
 @pytest.fixture
-def pagination_with_extra() -> Pagination:
-    return Pagination(
+def pagination_with_extra() -> compose.pagination.Pagination:
+    return compose.pagination.Pagination(
         total=2,
         items=[
             dict(id=compose.types.PyObjectId(b"test-id-0001")),
@@ -54,8 +53,8 @@ def pagination_with_extra() -> Pagination:
 
 
 @pytest.fixture
-def pagination_with_custom_parser() -> Pagination:
-    return Pagination(
+def pagination_with_custom_parser() -> compose.pagination.Pagination:
+    return compose.pagination.Pagination(
         total=2,
         items=[
             dict(id=compose.types.PyObjectId(b"test-id-0001"), version="v1"),
@@ -137,7 +136,7 @@ def test_from_pagination(
     expected: str,
     request: pytest.FixtureRequest,
 ):
-    pagination: Pagination = request.getfixturevalue(pagination)
+    pagination: compose.pagination.Pagination = request.getfixturevalue(pagination)
     expected: compose.schema.ListSchema[Item] = request.getfixturevalue(expected)
 
     actual = schema_type.from_pagination(pagination, **from_pagination_kwargs)
@@ -162,7 +161,7 @@ def test_from_pagination_with_undefined_parser(
     pagination: str,
     request: pytest.FixtureRequest,
 ):
-    pagination: Pagination = request.getfixturevalue(pagination)
+    pagination: compose.pagination.Pagination = request.getfixturevalue(pagination)
 
     with pytest.raises(AttributeError):
         schema_type.from_pagination(
