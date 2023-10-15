@@ -16,6 +16,8 @@ jobs:
           - "^2.3.0"
       fail-fast: false
 
+    name: Python ${{ matrix.python-version }} / pydantic ${{ matrix.pydantic-version }}
+
     steps:
       - uses: actions/checkout@v3
 
