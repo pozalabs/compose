@@ -20,7 +20,7 @@ def model_type() -> type[compose.BaseModel]:
         else:
 
             class Config:
-                json_schema_extra = schema_by_field_name()
+                schema_extra = schema_by_field_name()
 
     return Model
 

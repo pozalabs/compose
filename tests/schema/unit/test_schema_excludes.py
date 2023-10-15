@@ -21,7 +21,7 @@ def model_type() -> type[compose.BaseModel]:
         else:
 
             class Config:
-                json_schema_extra = schema_excludes("age")
+                schema_extra = schema_excludes("age")
 
     return Model
 
