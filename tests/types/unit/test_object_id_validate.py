@@ -4,6 +4,7 @@ import bson
 import pytest
 from pydantic import TypeAdapter
 
+from compose import compat
 from compose.types import PyObjectId
 
 
@@ -19,7 +20,7 @@ from compose.types import PyObjectId
     ),
 )
 def test_validate(object_id: Union[bson.ObjectId, bytes], expected: PyObjectId):
-    actual = TypeAdapter(PyObjectId).validate_python(object_id)
+    actual = compat.validate_obj(PyObjectId, object_id)
 
     assert actual == expected
 
