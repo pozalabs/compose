@@ -5,22 +5,20 @@ from unittest import mock
 import pytest
 from pymongo.collection import Collection
 
-from compose.entity import Entity
-from compose.repository import MongoRepository
-from compose.types import DateTime, PyObjectId
+import compose
 
 
-class Model(Entity):
+class Model(compose.entity.Entity):
     name: str
 
 
 @pytest.fixture
 def model_data() -> dict[str, Any]:
     return dict(
-        id=PyObjectId(b"test-id-0001"),
+        id=compose.types.PyObjectId(b"test-id-0001"),
         name="name01",
-        created_at=DateTime(2023, 1, 13),
-        updated_at=DateTime(2023, 1, 13),
+        created_at=compose.types.DateTime(2023, 1, 13),
+        updated_at=compose.types.DateTime(2023, 1, 13),
     )
 
 
@@ -32,8 +30,8 @@ def fake_collection(model_data: dict[str, Any]) -> Collection:
 
 
 @pytest.fixture
-def fake_mongo_repository(fake_collection: Collection) -> MongoRepository[Model]:
-    class ModelRepository(MongoRepository[Model]):
+def fake_mongo_repository(fake_collection: Collection) -> compose.repository.MongoRepository[Model]:
+    class ModelRepository(compose.repository.MongoRepository[Model]):
         __collection_name__ = "model"
 
     return ModelRepository(fake_collection)
@@ -45,9 +43,9 @@ def expected(model_data: dict[str, Any]) -> Model:
 
 
 def test_mongo_repository_find_by_return_concrete_entity_type(
-    fake_mongo_repository: MongoRepository[Model],
+    fake_mongo_repository: compose.repository.MongoRepository[Model],
     expected: Model,
 ):
-    actual = fake_mongo_repository.find_by({"_id": PyObjectId(b"test-id-0001")})
+    actual = fake_mongo_repository.find_by({"_id": compose.types.PyObjectId(b"test-id-0001")})
 
     assert actual == expected
