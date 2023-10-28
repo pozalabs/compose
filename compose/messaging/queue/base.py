@@ -13,5 +13,5 @@ class MessageQueue(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def delete(self) -> model.EventMessage | None:
+    def delete(self, message: model.EventMessage) -> None:
         raise NotImplementedError
