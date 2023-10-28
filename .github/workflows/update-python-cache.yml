@@ -19,7 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup python
-        uses: ./.github/actions/setup-python
+      - uses: POZAlabs/actions/.github/actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}

@@ -1,18 +1,24 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import Callable, Generator
 from typing import Any, Union
 
 import pendulum
-from pydantic.datetime_parse import parse_datetime
+from pydantic import GetCoreSchemaHandler
+from pydantic_core import CoreSchema, core_schema
 
 
 class DateTime(pendulum.DateTime):
+    """https://stackoverflow.com/a/76719893"""
+
     @classmethod
-    def __get_validators__(cls) -> Generator[Callable[[Any], pendulum.DateTime], None, None]:
-        yield parse_datetime  # type: ignore
-        yield cls._instance
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: GetCoreSchemaHandler
+    ) -> CoreSchema:
+        return core_schema.no_info_after_validator_function(
+            cls._instance,
+            handler(datetime.datetime),
+        )
 
     @classmethod
     def _instance(cls, v: Union[datetime.datetime, pendulum.DateTime]) -> pendulum.DateTime:

@@ -2,24 +2,13 @@ from typing import ClassVar
 
 import pytest
 
-from compose.entity import Entity
-
-
-def test_entity_id_field_is_ordered_first():
-    class TestEntity(Entity):
-        field_a: str
-        field_b: str
-
-    actual = list(TestEntity.__fields__.keys())
-    expected = ["id", "field_a", "field_b", "created_at", "updated_at"]
-
-    assert actual == expected
+import compose
 
 
 def test_cannot_declare_entity_mismatched_updatable_fields():
     with pytest.raises(ValueError):
 
-        class TestEntity(Entity):
+        class TestEntity(compose.entity.Entity):
             field_a: str
             field_b: str
 

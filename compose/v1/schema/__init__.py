@@ -6,6 +6,6 @@ __all__ = [
     "TimeStampedSchema",
     "ListSchema",
     "Error",
-    "schema_by_field_name",
     "schema_excludes",
+    "schema_by_field_name",
 ]

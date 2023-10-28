@@ -1,14 +1,15 @@
-from typing import Any, Callable, Type
+from collections.abc import Callable
+from typing import Any
 
 from pydantic import BaseModel as PydanticBaseModel
 
-SchemaExtraCallable = Callable[[dict[str, Any], Type[PydanticBaseModel]], None]
+SchemaExtraCallable = Callable[[dict[str, Any], type[PydanticBaseModel]], None]
 
 
 def schema_excludes(*excludes: str) -> SchemaExtraCallable:
     """OpenAPI 문서에서 특정 필드를 제외합니다. 외부에 노출하지 않아도 되는 필드를 문서에서 제외할 때 사용합니다."""
 
-    def wrapper(schema: dict[str, Any], model_class: Type[PydanticBaseModel]) -> None:
+    def wrapper(schema: dict[str, Any], model_class: type[PydanticBaseModel]) -> None:
         for exclude in excludes:
             schema.get("properties", {}).pop(exclude)
 
@@ -23,13 +24,14 @@ def schema_by_field_name() -> SchemaExtraCallable:
         https://github.com/tiangolo/fastapi/issues/1810#issuecomment-895126406
     """
 
-    def wrapper(schema: dict[str, Any], model_class: Type[PydanticBaseModel]) -> None:
+    def wrapper(schema: dict[str, Any], model_class: type[PydanticBaseModel]) -> None:
         updated = dict()
-        for field_name, field in model_class.model_fields.items():
+        for field in model_class.__fields__.values():
+            field_name = field.name
             alias = field.alias or field_name
             prop = schema.get("properties", {}).get(alias)
             updated[field_name] = prop
 
-        schema |= dict(properties=updated)
+        schema.update({"properties": updated})
 
     return wrapper
