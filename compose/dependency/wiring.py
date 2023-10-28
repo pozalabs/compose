@@ -6,8 +6,6 @@ from typing import Any, Protocol, TypeVar
 from dependency_injector import containers, providers
 from dependency_injector.wiring import Provide
 
-from compose.utils import deprecated
-
 T = TypeVar("T")
 
 
@@ -114,12 +112,6 @@ def resolve(
         if len(candidates) == 1
         else resolve_by_name(name=name, container_cls=container_cls)
     )
-
-
-resolve_dependency = deprecated(
-    "`resolve_dependency` is deprecated and will be removed in a future version. "
-    "Use `resolve` instead."
-)(resolve)
 
 
 def provide(

@@ -1,3 +1,3 @@
-from .wiring import create_wirer, provide, resolve, resolve_dependency
+from .wiring import create_wirer, provide, resolve
 
-__all__ = ["create_wirer", "resolve_dependency", "resolve", "provide"]
+__all__ = ["create_wirer", "resolve", "provide"]
