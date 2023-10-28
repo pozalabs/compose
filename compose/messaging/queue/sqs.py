@@ -31,7 +31,9 @@ class SqsMessageQueue(MessageQueue):
         self.wait_time_seconds = wait_time_seconds
 
         self._queue_url = self.client.get_queue_url(QueueName=queue_name)["QueueUrl"]
-        self._event_cls_map = {cls.__name__: cls for cls in utils.descendants_of(MessageQueue)}
+        self._event_cls_map = {
+            cls.__name__: cls for cls in utils.descendants_of(model.SqsEventMessage)
+        }
 
     def push(self, message: model.SqsEventMessage) -> None:
         self.client.send_message(
