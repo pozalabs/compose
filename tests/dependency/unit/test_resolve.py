@@ -26,6 +26,11 @@ def id_generator(length: int) -> str:
     return "ABCDEF"[:length]
 
 
+class RepositoryA:
+    def __init__(self, name: str):
+        self.name = name
+
+
 class NestedRepository:
     ...
 
@@ -38,6 +43,8 @@ class NestedContainer(containers.DeclarativeContainer):
 
 class ApplicationContainer(containers.DeclarativeContainer):
     repository = providers.Factory(Repository)
+    repository_a1 = providers.Factory(RepositoryA, name="repository_a1")
+    repository_a2 = providers.Factory(RepositoryA, name="repository_a2")
 
     nested = providers.Container(NestedContainer)
     adder = providers.Factory(adder, a=1, b=2)
@@ -72,6 +79,24 @@ def test_resolve(
     resolved = resolve(type_=type_, container_cls=container_cls)  # type: ignore
 
     assert isinstance(resolved.cls(), expected)
+
+
+@pytest.mark.parametrize(
+    "type_, container_cls, name, expected",
+    [
+        (RepositoryA, ApplicationContainer, "repository_a1", RepositoryA("repository_a1")),
+        (RepositoryA, ApplicationContainer, "repository_a2", RepositoryA("repository_a2")),
+    ],
+)
+def test_resolve_multiple_candidates(
+    type_: type[Any],
+    container_cls: type[containers.Container],
+    name: str,
+    expected: type[Any],
+):
+    resolved = resolve(type_=type_, container_cls=container_cls, name=name)
+
+    assert resolved().__dict__ == expected.__dict__
 
 
 @pytest.mark.parametrize(
@@ -111,3 +136,8 @@ def test_resolve_func_by_name(
 def test_cannot_resolve(type_: type[Any], container_cls: type[containers.Container]):
     with pytest.raises(ValueError):
         resolve(type_=type_, container_cls=container_cls)  # type: ignore
+
+
+def test_cannot_resolve_without_name_for_multiple_candidates():
+    with pytest.raises(ValueError):
+        resolve(RepositoryA, ApplicationContainer)
