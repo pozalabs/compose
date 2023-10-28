@@ -7,7 +7,7 @@ authors = ["sunwoong <sunwoong@pozalabs.com>"]
 packages = [{include = "compose"}]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
+python = ">=3.10,<4.0"
 pydantic = "^1.10.2"
 pendulum = "^2.1.2"
 pymongo = {extras = ["aws"], version = "^4.3.3"}
