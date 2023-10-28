@@ -1,7 +1,7 @@
 import functools
 import inspect
 from collections.abc import Iterable
-from typing import Any, Optional, Protocol, TypeVar, Union
+from typing import Any, Protocol, TypeVar
 
 from dependency_injector import containers, providers
 from dependency_injector.wiring import Provide
@@ -15,8 +15,8 @@ class Wirer(Protocol):
     def __call__(
         self,
         container: containers.Container,
-        modules: Optional[Iterable[str]] = None,
-        from_package: Optional[str] = None,
+        modules: Iterable[str] | None = None,
+        from_package: str | None = None,
     ) -> None:
         ...
 
@@ -24,8 +24,8 @@ class Wirer(Protocol):
 def create_wirer(packages: Iterable[str]) -> Wirer:
     def wire_container(
         container: containers.Container,
-        modules: Optional[Iterable[str]] = None,
-        from_package: Optional[str] = None,
+        modules: Iterable[str] | None = None,
+        from_package: str | None = None,
     ) -> None:
         container.check_dependencies()
         container.wire(modules=modules, packages=packages, from_package=from_package)
@@ -73,9 +73,7 @@ def resolve_by_name(
 
 
 @functools.lru_cache(32)
-def resolve(
-    type_: Union[type[Any], str], container_cls: type[containers.Container]
-) -> providers.Factory:
+def resolve(type_: type[Any] | str, container_cls: type[containers.Container]) -> providers.Factory:
     """
     의존성 전체 등록 경로를 참조하지 않고 의존성을 해결합니다. 다른 패키지의 의존성을 참조하는 경우
     의존 대상 선언 경로에 깊게 의존하는 것을 방지합니다. `container_cls`는 최상위 컨테이너일수도,
