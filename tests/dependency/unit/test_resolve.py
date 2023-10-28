@@ -88,7 +88,7 @@ def test_resolve(
         (RepositoryA, ApplicationContainer, "repository_a2", RepositoryA("repository_a2")),
     ],
 )
-def test_resolve_multiple_candidates(
+def test_resolve_from_multiple_candidates(
     type_: type[Any],
     container_cls: type[containers.Container],
     name: str,
@@ -138,6 +138,6 @@ def test_cannot_resolve(type_: type[Any], container_cls: type[containers.Contain
         resolve(type_=type_, container_cls=container_cls)  # type: ignore
 
 
-def test_cannot_resolve_without_name_for_multiple_candidates():
+def test_cannot_resolve_without_name_from_multiple_candidates():
     with pytest.raises(ValueError):
         resolve(RepositoryA, ApplicationContainer)
