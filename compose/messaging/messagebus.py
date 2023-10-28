@@ -36,7 +36,7 @@ class MessageBus:
         try:
             container = importlib.import_module(module_path)
         except ImportError:
-            raise ValueError(f"Cannot not import module {module_path}")
+            raise ImportError(f"Cannot not import module {module_path}")
 
         if (container_cls := getattr(container, container_name, None)) is None:
             raise ValueError(f"Cannot find container {container_name} in module {module_path}")
