@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 
+import compose
 from compose import utils
 
 from .. import model
@@ -26,13 +27,13 @@ class SqsMessageQueue(MessageQueue):
         sqs_client: mypy_boto3_sqs.SQSClient,
         queue_name: str,
         wait_time_seconds: int,
-        message_cls: type[model.SqsEventMessage] = model.SqsEventMessage,
+        event_cls: type[model.SqsEventMessage] = compose.event.Event,
     ):
         self.client = sqs_client
         self.wait_time_seconds = wait_time_seconds
 
         self._queue_url = self.client.get_queue_url(QueueName=queue_name)["QueueUrl"]
-        self._event_cls_map = {cls.__name__: cls for cls in utils.descendants_of(message_cls)}
+        self._event_cls_map = {cls.__name__: cls for cls in utils.descendants_of(event_cls)}
 
     def push(self, message: model.SqsEventMessage) -> None:
         self.client.send_message(
