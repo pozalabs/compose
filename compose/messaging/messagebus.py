@@ -39,7 +39,7 @@ class MessageBus:
             raise ImportError(f"Cannot not import module {module_path}")
 
         if (container_cls := getattr(container, container_name, None)) is None:
-            raise ValueError(f"Cannot find container {container_name} in module {module_path}")
+            raise ValueError(f"Cannot find container {container_name} in {module_path}")
 
         return cls(dependency_resolver=create_resolver(container_cls))
 
