@@ -8,12 +8,12 @@ import re
 from collections.abc import Callable
 from typing import Protocol
 
+import compose
 from compose.dependency.wiring import create_resolver
-from compose.event import Event
 
 
 class EventHandler(Protocol):
-    def handle(self, evt: Event) -> None:
+    def handle(self, evt: compose.event.Event) -> None:
         ...
 
 
@@ -43,14 +43,16 @@ class MessageBus:
 
         return cls(dependency_resolver=create_resolver(container_cls))
 
-    async def handle_event(self, evt: Event) -> None:
+    async def handle_event(self, evt: compose.event.Event) -> None:
         handler_names = self._event_handlers.get(evt.__class__.__name__, set())
         event_loop = asyncio.get_running_loop()
         for handler_name in handler_names:
             handler = self.dependency_resolver(handler_name)
             await event_loop.run_in_executor(None, functools.partial(handler.handle, evt))
 
-    def register(self, event_cls: type[Event]) -> Callable[[EventHandler], EventHandler]:
+    def register(
+        self, event_cls: type[compose.event.Event]
+    ) -> Callable[[EventHandler], EventHandler]:
         def wrapper(handler_cls: EventHandler) -> EventHandler:
             event_name = event_cls.__name__
             handler_name = handler_cls.__name__
