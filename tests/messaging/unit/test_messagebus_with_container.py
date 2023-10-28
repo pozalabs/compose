@@ -1,6 +1,5 @@
 import functools
 
-import pytest
 from dependency_injector import containers, providers
 
 import compose
@@ -18,16 +17,6 @@ class SomethingHappenedHandler:
 
 class ApplicationContainer(containers.DeclarativeContainer):
     something_happened_handler = providers.Factory(SomethingHappenedHandler)
-
-
-@pytest.fixture
-def with_container() -> MessageBus | None:
-    try:
-        return MessageBus.with_container(
-            "tests.messaging.unit.test_messagebus_with_container:ApplicationContainer"
-        )
-    except (ValueError, ImportError):
-        return None
 
 
 def test_with_container():
