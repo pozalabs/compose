@@ -18,7 +18,7 @@ EntityType = TypeVar("EntityType", bound=Entity)
 
 def entity_to_mongo_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
     default_kwargs = {"by_alias": True}
-    return entity.model_dump(**(default_kwargs | kwargs))
+    return entity.dict(**(default_kwargs | kwargs))
 
 
 class MongoRepository(base.BaseRepository, Generic[EntityType]):
@@ -42,7 +42,7 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         """https://stackoverflow.com/a/73746554/9331155"""
         entity_type: EntityType = get_args(self.__class__.__orig_bases__[0])[0]  # type: ignore
         result = self.collection.find_one(filter=filter_, **kwargs)
-        return result and entity_type.model_validate(result)
+        return result and entity_type.parse_obj(result)
 
     def find_by_query(self, qry: MongoQuery, **kwargs) -> Optional[dict[str, Any]]:
         query_result = self.collection.aggregate(qry.to_query(), **kwargs)

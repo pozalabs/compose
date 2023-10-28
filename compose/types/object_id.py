@@ -1,19 +1,31 @@
-from typing import Any, Callable, Generator, Union
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any, Type, Union
 
 import bson
+from pydantic_core import CoreSchema, core_schema
 
 
 class PyObjectId(bson.ObjectId):
     @classmethod
-    def __get_validators__(cls) -> Generator[Callable[[Any], bson.ObjectId], None, None]:
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v: Union[bson.ObjectId, bytes]) -> bson.ObjectId:
+    def validate(
+        cls, v: Union[bson.ObjectId, bytes], _: core_schema.ValidationInfo
+    ) -> bson.ObjectId:
         if not bson.ObjectId.is_valid(v):
             raise ValueError("Invalid object id")
         return bson.ObjectId(v)
 
     @classmethod
-    def __modify_schema__(cls, field_schema: dict[str, Any]) -> None:
-        field_schema.update(type="string")
+    def __get_pydantic_core_schema__(cls, source_type: Type[PyObjectId]) -> CoreSchema:
+        return core_schema.general_plain_validator_function(
+            cls.validate, serialization=core_schema.to_string_ser_schema()
+        )
+
+    @classmethod
+    def __get_pydantic_json_schema__(
+        cls,
+        schema: core_schema.CoreSchema,
+        handler: Callable[[Any], core_schema.CoreSchema],
+    ) -> CoreSchema:
+        return dict(type="string")

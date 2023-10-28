@@ -1,12 +1,13 @@
-from compose.container import BaseModel
-from compose.types import PyObjectId
+import compose
+
+
+class TestModel(compose.BaseModel):
+    id: compose.types.PyObjectId
 
 
 def test_py_object_id_schema_type_is_string():
-    class TestModel(BaseModel):
-        id: PyObjectId
+    actual = compose.compat.model_schema(TestModel)
 
-    actual = TestModel.schema()
     expected = {
         "properties": {"id": {"title": "Id", "type": "string"}},
         "required": ["id"],
