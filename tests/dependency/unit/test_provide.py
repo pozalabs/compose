@@ -1,9 +1,11 @@
-from typing import Any
+from typing import TypeVar
 
 import pytest
 from dependency_injector import containers, providers
 
 from compose.dependency import provide
+
+T = TypeVar("T")
 
 
 class RepositoryA:
@@ -24,10 +26,10 @@ class ApplicationContainer(containers.DeclarativeContainer):
     ],
 )
 def test_provide_from_multiple_candidates(
-    type_: type[Any],
+    type_: type[T],
     container_cls: type[containers.Container],
     name: str,
-    expected: type[Any],
+    expected: type[T],
 ):
     provided = provide(type_, container_cls, name=name)
 
