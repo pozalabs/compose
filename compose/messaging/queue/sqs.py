@@ -11,6 +11,14 @@ from .base import MessageQueue
 if TYPE_CHECKING:
     import mypy_boto3_sqs
 
+try:
+    import boto3  # noqa: F401
+except ImportError:
+    raise ImportError(
+        "The aws extra must be installed to use the `SqsMessageQueue`. "
+        "Install with package with `aws` extra (`compose[aws]`)"
+    )
+
 
 class SqsMessageQueue(MessageQueue):
     def __init__(
