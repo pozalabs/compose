@@ -1,6 +1,6 @@
 import functools
 import inspect
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from typing import Any, Protocol, TypeVar
 
 from dependency_injector import containers, providers
@@ -118,3 +118,10 @@ def provide(
     type_: type[T], from_: type[containers.Container], /, *, name: str | None
 ) -> Provide[T]:
     return Provide[resolve(type_=type_, container_cls=from_, name=name)]
+
+
+def create_resolver(container_cls: type[containers.Container]) -> Callable[[str], Any]:
+    def resolver(name: str) -> Any:
+        return resolve(type_=name, container_cls=container_cls)
+
+    return resolver
