@@ -115,7 +115,7 @@ def resolve(
 
 
 def provide(
-    type_: type[T], from_: type[containers.Container], /, *, name: str | None
+    type_: type[T], from_: type[containers.Container], /, *, name: str | None = None
 ) -> Provide[T]:
     return Provide[resolve(type_=type_, container_cls=from_, name=name)]
 
