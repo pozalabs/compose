@@ -1,3 +1,3 @@
-from mongo import MongoUnitOfWork
+from .mongo import MongoUnitOfWork
 
 __all__ = ["MongoUnitOfWork"]
