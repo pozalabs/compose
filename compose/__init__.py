@@ -1,4 +1,4 @@
-from . import compat, dependency, result
+from . import compat, db, dependency, result
 
 if compat.IS_PYDANTIC_V2:
     from . import command, entity, event, field, pagination, query, repository, schema, types
@@ -22,4 +22,5 @@ __all__ = [
     "compat",
     "pagination",
     "result",
+    "db",
 ]
