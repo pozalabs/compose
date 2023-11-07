@@ -7,7 +7,7 @@ from . import model
 from .messagebus import MessageBus
 from .queue import MessageQueue
 
-CAN_USE_RUNNER = sys.version_info >= (3, 11)
+CAN_USE_ASYNCIO_RUNNER = sys.version_info >= (3, 11)
 
 
 class MessageConsumer:
@@ -50,7 +50,7 @@ class MessageConsumerRunner:
             t.join()
 
     def _run_in_thread(self) -> None:
-        if CAN_USE_RUNNER:
+        if CAN_USE_ASYNCIO_RUNNER:
             with asyncio.Runner() as runner:
                 runner.run(self._run_consumer())
         else:
