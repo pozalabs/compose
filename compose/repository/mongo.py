@@ -4,6 +4,7 @@ from typing import Any, ClassVar, Generic, Optional, TypeVar, get_args
 
 import pymongo
 from pymongo import UpdateOne
+from pymongo.client_session import ClientSession
 from pymongo.collection import Collection
 from pymongo.database import Database
 
@@ -35,49 +36,68 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
             collection.create_indexes(cls.__indexes__)
         return cls(collection)
 
-    def find_by_id(self, entity_id: types.PyObjectId, **kwargs) -> Optional[EntityType]:
-        return self.find_by({"_id": entity_id}, **kwargs)
+    def find_by_id(
+        self,
+        entity_id: types.PyObjectId,
+        session: ClientSession | None = None,
+        **kwargs,
+    ) -> Optional[EntityType]:
+        return self.find_by({"_id": entity_id}, session=session, **kwargs)
 
-    def find_by(self, filter_: dict[str, Any], **kwargs) -> Optional[EntityType]:
+    def find_by(
+        self, filter_: dict[str, Any], session: ClientSession | None = None, **kwargs
+    ) -> Optional[EntityType]:
         """https://stackoverflow.com/a/73746554/9331155"""
         entity_type: EntityType = get_args(self.__class__.__orig_bases__[0])[0]  # type: ignore
-        result = self.collection.find_one(filter=filter_, **kwargs)
+        result = self.collection.find_one(filter=filter_, session=session, **kwargs)
         return result and entity_type.model_validate(result)
 
-    def find_by_query(self, qry: MongoQuery, **kwargs) -> Optional[dict[str, Any]]:
-        query_result = self.collection.aggregate(qry.to_query(), **kwargs)
+    def find_by_query(
+        self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
+    ) -> Optional[dict[str, Any]]:
+        query_result = self.collection.aggregate(qry.to_query(), session=session, **kwargs)
         return next(query_result, None)
 
-    def list_by_query(self, qry: MongoQuery, **kwargs) -> list[dict[str, Any]]:
-        query_result = self.collection.aggregate(qry.to_query(), **kwargs)
+    def list_by_query(
+        self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
+    ) -> list[dict[str, Any]]:
+        query_result = self.collection.aggregate(qry.to_query(), session=session, **kwargs)
         return list(query_result)
 
-    def add(self, entity: EntityType, **kwargs) -> None:
-        self.collection.insert_one(entity_to_mongo_schema(entity), **kwargs)
+    def add(self, entity: EntityType, session: ClientSession | None = None, **kwargs) -> None:
+        self.collection.insert_one(entity_to_mongo_schema(entity), session=session, **kwargs)
 
-    def add_many(self, entities: list[EntityType], **kwargs) -> None:
+    def add_many(
+        self, entities: list[EntityType], session: ClientSession | None = None, **kwargs
+    ) -> None:
         self.collection.insert_many(
-            [entity_to_mongo_schema(entity) for entity in entities], **kwargs
+            [entity_to_mongo_schema(entity) for entity in entities], session=session, **kwargs
         )
 
-    def update(self, entity: EntityType, **kwargs) -> None:
+    def update(self, entity: EntityType, session: ClientSession | None = None, **kwargs) -> None:
         self.collection.update_one(
             {"_id": entity.id},
             {"$set": entity_to_mongo_schema(entity)},
+            session=session,
             **kwargs,
         )
 
-    def update_many(self, entities: list[EntityType], **kwargs) -> None:
+    def update_many(
+        self, entities: list[EntityType], session: ClientSession | None = None, **kwargs
+    ) -> None:
         self.collection.bulk_write(
             requests=[
                 UpdateOne({"_id": entity.id}, {"$set": entity_to_mongo_schema(entity)})
                 for entity in entities
             ],
+            session=session,
             **kwargs,
         )
 
-    def delete(self, entity_id: types.PyObjectId, **kwargs) -> None:
-        self.collection.delete_one({"_id": entity_id}, **kwargs)
+    def delete(
+        self, entity_id: types.PyObjectId, session: ClientSession | None = None, **kwargs
+    ) -> None:
+        self.collection.delete_one({"_id": entity_id}, session=session, **kwargs)
 
     def execute_raw(self, operation: str, **operation_kwargs) -> Any:
         op = getattr(self.collection, operation, None)
@@ -85,8 +105,10 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
             raise ValueError(f"Unknown operation on collection: {operation}")
         return op(**operation_kwargs)
 
-    def filter(self, qry: MongoFilterQuery) -> Pagination:
-        query_result = self.collection.aggregate(qry.to_query())
+    def filter(
+        self, qry: MongoFilterQuery, session: ClientSession | None = None, **kwargs
+    ) -> Pagination:
+        query_result = self.collection.aggregate(qry.to_query(), session=session, **kwargs)
         if (unwrapped := next(query_result, None)) is None:
             raise ValueError(f"{qry.__class__.__name__} returned nothing")
 
