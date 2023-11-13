@@ -6,17 +6,13 @@ from . import (
     entity,
     event,
     pagination,
+    query,
     repository,
     result,
     schema,
     types,
 )
 from .container import BaseModel, TimeStampedModel
-
-if compat.IS_PYDANTIC_V2:
-    from . import query
-else:
-    from .v1 import query
 
 __all__ = [
     "BaseModel",
