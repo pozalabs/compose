@@ -1,11 +1,13 @@
+from .. import compat
 from .datetime import DateTime
-from .helper import SupportsGetValidators, chain, get_pydantic_core_schema
 from .object_id import PyObjectId
 
 __all__ = [
     "PyObjectId",
     "DateTime",
-    "SupportsGetValidators",
-    "get_pydantic_core_schema",
-    "chain",
 ]
+
+if compat.IS_PYDANTIC_V2:
+    from .helper import SupportsGetValidators, chain, get_pydantic_core_schema  # noqa: F401
+
+    __all__.extend(["SupportsGetValidators", "get_pydantic_core_schema", "chain"])
