@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import enum
+import inspect
 from typing import Any, ClassVar, Generic, Optional, TypeVar, get_args
 
 import pymongo
@@ -17,6 +19,11 @@ from . import base
 EntityType = TypeVar("EntityType", bound=Entity)
 
 
+class SessionRequirement(str, enum.Enum):
+    REQUIRED = "required"
+    OPTIONAL = "optional"
+
+
 def entity_to_mongo_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
     default_kwargs = {"by_alias": True}
     return entity.model_dump(**(default_kwargs | kwargs))
@@ -28,6 +35,26 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
 
     def __init__(self, collection: Collection):
         self.collection = collection
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__()
+        cls._validate_session_requirement(
+            kwargs.get("session_requirement", SessionRequirement.OPTIONAL)
+        )
+
+    @classmethod
+    def _validate_session_requirement(cls, requirement: SessionRequirement) -> None:
+        if requirement == SessionRequirement.OPTIONAL:
+            return
+
+        for name, member in inspect.getmembers(cls, predicate=inspect.isfunction):
+            if name.startswith("__"):
+                continue
+
+            method_annotations = inspect.get_annotations(member)
+            session_annotation = method_annotations.get("session")
+            if not (session_annotation is not None and "ClientSession" in session_annotation):
+                raise ValueError(f"Method {name} does not have a session argument")
 
     @classmethod
     def create(cls, database: Database, **kwargs) -> MongoRepository:
@@ -99,11 +126,16 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
     ) -> None:
         self.collection.delete_one({"_id": entity_id}, session=session, **kwargs)
 
-    def execute_raw(self, operation: str, **operation_kwargs) -> Any:
+    def execute_raw(
+        self,
+        operation: str,
+        session: ClientSession | None = None,
+        **operation_kwargs,
+    ) -> Any:
         op = getattr(self.collection, operation, None)
         if op is None:
             raise ValueError(f"Unknown operation on collection: {operation}")
-        return op(**operation_kwargs)
+        return op(session=session, **operation_kwargs)
 
     def filter(
         self, qry: MongoFilterQuery, session: ClientSession | None = None, **kwargs
