@@ -27,8 +27,8 @@ def model_schema(t: type[BaseModel], **kwargs) -> dict[str, Any]:
         return t.schema(**kwargs)
 
 
-def parse_obj(t: type[BaseModel], obj: Any) -> BaseModel:
+def model_validate(t: type[BaseModel], obj: Any, **kwargs) -> BaseModel:
     if IS_PYDANTIC_V2:
-        return t.model_validate(obj)
+        return t.model_validate(obj, **kwargs)
     else:
         return t.parse_obj(**obj)
