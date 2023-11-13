@@ -88,7 +88,7 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         """https://stackoverflow.com/a/73746554/9331155"""
         entity_type: EntityType = get_args(self.__class__.__orig_bases__[0])[0]  # type: ignore
         result = self.collection.find_one(filter=filter_, session=session, **kwargs)
-        return result and entity_type.model_validate(result)
+        return result and entity_type.parse_obj(result)
 
     def find_by_query(
         self, qry: MongoQuery, session: ClientSession | None = None, **kwargs

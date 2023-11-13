@@ -1,6 +1,10 @@
-from typing import Any, ClassVar
+from typing import Any, ClassVar, TypeVar
+
+from pydantic import BaseModel
 
 from . import compat, container, field, types
+
+ModelType = TypeVar("ModelType", bound=BaseModel)
 
 
 class Entity(container.TimeStampedModel):
@@ -36,3 +40,10 @@ class Entity(container.TimeStampedModel):
                 continue
 
             setattr(self, key, value)
+
+    @classmethod
+    def parse_obj(cls, obj: Any) -> ModelType:
+        if compat.IS_PYDANTIC_V2:
+            return cls.model_validate(obj)
+        else:
+            return super().parse_obj(obj)

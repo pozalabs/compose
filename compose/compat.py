@@ -1,6 +1,7 @@
 from typing import Any, TypeVar
 
 import pydantic
+from pydantic import BaseModel
 
 IS_PYDANTIC_V2 = int(pydantic.VERSION.split(".")[0]) >= 2
 
@@ -19,8 +20,15 @@ def validate_obj(t: type[T], value: Any, /) -> T:
         return parse_obj_as(t, value)
 
 
-def model_schema(t: type[pydantic.BaseModel], **kwargs) -> dict[str, Any]:
+def model_schema(t: type[BaseModel], **kwargs) -> dict[str, Any]:
     if IS_PYDANTIC_V2:
         return t.model_json_schema(**kwargs)
     else:
         return t.schema(**kwargs)
+
+
+def parse_obj(t: type[BaseModel], obj: Any) -> BaseModel:
+    if IS_PYDANTIC_V2:
+        return t.model_validate(obj)
+    else:
+        return t.parse_obj(**obj)
