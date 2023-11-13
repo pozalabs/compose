@@ -30,6 +30,24 @@ def entity_to_mongo_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
 
 
 class MongoRepository(base.BaseRepository, Generic[EntityType]):
+    """
+    `MongoRepository` 추상 클래스
+
+    상속 인자:
+        `session_requirement`: `MongoRepository` 상속 시 `session_requirement` 인자를 통해
+        `session` 인자 선언 여부를 검사할 수 있습니다. 프로덕션에서는 `session_requirement`를
+        `SessionRequirement.REQUIRED`로 설정하는 것을 권장합니다.
+
+        ```python
+        class UserRepository(
+            MongoRepository[User],
+            session_requirement=SessionRequirement.REQUIRED,
+        ):
+            ...
+        ```
+
+    """
+
     __collection_name__: ClassVar[str] = ""
     __indexes__: ClassVar[Optional[list[pymongo.IndexModel]]] = None
 
