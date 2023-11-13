@@ -6,7 +6,9 @@ from typing import Any, Optional, TypeVar, Union
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import ConfigDict
 
-from . import field, types
+from compose.types import DateTime
+
+from . import field
 
 IncEx = Union[set[int], set[str], dict[int, Any], dict[str, Any], None]
 AbstractSetIntStr = Union[set[int], set[str]]
@@ -62,5 +64,5 @@ class BaseModel(PydanticBaseModel):
 
 
 class TimeStampedModel(BaseModel):
-    created_at: types.DateTime = field.DateTimeField()
-    updated_at: types.DateTime = field.DateTimeField()
+    created_at: DateTime = field.DateTimeField()
+    updated_at: DateTime = field.DateTimeField()
