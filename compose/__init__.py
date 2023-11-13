@@ -1,10 +1,10 @@
-from . import compat, db, dependency, entity, pagination, result, types
+from . import compat, db, dependency, entity, pagination, repository, result, types
 from .container import BaseModel, TimeStampedModel
 
 if compat.IS_PYDANTIC_V2:
-    from . import command, event, query, repository, schema
+    from . import command, event, query, schema
 else:
-    from .v1 import command, event, query, repository, schema
+    from .v1 import command, event, query, schema
 
 __all__ = [
     "BaseModel",
