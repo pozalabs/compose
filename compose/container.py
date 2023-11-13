@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar
 
 import bson
 from pydantic import BaseModel as PydanticBaseModel
@@ -12,13 +12,13 @@ from . import compat, field, types
 if compat.IS_PYDANTIC_V2:
     from pydantic import ConfigDict
 
-    AbstractSetIntStr = Union[set[int], set[str]]
-    MappingIntStrAny = Union[dict[int, Any], dict[str, Any]]
+    AbstractSetIntStr: TypeAlias = set[int] | set[str]
+    MappingIntStrAny: TypeAlias = dict[int, Any] | dict[str, Any]
 else:
     if TYPE_CHECKING:
         from pydantic.typing import AbstractSetIntStr, DictStrAny, MappingIntStrAny
 
-IncEx = Union[set[int], set[str], dict[int, Any], dict[str, Any], None]
+IncEx: TypeAlias = set[int] | set[str] | dict[int, Any] | dict[str, Any] | None
 Model = TypeVar("Model", bound=PydanticBaseModel)
 
 
@@ -28,9 +28,9 @@ class BaseModel(PydanticBaseModel):
         def copy(
             self,
             *,
-            include: Optional[Union[AbstractSetIntStr, MappingIntStrAny]] = None,
-            exclude: Optional[Union[AbstractSetIntStr, MappingIntStrAny]] = None,
-            update: Optional[dict[str, Any]] = None,
+            include: AbstractSetIntStr | MappingIntStrAny | None = None,
+            exclude: AbstractSetIntStr | MappingIntStrAny | None = None,
+            update: dict[str, Any] | None = None,
             deep: bool = False,
         ) -> Model:
             return super().model_copy(update=update, deep=deep)
@@ -38,7 +38,7 @@ class BaseModel(PydanticBaseModel):
         def encode(
             self,
             *,
-            indent: Optional[int] = None,
+            indent: int | None = None,
             include: IncEx = None,
             exclude: IncEx = None,
             by_alias: bool = False,
