@@ -1,7 +1,6 @@
 from . import (
     command,
     compat,
-    db,
     dependency,
     entity,
     event,
@@ -12,6 +11,7 @@ from . import (
     result,
     schema,
     types,
+    uow,
 )
 from .container import BaseModel, TimeStampedModel
 
@@ -30,6 +30,6 @@ __all__ = [
     "compat",
     "pagination",
     "result",
-    "db",
+    "uow",
     "messaging",
 ]
