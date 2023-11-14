@@ -1,4 +1,5 @@
-from .consumer import MessageConsumer, MessageConsumerRunner
+from .consumer import MessageConsumer
+from .consumer_runner import MessageConsumerThreadRunner
 from .model import EventMessage, SqsEventMessage
 from .queue import MessageQueue, SqsMessageQueue
 
@@ -8,5 +9,5 @@ __all__ = [
     "MessageQueue",
     "SqsMessageQueue",
     "MessageConsumer",
-    "MessageConsumerRunner",
+    "MessageConsumerThreadRunner",
 ]
