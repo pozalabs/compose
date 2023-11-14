@@ -1,3 +1,4 @@
+import enum
 import functools
 import inspect
 from collections.abc import Callable, Iterable
@@ -70,11 +71,18 @@ def resolve_by_name(
     raise ValueError(f"Cannot find {name} from given container")
 
 
+class ConflictResolution(str, enum.Enum):
+    FIRST = "first"
+    ERROR = "error"
+
+
 @functools.lru_cache(32)
 def resolve(
     type_: type[Any] | str,
     container_cls: type[containers.Container],
+    *,
     name: str | None = None,
+    conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
 ) -> providers.Factory:
     """
     의존성 전체 등록 경로를 참조하지 않고 의존성을 해결합니다. 다른 패키지의 의존성을 참조하는 경우
@@ -100,24 +108,38 @@ def resolve(
     if not candidates:
         raise ValueError(f"Cannot find {type_.__name__} from given container")
 
-    if len(candidates) > 1 and name is None:
+    if len(candidates) > 1 and name is None and conflict_resolution == ConflictResolution.ERROR:
         type_name = type_.__name__ if inspect.isclass(type_) else type_
         raise ValueError(
             f"Cannot resolve {type_name} since there are multiple candidates. "
             f"You must specify `name` argument to resolve dependency"
         )
 
-    return (
-        candidates.pop()
-        if len(candidates) == 1
-        else resolve_by_name(name=name, container_cls=container_cls)
-    )
+    if len(candidates) == 1:
+        return candidates[0]
+
+    if name is None and conflict_resolution == ConflictResolution.FIRST:
+        return candidates[0]
+
+    return resolve_by_name(name=name, container_cls=container_cls)
 
 
 def provide(
-    type_: type[T], from_: type[containers.Container], /, *, name: str | None = None
+    type_: type[T],
+    from_: type[containers.Container],
+    /,
+    *,
+    name: str | None = None,
+    conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
 ) -> Provide[T]:
-    return Provide[resolve(type_=type_, container_cls=from_, name=name)]
+    return Provide[
+        resolve(
+            type_=type_,
+            container_cls=from_,
+            name=name,
+            conflict_resolution=conflict_resolution,
+        )
+    ]
 
 
 def create_resolver(container_cls: type[containers.Container]) -> Callable[[str], Any]:
