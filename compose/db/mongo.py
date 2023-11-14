@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from typing import TypeAlias, TypeVar
 
-from pymongo import MongoClient, WriteConcern
+from pymongo import WriteConcern
 from pymongo.client_session import ClientSession
 from pymongo.read_concern import ReadConcern
 from pymongo.read_preferences import Nearest, Primary, PrimaryPreferred, SecondaryPreferred
@@ -11,8 +11,8 @@ ServerMode: TypeAlias = Primary | PrimaryPreferred | SecondaryPreferred | Neares
 
 
 class MongoUnitOfWork:
-    def __init__(self, mongo_client: MongoClient):
-        self.mongo_client = mongo_client
+    def __init__(self, session_factory: Callable[..., ClientSession]):
+        self.session_factory = session_factory
 
     def with_transaction(
         self,
@@ -22,7 +22,7 @@ class MongoUnitOfWork:
         read_preference: ServerMode | None = None,
         max_commit_time_ms: int | None = None,
     ) -> T:
-        with self.mongo_client.start_session() as session:
+        with self.session_factory() as session:
             result = session.with_transaction(
                 callback=callback,
                 read_concern=read_concern,
