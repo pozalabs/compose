@@ -13,6 +13,7 @@ class MongoUnitOfWork:
     def with_transaction(
         self,
         callback: Callable[[ClientSession], T],
+        *,
         session_options: SessionOptions | None = None,
         transaction_options: TransactionOptions | None = None,
     ) -> T:
