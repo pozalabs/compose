@@ -5,6 +5,7 @@ from . import (
     dependency,
     entity,
     event,
+    messaging,
     pagination,
     query,
     repository,
@@ -30,4 +31,5 @@ __all__ = [
     "pagination",
     "result",
     "db",
+    "messaging",
 ]
