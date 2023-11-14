@@ -45,7 +45,7 @@ def resolve_by_name_from_container_provider(
             return provider
 
         if isinstance(provider, providers.Container):
-            return resolve_by_name_from_container_provider(name=name, container=container)
+            return resolve_by_name_from_container_provider(name=name, container=provider)
 
 
 def resolve_by_name(
