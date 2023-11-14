@@ -5,7 +5,7 @@ from typing import Any
 import pytest
 from dependency_injector import containers, providers
 
-from compose.dependency import resolve
+from compose.dependency import ConflictResolution, resolve
 
 
 class Repository:
@@ -94,7 +94,12 @@ def test_resolve_from_multiple_candidates(
     name: str,
     expected: type[Any],
 ):
-    resolved = resolve(type_=type_, container_cls=container_cls, name=name)
+    resolved = resolve(
+        type_=type_,
+        container_cls=container_cls,
+        name=name,
+        conflict_resolution=ConflictResolution.ERROR,
+    )
 
     assert resolved().__dict__ == expected.__dict__
 
@@ -140,4 +145,4 @@ def test_cannot_resolve(type_: type[Any], container_cls: type[containers.Contain
 
 def test_cannot_resolve_without_name_from_multiple_candidates():
     with pytest.raises(ValueError):
-        resolve(RepositoryA, ApplicationContainer)
+        resolve(RepositoryA, ApplicationContainer, conflict_resolution=ConflictResolution.ERROR)

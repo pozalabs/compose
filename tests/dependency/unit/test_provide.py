@@ -3,7 +3,7 @@ from typing import TypeVar
 import pytest
 from dependency_injector import containers, providers
 
-from compose.dependency import provide
+from compose.dependency import ConflictResolution, provide
 
 T = TypeVar("T")
 
@@ -31,6 +31,11 @@ def test_provide_from_multiple_candidates(
     name: str,
     expected: type[T],
 ):
-    provided = provide(type_, container_cls, name=name)
+    provided = provide(
+        type_,
+        container_cls,
+        name=name,
+        conflict_resolution=ConflictResolution.ERROR,
+    )
 
     assert provided.provider().__dict__ == expected.__dict__
