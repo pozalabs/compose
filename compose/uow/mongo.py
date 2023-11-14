@@ -1,7 +1,6 @@
 from collections.abc import Callable
 from typing import TypeVar
 
-from pymongo import MongoClient
 from pymongo.client_session import ClientSession, SessionOptions, TransactionOptions
 
 T = TypeVar("T")
@@ -10,7 +9,6 @@ T = TypeVar("T")
 class MongoUnitOfWork:
     def __init__(self, session_factory: Callable[..., ClientSession]):
         self.session_factory = session_factory
-        MongoClient().start_session()
 
     def with_transaction(
         self,
