@@ -52,6 +52,10 @@ class Spec(Operator):
     def exclude(cls, field: str) -> Spec:
         return cls(field=field, spec=0)
 
+    @classmethod
+    def ref(cls, field: str, spec: str) -> Spec:
+        return cls(field=field, spec=_FieldPath(spec))
+
 
 Specification = Spec
 
