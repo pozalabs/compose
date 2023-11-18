@@ -1,6 +1,6 @@
 from typing import Any
 
-from ..base import Operator
+from ..base import Evaluable, Operator
 from ..types import DictExpression, _String
 
 
@@ -13,8 +13,8 @@ class Map(Operator):
     def expression(self) -> DictExpression:
         return {
             "$map": {
-                "input": self.input,
+                "input": Evaluable(self.input).expression(),
                 "as": self.as_,
-                "in": self.in_,
+                "in": Evaluable(self.in_).expression(),
             }
         }

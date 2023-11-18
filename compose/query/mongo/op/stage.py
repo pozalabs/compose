@@ -5,7 +5,7 @@ from typing import Any, Optional, Union
 from .base import Evaluable, Merge, Operator, Stage
 from .logical import And, LogicalOperator, Or
 from .pipeline import Pipeline
-from .types import DictExpression, ListExpression, MongoKeyword, _UnwindPath
+from .types import DictExpression, ListExpression, MongoKeyword, _FieldPath
 
 
 class Match(Stage):
@@ -51,6 +51,10 @@ class Spec(Operator):
     @classmethod
     def exclude(cls, field: str) -> Spec:
         return cls(field=field, spec=0)
+
+    @classmethod
+    def ref(cls, field: str, spec: str) -> Spec:
+        return cls(field=field, spec=_FieldPath(spec))
 
 
 Specification = Spec
@@ -105,7 +109,7 @@ class Unwind(Stage):
         include_array_index: Optional[str] = None,
         preserve_null_and_empty_arrays: Optional[bool] = None,
     ):
-        self.path = _UnwindPath(path)
+        self.path = _FieldPath(path)
         self.include_array_index = include_array_index
         self.preserve_null_and_empty_arrays = preserve_null_and_empty_arrays
 
