@@ -72,3 +72,11 @@ class _UnwindPath(str):
             raise ValueError("path must be prefixed with $")
 
         return super().__new__(cls, v)
+
+
+class _String(str):
+    def __new__(cls, v: str):
+        if v.startswith("$"):
+            raise ValueError("string must not be prefixed with $")
+
+        return super().__new__(cls, v)
