@@ -66,7 +66,7 @@ class AggVar(str):
         return cls.current("ROOT")
 
 
-class _UnwindPath(str):
+class _FieldPath(str):
     def __new__(cls, v: str):
         if not v.startswith("$"):
             raise ValueError("path must be prefixed with $")
