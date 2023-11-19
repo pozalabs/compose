@@ -26,7 +26,7 @@ class SessionRequirement(str, enum.Enum):
 
 def entity_to_mongo_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
     default_kwargs = {"by_alias": True}
-    return entity.model_dump(**(default_kwargs | kwargs))
+    return compat.model_dump(entity, **(default_kwargs | kwargs))
 
 
 class MongoRepository(base.BaseRepository, Generic[EntityType]):
