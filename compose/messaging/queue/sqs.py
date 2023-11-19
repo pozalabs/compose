@@ -55,7 +55,7 @@ class SqsMessageQueue(MessageQueue):
     def push(self, message: model.SqsEventMessage) -> None:
         self.client.send_message(
             QueueUrl=self._queue_url,
-            MessageBody=json.dumps(message.encode(by_alias=True)),
+            MessageBody=json.dumps(message.body.encode(by_alias=True)),
             MessageGroupId=str(message.body.id),
             MessageDeduplicationId=str(message.body.id),
             MessageAttributes=dict(
