@@ -32,3 +32,10 @@ def model_validate(t: type[BaseModel], obj: Any, **kwargs) -> BaseModel:
         return t.model_validate(obj, **kwargs)
     else:
         return t.parse_obj(obj)
+
+
+def model_dump(t: BaseModel, **kwargs) -> dict[str, Any]:
+    if IS_PYDANTIC_V2:
+        return t.model_dump(**kwargs)
+    else:
+        return t.dict(**kwargs)
