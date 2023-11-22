@@ -17,6 +17,22 @@ class EventHandler(Protocol):
         ...
 
 
+def create_lazy_dependency_resolver(container_path: str) -> Callable[[str], EventHandler]:
+    def lazy_dependency_resolver(handler_name: str) -> EventHandler:
+        module_path, container_name = container_path.split(":")
+        try:
+            container = importlib.import_module(module_path)
+        except ImportError:
+            raise ImportError(f"Cannot not import module {module_path}")
+
+        if (container_cls := getattr(container, container_name, None)) is None:
+            raise ValueError(f"Cannot find container {container_name} in {module_path}")
+
+        return create_resolver(container_cls)(handler_name)
+
+    return lazy_dependency_resolver
+
+
 class MessageBus:
     def __init__(self, dependency_resolver: Callable[[str], EventHandler]):
         self.dependency_resolver = dependency_resolver
@@ -32,16 +48,7 @@ class MessageBus:
                 "Must be in the format `module.path:ContainerName`"
             )
 
-        module_path, container_name = container_path.split(":")
-        try:
-            container = importlib.import_module(module_path)
-        except ImportError:
-            raise ImportError(f"Cannot not import module {module_path}")
-
-        if (container_cls := getattr(container, container_name, None)) is None:
-            raise ValueError(f"Cannot find container {container_name} in {module_path}")
-
-        return cls(dependency_resolver=create_resolver(container_cls))
+        return cls(dependency_resolver=create_lazy_dependency_resolver(container_path))
 
     async def handle_event(self, evt: compose.event.Event) -> None:
         handler_names = self._event_handlers.get(evt.__class__.__name__, set())
