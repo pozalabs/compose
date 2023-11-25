@@ -18,3 +18,11 @@ class Map(Operator):
                 "in": Evaluable(self.in_).expression(),
             }
         }
+
+
+class Size(Operator):
+    def __init__(self, expression: Any):
+        self.expression = expression
+
+    def expression(self) -> DictExpression:
+        return {"$size": Evaluable(self.expression).expression()}
