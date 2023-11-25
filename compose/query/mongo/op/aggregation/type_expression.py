@@ -6,7 +6,7 @@ from ..types import DictExpression
 
 class ToBool(Operator):
     def __init__(self, expression: Any):
-        self.expression = expression
+        self._expression = expression
 
     def expression(self) -> DictExpression:
-        return {"$toBool": Evaluable(self.expression).expression()}
+        return {"$toBool": Evaluable(self._expression).expression()}
