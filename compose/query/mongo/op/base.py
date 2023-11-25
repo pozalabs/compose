@@ -63,7 +63,7 @@ class Merge(Operator):
         return cls(*ops, initial={})
 
 
-class Filter(Operator):
+class OpFilter(Operator):
     def __init__(self, *ops: Operator, predicate: Callable[[Operator], bool]):
         self.ops = list(ops)
         self.predicate = predicate
@@ -72,7 +72,7 @@ class Filter(Operator):
         return [op.expression() for op in self.ops if self.predicate(op)]
 
     @classmethod
-    def non_empty(cls, *ops: Operator) -> Filter:
+    def non_empty(cls, *ops: Operator) -> OpFilter:
         return cls(*ops, predicate=lambda op: op.expression())
 
 
