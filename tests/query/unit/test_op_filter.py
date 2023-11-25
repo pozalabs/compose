@@ -5,9 +5,9 @@ from compose.query.mongo.op import (
     DictExpression,
     EmptyOnNull,
     Eq,
-    Filter,
     Match,
     Operator,
+    OpFilter,
     Sort,
     SortBy,
 )
@@ -27,4 +27,4 @@ def expected() -> list[DictExpression]:
 
 
 def test_non_empty_expression(ops: list[Operator], expected: list[DictExpression]):
-    assert Filter.non_empty(*ops).expression() == expected
+    assert OpFilter.non_empty(*ops).expression() == expected
