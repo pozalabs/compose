@@ -22,10 +22,10 @@ class Map(Operator):
 
 class Size(Operator):
     def __init__(self, expression: Any):
-        self.expression = expression
+        self._expression = expression
 
     def expression(self) -> DictExpression:
-        return {"$size": Evaluable(self.expression).expression()}
+        return {"$size": Evaluable(self._expression).expression()}
 
 
 class Filter(Operator):
