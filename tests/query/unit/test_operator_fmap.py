@@ -15,8 +15,8 @@ from compose.query.mongo.op import Filter, Operator, Size, ToBool
                     as_="output",
                     cond={"$eq": ["$$field", "value"]},
                 )
-                .chain(Size)
-                .chain(ToBool)
+                .fmap(Size)
+                .fmap(ToBool)
             ),
             {
                 "$toBool": {
@@ -33,5 +33,5 @@ from compose.query.mongo.op import Filter, Operator, Size, ToBool
     ],
     ids=("Filter -> Size -> ToBool",),
 )
-def test_chain(chained_op: Operator, expected: Any):
+def test_fmap(chained_op: Operator, expected: Any):
     assert chained_op.expression() == expected
