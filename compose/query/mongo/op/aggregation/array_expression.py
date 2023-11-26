@@ -15,9 +15,8 @@ class Map(Operator):
     def expression(self) -> DictExpression:
         return {
             "$map": {
-                "input": Evaluable(self.input).expression(),
-                "as": self.as_,
-                "in": Evaluable(self.in_).expression(),
+                MongoKeyword.from_py(field): Evaluable(value).expression()
+                for field, value in self.__dict__.items()
             }
         }
 
@@ -38,15 +37,13 @@ class Filter(Operator):
         self.limit = limit
 
     def expression(self) -> DictExpression:
-        expression = {
-            "input": Evaluable(self.input).expression(),
-            "as": self.as_,
-            "cond": Evaluable(self.cond).expression(),
+        return {
+            "$filter": {
+                MongoKeyword.from_py(field): Evaluable(value).expression()
+                for field, value in self.__dict__.items()
+                if value is not None
+            },
         }
-        if self.limit is not None:
-            expression["limit"] = Evaluable(self.limit).expression()
-
-        return {"$filter": expression}
 
 
 class Reduce(Operator):
@@ -60,7 +57,6 @@ class Reduce(Operator):
             "$reduce": {
                 MongoKeyword.from_py(field): Evaluable(value).expression()
                 for field, value in self.__dict__.items()
-                if value is not None
             }
         }
 
