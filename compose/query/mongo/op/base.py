@@ -14,6 +14,9 @@ class Operator:
     def expression(self) -> Any:
         raise NotImplementedError
 
+    def chain(self, op: Callable[..., Operator]) -> Operator:
+        return op(self.expression())
+
 
 class ComparisonOperator(Operator):
     def __init__(self, field: str, value: Optional[Any] = None):
