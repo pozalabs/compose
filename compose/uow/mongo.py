@@ -17,6 +17,9 @@ class MongoUnitOfWork:
         session_options: SessionOptions | None = None,
         transaction_options: TransactionOptions | None = None,
     ) -> T:
+        session_options = session_options or SessionOptions()
+        transaction_options = transaction_options or TransactionOptions()
+
         with self.session_factory(
             causal_consistency=session_options.causal_consistency,
             default_transaction_options=session_options.default_transaction_options,
