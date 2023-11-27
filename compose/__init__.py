@@ -4,7 +4,6 @@ from . import (
     dependency,
     entity,
     event,
-    logging,
     messaging,
     pagination,
     query,
@@ -33,5 +32,11 @@ __all__ = [
     "result",
     "uow",
     "messaging",
-    "logging",
 ]
+
+try:
+    from . import logging  # noqa: F401
+
+    __all__.append("logging")
+except ImportError:
+    pass
