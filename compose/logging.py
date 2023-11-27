@@ -27,3 +27,7 @@ class InterceptHandler(logging.Handler):
 
     def filter(self, record: logging.LogRecord) -> bool:
         return "/health-check" not in record.getMessage()
+
+
+def intercept_logging(log_level: int) -> None:
+    logging.basicConfig(handlers=[InterceptHandler()], level=log_level, force=True)
