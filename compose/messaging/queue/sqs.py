@@ -16,8 +16,8 @@ try:
     import boto3  # noqa: F401
 except ImportError:
     raise ImportError(
-        "The aws extra must be installed to use the `SqsMessageQueue`. "
-        "Install with package with `aws` extra (`compose[aws]`)"
+        "The `aws` extra must be installed to use the `SqsMessageQueue`. "
+        "Install compose with `aws` extra (`compose[aws]`)"
     )
 
 
