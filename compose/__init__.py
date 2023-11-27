@@ -4,6 +4,7 @@ from . import (
     dependency,
     entity,
     event,
+    logging,
     messaging,
     pagination,
     query,
@@ -32,4 +33,5 @@ __all__ = [
     "result",
     "uow",
     "messaging",
+    "logging",
 ]
