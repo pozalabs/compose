@@ -30,4 +30,12 @@ class InterceptHandler(logging.Handler):
 
 
 def intercept_logging(log_level: int) -> None:
+    """Python 내장 logging 모듈을 loguru로 대체합니다. (해당 함수를 호출하려면 `loguru`를 설치해야 합니다.)
+
+    ```python
+    import compose
+
+    compose.logging.intercept_logging(logging.INFO)
+    ```
+    """
     logging.basicConfig(handlers=[InterceptHandler()], level=log_level, force=True)
