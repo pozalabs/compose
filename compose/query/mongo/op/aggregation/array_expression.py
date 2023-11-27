@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from typing import Any
 
 from ..base import Evaluable, Operator
-from ..types import DictExpression, _String
+from ..types import DictExpression, MongoKeyword, _String
 
 
 class Map(Operator):
@@ -13,9 +15,8 @@ class Map(Operator):
     def expression(self) -> DictExpression:
         return {
             "$map": {
-                "input": Evaluable(self.input).expression(),
-                "as": self.as_,
-                "in": Evaluable(self.in_).expression(),
+                MongoKeyword.from_py(field): Evaluable(value).expression()
+                for field, value in self.__dict__.items()
             }
         }
 
@@ -36,12 +37,33 @@ class Filter(Operator):
         self.limit = limit
 
     def expression(self) -> DictExpression:
-        expression = {
-            "input": Evaluable(self.input).expression(),
-            "as": self.as_,
-            "cond": Evaluable(self.cond).expression(),
+        return {
+            "$filter": {
+                MongoKeyword.from_py(field): Evaluable(value).expression()
+                for field, value in self.__dict__.items()
+                if value is not None
+            },
         }
-        if self.limit is not None:
-            expression["limit"] = Evaluable(self.limit).expression()
 
-        return {"$filter": expression}
+
+class Reduce(Operator):
+    def __init__(self, input_: Any, initial_value: Any, in_: Any):
+        self.input = input_
+        self.initial_value = initial_value
+        self.in_ = in_
+
+    def expression(self) -> DictExpression:
+        return {
+            "$reduce": {
+                MongoKeyword.from_py(field): Evaluable(value).expression()
+                for field, value in self.__dict__.items()
+            }
+        }
+
+    @classmethod
+    def list(cls, input_: Any, in_: Any) -> Reduce:
+        return cls(input_=input_, initial_value=[], in_=in_)
+
+    @classmethod
+    def int(cls, input_: Any, in_: Any) -> Reduce:
+        return cls(input_=input_, initial_value=0, in_=in_)
