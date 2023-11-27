@@ -33,3 +33,10 @@ __all__ = [
     "uow",
     "messaging",
 ]
+
+try:
+    from . import logging  # noqa: F401
+
+    __all__.append("logging")
+except ImportError:
+    pass
