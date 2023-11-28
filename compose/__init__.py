@@ -1,6 +1,7 @@
 from . import (
     command,
     compat,
+    concurrent,
     dependency,
     entity,
     event,
@@ -32,6 +33,7 @@ __all__ = [
     "result",
     "uow",
     "messaging",
+    "concurrent",
 ]
 
 try:
