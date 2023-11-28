@@ -15,8 +15,8 @@ def test_execute_in_pool():
     }
 
     result = execute_in_pool(
-        funcs=funcs,
         pool_factory=lambda: concurrent.futures.ThreadPoolExecutor(max_workers=4),
+        funcs=funcs,
     )
 
     expected = {

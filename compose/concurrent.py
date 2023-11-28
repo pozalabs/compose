@@ -7,8 +7,8 @@ T = TypeVar("T")
 
 
 def execute_in_pool(
-    funcs: dict[K, Callable[[], T]],
     pool_factory: Callable[[], concurrent.futures.Executor],
+    funcs: dict[K, Callable[[], T]],
     timeout: int | None = None,
 ) -> dict[K, T]:
     result = {}
