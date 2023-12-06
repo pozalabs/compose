@@ -71,6 +71,24 @@ def resolve_by_name(
     raise ValueError(f"Cannot find {name} from given container")
 
 
+def resolve_by_object_name(name: str, container_cls: type[containers.Container]) -> Any:
+    candidates: list[providers.Factory] = []
+    for provider in container_cls.traverse([providers.Factory]):
+        if not inspect.isclass(provider.cls):
+            continue
+
+        if provider.cls.__name__.split(".")[-1] == name:
+            candidates.append(provider)
+
+    if not candidates:
+        raise ValueError(f"Cannot find {name} from given container")
+
+    if len(candidates) > 1:
+        raise ValueError(f"Cannot resolve {name} since there are multiple candidates")
+
+    return candidates[0]()
+
+
 class ConflictResolution(str, enum.Enum):
     FIRST = "first"
     ERROR = "error"
