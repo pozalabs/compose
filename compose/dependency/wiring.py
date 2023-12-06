@@ -1,5 +1,6 @@
 import enum
 import functools
+import importlib
 import inspect
 from collections.abc import Callable, Iterable
 from typing import Any, Protocol, TypeVar
@@ -69,6 +70,24 @@ def resolve_by_name(
                 return result
 
     raise ValueError(f"Cannot find {name} from given container")
+
+
+def resolve_by_object_name(name: str, container_cls: type[containers.Container]) -> Any:
+    candidates: list[providers.Factory] = []
+    for provider in container_cls.traverse([providers.Factory]):
+        if not inspect.isclass(provider.cls):
+            continue
+
+        if provider.cls.__name__.split(".")[-1] == name:
+            candidates.append(provider)
+
+    if not candidates:
+        raise ValueError(f"Cannot find {name} from given container")
+
+    if len(candidates) > 1:
+        raise ValueError(f"Cannot resolve {name} since there are multiple candidates")
+
+    return candidates[0]()
 
 
 class ConflictResolution(str, enum.Enum):
@@ -145,5 +164,21 @@ def provide(
 def create_resolver(container_cls: type[containers.Container]) -> Callable[[str], Any]:
     def resolver(name: str) -> Any:
         return resolve(type_=name, container_cls=container_cls)
+
+    return resolver
+
+
+def create_lazy_resolver(container_path: str) -> Callable[[str], Any]:
+    def resolver(object_name: str) -> Any:
+        module_path, container_name = container_path.split(":")
+        try:
+            container = importlib.import_module(module_path)
+        except ImportError:
+            raise ImportError(f"Cannot not import module {module_path}")
+
+        if (container_cls := getattr(container, container_name, None)) is None:
+            raise ValueError(f"Cannot find container {container_name} in {module_path}")
+
+        return resolve_by_object_name(name=object_name, container_cls=container_cls)
 
     return resolver
