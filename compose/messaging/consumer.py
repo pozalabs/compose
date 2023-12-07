@@ -1,15 +1,13 @@
 import asyncio
 import json
 import logging
-import sys
 from collections.abc import Callable
-from typing import Literal, TypeAlias
+from typing import Literal, Protocol, TypeAlias
 
+from .._signal import SignalHandler
 from . import model
 from .messagebus import MessageBus
 from .queue import MessageQueue
-
-CAN_USE_ASYNCIO_RUNNER = sys.version_info >= (3, 11)
 
 HookEventType = Literal[
     "on_start",
@@ -22,6 +20,12 @@ HookArgType: TypeAlias = str | model.EventMessage | Exception
 Hook = Callable[[HookArgType], None]
 
 logger = logging.getLogger("compose")
+
+
+class SignalHandleable(Protocol):
+    @property
+    def received_signal(self) -> bool:
+        return ...
 
 
 def log_event_message(log_message: str, message: model.EventMessage) -> None:
@@ -50,17 +54,19 @@ class MessageConsumer:
         messagebus: MessageBus,
         message_queue: MessageQueue,
         hooks: dict[HookEventType, list[Hook]] | None = None,
+        signal_handler: SignalHandleable | None = None,
     ):
         self.messagebus = messagebus
         self.message_queue = message_queue
         self.hooks = DEFAULT_HOOKS | (hooks or {})
+        self.signal_handler = signal_handler or SignalHandler()
 
         self._default_hook = lambda _: None
 
     async def run(self) -> None:
         self._execute_hook("on_start", "MessageConsumer started")
 
-        while True:
+        while not self.signal_handler.received_signal:
             try:
                 message = self.message_queue.peek()
             except Exception as exc:
