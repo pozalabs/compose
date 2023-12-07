@@ -1,3 +1,4 @@
+from . import _signal as signal
 from . import (
     command,
     compat,
@@ -34,6 +35,7 @@ __all__ = [
     "uow",
     "messaging",
     "concurrent",
+    "signal",
 ]
 
 try:
