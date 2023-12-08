@@ -4,8 +4,8 @@ import enum
 import inspect
 from typing import Any, ClassVar, Generic, Optional, TypeVar, get_args, get_type_hints
 
+import pendulum
 import pymongo
-from pymongo import UpdateOne
 from pymongo.client_session import ClientSession
 from pymongo.collection import Collection
 from pymongo.database import Database
@@ -90,7 +90,8 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         collection = database.get_collection(cls.__collection_name__, **kwargs)
         if cls.__indexes__ is not None:
             collection.create_indexes(cls.__indexes__)
-        return cls(collection)
+
+        return cls(collection=collection)
 
     def find_by_id(
         self,
@@ -131,9 +132,25 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         )
 
     def update(self, entity: EntityType, session: ClientSession | None = None, **kwargs) -> None:
+        schema = entity_to_mongo_schema(entity)
+        update_result = self.collection.update_one(
+            {"_id": entity.id},
+            {"$set": schema},
+            session=session,
+            **kwargs,
+        )
+        if not update_result.modified_count:
+            return
+
+        self.on_update(entity=entity, session=session, **kwargs)
+
+    def on_update(self, entity: EntityType, session: ClientSession | None = None, **kwargs) -> None:
+        if getattr(entity, "updated_at") is None:
+            return
+
         self.collection.update_one(
             {"_id": entity.id},
-            {"$set": entity_to_mongo_schema(entity)},
+            {"$set": {"updated_at": pendulum.DateTime.utcnow()}},
             session=session,
             **kwargs,
         )
@@ -141,14 +158,8 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
     def update_many(
         self, entities: list[EntityType], session: ClientSession | None = None, **kwargs
     ) -> None:
-        self.collection.bulk_write(
-            requests=[
-                UpdateOne({"_id": entity.id}, {"$set": entity_to_mongo_schema(entity)})
-                for entity in entities
-            ],
-            session=session,
-            **kwargs,
-        )
+        for entity in entities:
+            self.update(entity=entity, session=session, **kwargs)
 
     def delete(
         self, entity_id: types.PyObjectId, session: ClientSession | None = None, **kwargs
