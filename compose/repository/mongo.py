@@ -8,7 +8,6 @@ from typing import Any, ClassVar, Generic, Optional, TypeVar, get_args, get_type
 import pendulum
 import pymongo
 from pydantic import Field
-from pymongo import UpdateOne
 from pymongo.client_session import ClientSession
 from pymongo.collection import Collection
 from pymongo.database import Database
@@ -172,14 +171,8 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
     def update_many(
         self, entities: list[EntityType], session: ClientSession | None = None, **kwargs
     ) -> None:
-        self.collection.bulk_write(
-            requests=[
-                UpdateOne({"_id": entity.id}, {"$set": entity_to_mongo_schema(entity)})
-                for entity in entities
-            ],
-            session=session,
-            **kwargs,
-        )
+        for entity in entities:
+            self.update(entity=entity, session=session, **kwargs)
 
     def delete(
         self, entity_id: types.PyObjectId, session: ClientSession | None = None, **kwargs
