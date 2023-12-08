@@ -3,7 +3,7 @@ from __future__ import annotations
 import enum
 import inspect
 from collections.abc import Callable
-from typing import Any, ClassVar, Generic, Optional, TypeVar, get_args, get_type_hints
+from typing import Annotated, Any, ClassVar, Generic, Optional, TypeVar, get_args, get_type_hints
 
 import pendulum
 import pymongo
@@ -21,6 +21,24 @@ from . import base
 EntityType = TypeVar("EntityType", bound=Entity)
 
 
+if compat.IS_PYDANTIC_V2:
+    from pydantic import AfterValidator
+
+    def validate_unique_spec_keys(
+        specs: list[tuple[str, Callable[[], Any]] | Any]
+    ) -> list[tuple[str, Callable[[], Any]] | Any]:
+        spec_keys = {spec[0] for spec in specs}
+        assert len(spec_keys) == len(specs), "Spec keys must be unique"
+        return specs
+
+    OnUpdateSpecs = Annotated[
+        list[tuple[str, Callable[[], Any]] | Any],
+        AfterValidator(validate_unique_spec_keys),
+    ]
+else:
+    OnUpdateSpecs = list[tuple[str, Callable[[], Any]] | Any]
+
+
 class SessionRequirement(str, enum.Enum):
     REQUIRED = "required"
     OPTIONAL = "optional"
@@ -32,7 +50,7 @@ def entity_to_mongo_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
 
 
 class OnUpdate(container.BaseModel):
-    specs: list[tuple[str, Callable[[], Any]] | Any] = Field(
+    specs: OnUpdateSpecs = Field(
         default_factory=lambda: [("updated_at", pendulum.DateTime.utcnow)],
     )
 
@@ -43,6 +61,17 @@ class OnUpdate(container.BaseModel):
             for field, value in specs
             if schema.get(field) is not None
         }
+
+    if not compat.IS_PYDANTIC_V2:
+        from pydantic import validator
+
+        @validator("specs")
+        def validate_unique_spec_keys(cls, specs: list[OnUpdateSpecs]) -> list[OnUpdateSpecs]:
+            spec_keys = {spec[0] for spec in specs}
+            if len(spec_keys) != len(specs):
+                raise ValueError("Spec keys must be unique")
+
+            return specs
 
 
 class MongoRepository(base.BaseRepository, Generic[EntityType]):
