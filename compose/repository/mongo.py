@@ -32,7 +32,7 @@ def entity_to_mongo_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
 
 
 class OnUpdate(container.BaseModel):
-    specs: list[tuple[str, Callable[[], Any]] | None] = Field(
+    specs: list[tuple[str, Callable[[], Any]] | Any] = Field(
         default_factory=lambda: [("updated_at", pendulum.DateTime.utcnow)],
     )
 
