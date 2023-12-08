@@ -2,41 +2,21 @@ from __future__ import annotations
 
 import enum
 import inspect
-from collections.abc import Callable
-from typing import Annotated, Any, ClassVar, Generic, Optional, TypeVar, get_args, get_type_hints
+from typing import Any, ClassVar, Generic, Optional, TypeVar, get_args, get_type_hints
 
 import pendulum
 import pymongo
-from pydantic import Field
 from pymongo.client_session import ClientSession
 from pymongo.collection import Collection
 from pymongo.database import Database
 
-from .. import compat, container, types
+from .. import compat, types
 from ..entity import Entity
 from ..pagination import Pagination
 from ..query.mongo import MongoFilterQuery, MongoQuery
 from . import base
 
 EntityType = TypeVar("EntityType", bound=Entity)
-
-
-if compat.IS_PYDANTIC_V2:
-    from pydantic import AfterValidator
-
-    def validate_unique_spec_keys(
-        specs: list[tuple[str, Callable[[], Any]] | Any]
-    ) -> list[tuple[str, Callable[[], Any]] | Any]:
-        spec_keys = {spec[0] for spec in specs}
-        assert len(spec_keys) == len(specs), "Spec keys must be unique"
-        return specs
-
-    OnUpdateSpecs = Annotated[
-        list[tuple[str, Callable[[], Any]] | Any],
-        AfterValidator(validate_unique_spec_keys),
-    ]
-else:
-    OnUpdateSpecs = list[tuple[str, Callable[[], Any]] | Any]
 
 
 class SessionRequirement(str, enum.Enum):
@@ -47,31 +27,6 @@ class SessionRequirement(str, enum.Enum):
 def entity_to_mongo_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
     default_kwargs = {"by_alias": True}
     return compat.model_dump(entity, **(default_kwargs | kwargs))
-
-
-class OnUpdate(container.BaseModel):
-    specs: OnUpdateSpecs = Field(
-        default_factory=lambda: [("updated_at", pendulum.DateTime.utcnow)],
-    )
-
-    def to_updates(self, schema: dict[str, Any]) -> dict[str, Any]:
-        specs = self.specs or [("updated_at", pendulum.DateTime.utcnow)]
-        return {
-            field: value() if isinstance(value, Callable) else value
-            for field, value in specs
-            if schema.get(field) is not None
-        }
-
-    if not compat.IS_PYDANTIC_V2:
-        from pydantic import validator
-
-        @validator("specs")
-        def validate_unique_spec_keys(cls, specs: list[OnUpdateSpecs]) -> list[OnUpdateSpecs]:
-            spec_keys = {spec[0] for spec in specs}
-            if len(spec_keys) != len(specs):
-                raise ValueError("Spec keys must be unique")
-
-            return specs
 
 
 class MongoRepository(base.BaseRepository, Generic[EntityType]):
@@ -96,9 +51,8 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
     __collection_name__: ClassVar[str] = ""
     __indexes__: ClassVar[Optional[list[pymongo.IndexModel]]] = None
 
-    def __init__(self, collection: Collection, on_update: OnUpdate | None = None):
+    def __init__(self, collection: Collection):
         self.collection = collection
-        self.on_update = on_update or OnUpdate()
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__()
@@ -132,16 +86,12 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
                 raise ValueError(error_message.format(name))
 
     @classmethod
-    def create(
-        cls,
-        database: Database,
-        on_update: OnUpdate | None = None,
-        **kwargs,
-    ) -> MongoRepository:
+    def create(cls, database: Database, **kwargs) -> MongoRepository:
         collection = database.get_collection(cls.__collection_name__, **kwargs)
         if cls.__indexes__ is not None:
             collection.create_indexes(cls.__indexes__)
-        return cls(collection=collection, on_update=on_update)
+
+        return cls(collection=collection)
 
     def find_by_id(
         self,
@@ -196,6 +146,17 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
             return
 
         self.collection.update_one({"_id": entity.id}, updates, session=session, **kwargs)
+
+    def on_update(self, entity: EntityType, session: ClientSession | None = None, **kwargs) -> None:
+        if getattr(entity, "updated_at") is None:
+            return
+
+        self.collection.update_one(
+            {"_id": entity.id},
+            {"$set": {"updated_at": pendulum.DateTime.utcnow()}},
+            session=session,
+            **kwargs,
+        )
 
     def update_many(
         self, entities: list[EntityType], session: ClientSession | None = None, **kwargs
