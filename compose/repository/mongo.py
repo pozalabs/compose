@@ -142,10 +142,7 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         if not update_result.modified_count:
             return
 
-        if self.on_update is None or not (updates := self.on_update.to_updates(schema)):
-            return
-
-        self.collection.update_one({"_id": entity.id}, updates, session=session, **kwargs)
+        self.on_update(entity=entity, session=session, **kwargs)
 
     def on_update(self, entity: EntityType, session: ClientSession | None = None, **kwargs) -> None:
         if getattr(entity, "updated_at") is None:
