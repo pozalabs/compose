@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 import enum
 import inspect
 from collections.abc import Callable
@@ -8,6 +7,7 @@ from typing import Any, ClassVar, Generic, Optional, TypeVar, get_args, get_type
 
 import pendulum
 import pymongo
+from pydantic import Field
 from pymongo import UpdateOne
 from pymongo.client_session import ClientSession
 from pymongo.collection import Collection
@@ -32,9 +32,18 @@ def entity_to_mongo_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
     return compat.model_dump(entity, **(default_kwargs | kwargs))
 
 
-class OnUpdateOptions(container.BaseModel):
-    timestamp_field: str = "updated_at"
-    timestamp_factory: Callable[[], datetime.datetime] = pendulum.DateTime.utcnow
+class OnUpdate(container.BaseModel):
+    specs: list[tuple[str, Callable[[], Any]] | None] = Field(
+        default_factory=lambda: [("updated_at", pendulum.DateTime.utcnow)],
+    )
+
+    def to_updates(self, schema: dict[str, Any]) -> dict[str, Any]:
+        specs = self.specs or [("updated_at", pendulum.DateTime.utcnow)]
+        return {
+            field: value() if isinstance(value, Callable) else value
+            for field, value in specs
+            if schema.get(field) is not None
+        }
 
 
 class MongoRepository(base.BaseRepository, Generic[EntityType]):
@@ -59,9 +68,9 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
     __collection_name__: ClassVar[str] = ""
     __indexes__: ClassVar[Optional[list[pymongo.IndexModel]]] = None
 
-    def __init__(self, collection: Collection, on_update: OnUpdateOptions | None = None):
+    def __init__(self, collection: Collection, on_update: OnUpdate | None = None):
         self.collection = collection
-        self.on_update = on_update
+        self.on_update = on_update or OnUpdate()
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__()
@@ -98,7 +107,7 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
     def create(
         cls,
         database: Database,
-        on_update: OnUpdateOptions | None = None,
+        on_update: OnUpdate | None = None,
         **kwargs,
     ) -> MongoRepository:
         collection = database.get_collection(cls.__collection_name__, **kwargs)
@@ -145,19 +154,20 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         )
 
     def update(self, entity: EntityType, session: ClientSession | None = None, **kwargs) -> None:
+        schema = entity_to_mongo_schema(entity)
         update_result = self.collection.update_one(
             {"_id": entity.id},
-            {"$set": entity_to_mongo_schema(entity)},
+            {"$set": schema},
             session=session,
             **kwargs,
         )
-        if update_result.modified_count and self.on_update is not None:
-            self.collection.update_one(
-                {"_id": entity.id},
-                {"$set": {self.on_update.timestamp_field: self.on_update.timestamp_factory()}},
-                session=session,
-                **kwargs,
-            )
+        if not update_result.modified_count:
+            return
+
+        if self.on_update is None or not (updates := self.on_update.to_updates(schema)):
+            return
+
+        self.collection.update_one({"_id": entity.id}, updates, session=session, **kwargs)
 
     def update_many(
         self, entities: list[EntityType], session: ClientSession | None = None, **kwargs
