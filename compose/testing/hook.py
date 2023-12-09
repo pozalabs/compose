@@ -21,5 +21,15 @@ def add_test_type_markers(
     items: list[pytest.Function],
     marker_getter: Callable[[pytest.Function], pytest.MarkDecorator] = default_marker_getter,
 ) -> None:
+    """
+
+    Examples:
+        >>> from compose import testing
+        >>> import pytest
+        >>> def pytest_collection_modifyitems(items: list[pytest.Function]) -> None:
+        >>>     testing.add_test_type_markers(items)
+
+    """
+
     for item in items:
         item.add_marker(marker_getter(item))
