@@ -6,6 +6,7 @@ from . import (
     dependency,
     entity,
     event,
+    field,
     messaging,
     pagination,
     query,
