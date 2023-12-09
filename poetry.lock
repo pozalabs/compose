@@ -1578,9 +1578,9 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [extras]
 aws = ["boto3"]
 logging = ["loguru"]
-testing = ["pytest"]
+testing = []
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "a39755ad1fa5ae5f4be6f291be010f35989d0cad6b7b8687b621320181836cd8"
+content-hash = "1e63bf26657cb11e262b3482252ef24534614811f7b32b3b22fed595978ca184"
