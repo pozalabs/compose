@@ -2,6 +2,7 @@ from .consumer import MessageConsumer
 from .consumer_runner import MessageConsumerThreadRunner
 from .messagebus import MessageBus
 from .model import EventMessage, SqsEventMessage
+from .publisher import EventPublisher
 from .queue import MessageQueue
 
 __all__ = [
@@ -11,6 +12,7 @@ __all__ = [
     "MessageConsumer",
     "MessageConsumerThreadRunner",
     "MessageBus",
+    "EventPublisher",
 ]
 
 try:
