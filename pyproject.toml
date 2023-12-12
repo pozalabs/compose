@@ -15,17 +15,16 @@ dependency-injector = "^4.41.0"
 pydantic = ">=1.10.0,<3"
 boto3 = {version = "^1.28.73", optional = true}
 loguru = {version = "^0.7.2", optional = true}
-pytest = {version = "^7.3.1", optional = true}
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^2.20.0"
+pytest = "^7.3.1"
 bump-pydantic = "^0.6.1"
 boto3-stubs-lite = {extras = ["essential"], version = "^1.28.73"}
 
 [tool.poetry.extras]
 aws = ["boto3"]
 logging = ["loguru"]
-testing = ["pytest"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
