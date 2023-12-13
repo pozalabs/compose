@@ -6,6 +6,7 @@ from . import (
     dependency,
     entity,
     event,
+    field,
     messaging,
     pagination,
     query,
@@ -42,5 +43,12 @@ try:
     from . import logging  # noqa: F401
 
     __all__.append("logging")
+except ImportError:
+    pass
+
+try:
+    from . import testing  # noqa: F401
+
+    __all__.append("testing")
 except ImportError:
     pass
