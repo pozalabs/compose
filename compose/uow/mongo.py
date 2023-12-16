@@ -1,7 +1,10 @@
+import functools
 from collections.abc import Callable
 from typing import TypeVar
 
 from pymongo.client_session import ClientSession, SessionOptions, TransactionOptions
+
+from ..utils import unordered_partial
 
 T = TypeVar("T")
 
@@ -26,7 +29,7 @@ class MongoUnitOfWork:
             snapshot=session_options.snapshot,
         ) as session:
             result = session.with_transaction(
-                callback=callback,
+                callback=unordered_partial(p=functools.partial(callback), t=ClientSession),
                 read_concern=transaction_options.read_concern,
                 write_concern=transaction_options.write_concern,
                 read_preference=transaction_options.read_preference,
