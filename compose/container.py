@@ -107,7 +107,7 @@ class BaseModel(PydanticBaseModel):
             models_as_dict: bool = True,
             **dumps_kwargs: Any,
         ) -> dict[str, Any]:
-            return json.loads(
+            return self.__config__.json_loads(
                 self.json(
                     include=include,
                     exclude=exclude,
