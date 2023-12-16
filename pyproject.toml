@@ -15,6 +15,7 @@ dependency-injector = "^4.41.0"
 pydantic = ">=1.10.0,<3"
 boto3 = {version = "^1.28.73", optional = true}
 loguru = {version = "^0.7.2", optional = true}
+orjson = {version = "^3.9.10", optional = true}
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^2.20.0"
