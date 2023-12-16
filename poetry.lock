@@ -1637,8 +1637,9 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [extras]
 aws = ["boto3"]
 logging = ["loguru"]
+orjson = ["orjson"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "cdc8bccaa6fc50daabd489125e8c0840a8a80ca595d0a680af52ecf1fa579472"
+content-hash = "c7fbab080d17482a15d50e49bbab569b7c4a846206d666168ef5ed1a648298ca"
