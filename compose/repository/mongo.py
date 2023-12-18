@@ -9,6 +9,7 @@ import pymongo
 from pymongo.client_session import ClientSession
 from pymongo.collection import Collection
 from pymongo.database import Database
+from pymongo.results import UpdateResult
 
 from .. import compat, types
 from ..entity import Entity
@@ -139,12 +140,24 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
             session=session,
             **kwargs,
         )
+
+        self.on_update(
+            update_result=update_result,
+            entity=entity,
+            session=session,
+            **kwargs,
+        )
+
+    def on_update(
+        self,
+        update_result: UpdateResult,
+        entity: EntityType,
+        session: ClientSession | None = None,
+        **kwargs,
+    ) -> None:
         if not update_result.modified_count:
             return
 
-        self.on_update(entity=entity, session=session, **kwargs)
-
-    def on_update(self, entity: EntityType, session: ClientSession | None = None, **kwargs) -> None:
         if getattr(entity, "updated_at") is None:
             return
 
