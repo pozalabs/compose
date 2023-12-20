@@ -1,4 +1,5 @@
 import concurrent.futures
+import functools
 from collections.abc import Callable
 from typing import TypeVar
 
@@ -8,7 +9,7 @@ T = TypeVar("T")
 
 def execute_in_pool(
     pool_factory: Callable[[], concurrent.futures.Executor],
-    funcs: dict[K, Callable[[], T]],
+    funcs: dict[K, functools.partial[T]],
     timeout: int | None = None,
 ) -> dict[K, T]:
     result = {}
