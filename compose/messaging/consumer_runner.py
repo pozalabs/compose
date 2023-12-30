@@ -8,7 +8,7 @@ import types
 from collections.abc import Callable
 
 from .consumer import MessageConsumer
-from .signal_handler import SignalHandler
+from .signal_handler import SignalHandler, ThreadSignalHandler
 
 CAN_USE_ASYNCIO_RUNNER = sys.version_info >= (3, 11)
 
@@ -19,7 +19,7 @@ class MessageConsumerThreadRunner:
     def __init__(
         self,
         message_consumer_factory: Callable[[], MessageConsumer],
-        signal_handler_factory: Callable[[], SignalHandler],
+        signal_handler_factory: Callable[[], SignalHandler] = ThreadSignalHandler,
     ):
         self.message_consumer_factory = message_consumer_factory
         self.signal_handler_factory = signal_handler_factory
