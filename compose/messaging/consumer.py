@@ -44,7 +44,7 @@ DEFAULT_HOOKS = {
     "on_receive": [lambda message: log_event_message("Received message", message)],
     "on_receive_error": [lambda exc: log_exception("Failed to receive message", exc)],
     "on_consume": [lambda message: log_event_message("Consumed message", message)],
-    "on_consume_error": [lambda exc: log_exception("Failed to consume message", exc)],
+    "on_consume_error": [lambda exc: log_exception(f"Failed to consume message due to {exc}", exc)],
 }
 
 
