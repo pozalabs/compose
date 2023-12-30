@@ -33,7 +33,6 @@ class ThreadSignalHandler(SignalHandler):
 
     def handle(self) -> None:
         self._exit_event.set()
-        print(self._exit_event.is_set())
 
     @property
     def received_signal(self) -> bool:
