@@ -1,5 +1,5 @@
 from .consumer import MessageConsumer
-from .consumer_runner import MessageConsumerThreadRunner
+from .consumer_runner import ThreadMessageConsumerRunner
 from .messagebus import MessageBus
 from .model import EventMessage, SqsEventMessage
 from .publisher import EventPublisher
@@ -11,7 +11,7 @@ __all__ = [
     "SqsEventMessage",
     "MessageQueue",
     "MessageConsumer",
-    "MessageConsumerThreadRunner",
+    "ThreadMessageConsumerRunner",
     "MessageBus",
     "EventPublisher",
     "SignalHandler",
