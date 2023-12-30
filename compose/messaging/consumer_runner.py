@@ -15,7 +15,7 @@ CAN_USE_ASYNCIO_RUNNER = sys.version_info >= (3, 11)
 logger = logging.getLogger("compose")
 
 
-class ThreadMessageConsumerRunner:
+class MessageConsumerThreadRunner:
     def __init__(
         self,
         message_consumer_factory: Callable[[], MessageConsumer],
