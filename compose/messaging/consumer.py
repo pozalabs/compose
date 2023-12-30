@@ -2,12 +2,12 @@ import asyncio
 import json
 import logging
 from collections.abc import Callable
-from typing import Literal, Protocol, TypeAlias
+from typing import Literal, TypeAlias
 
-from .._signal import SignalHandler
 from . import model
 from .messagebus import MessageBus
 from .queue import MessageQueue
+from .signal_handler import DefaultSignalHandler, SignalHandler
 
 HookEventType = Literal[
     "on_start",
@@ -17,15 +17,9 @@ HookEventType = Literal[
     "on_consume_error",
 ]
 HookArgType: TypeAlias = str | model.EventMessage | Exception
-Hook = Callable[[HookArgType], None]
+Hook: TypeAlias = Callable[[HookArgType], None]
 
 logger = logging.getLogger("compose")
-
-
-class SignalHandleable(Protocol):
-    @property
-    def received_signal(self) -> bool:
-        return ...
 
 
 def log_event_message(log_message: str, message: model.EventMessage) -> None:
@@ -54,28 +48,27 @@ class MessageConsumer:
         messagebus: MessageBus,
         message_queue: MessageQueue,
         hooks: dict[HookEventType, list[Hook]] | None = None,
-        signal_handler: SignalHandleable | None = None,
     ):
         self.messagebus = messagebus
         self.message_queue = message_queue
         self.hooks = DEFAULT_HOOKS | (hooks or {})
-        self.signal_handler = signal_handler or SignalHandler()
 
         self._default_hook = lambda _: None
 
-    async def run(self) -> None:
+    async def run(self, signal_handler: SignalHandler | None = None) -> None:
+        signal_handler = signal_handler or DefaultSignalHandler()
         self._execute_hook("on_start", "MessageConsumer started")
 
-        while not self.signal_handler.received_signal:
+        while not signal_handler.received_signal:
             try:
                 message = self.message_queue.peek()
             except Exception as exc:
                 self._execute_hook("on_receive_error", exc)
                 continue
 
-            self._execute_hook("on_receive", message)
             if message is None:
                 continue
+            self._execute_hook("on_receive", message)
 
             try:
                 await asyncio.create_task(self.consume(message))
