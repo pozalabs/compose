@@ -15,6 +15,7 @@ HookEventType = Literal[
     "on_receive_error",
     "on_consume",
     "on_consume_error",
+    "on_shutdown",
 ]
 HookArgType: TypeAlias = str | model.EventMessage | Exception
 Hook: TypeAlias = Callable[[HookArgType], None]
@@ -39,6 +40,7 @@ DEFAULT_HOOKS = {
     "on_receive_error": [lambda exc: log_exception("Failed to receive message", exc)],
     "on_consume": [lambda message: log_event_message("Consumed message", message)],
     "on_consume_error": [lambda exc: log_exception(f"Failed to consume message due to {exc}", exc)],
+    "on_shutdown": [logger.info],
 }
 
 
@@ -48,18 +50,19 @@ class MessageConsumer:
         messagebus: MessageBus,
         message_queue: MessageQueue,
         hooks: dict[HookEventType, list[Hook]] | None = None,
+        signal_handler: SignalHandler | None = None,
     ):
         self.messagebus = messagebus
         self.message_queue = message_queue
         self.hooks = DEFAULT_HOOKS | (hooks or {})
+        self.signal_handler = signal_handler or DefaultSignalHandler()
 
         self._default_hook = lambda _: None
 
-    async def run(self, signal_handler: SignalHandler | None = None) -> None:
-        signal_handler = signal_handler or DefaultSignalHandler()
+    async def run(self) -> None:
         self._execute_hook("on_start", "MessageConsumer started")
 
-        while not signal_handler.received_signal:
+        while not self.signal_handler.received_signal:
             try:
                 message = self.message_queue.peek()
             except Exception as exc:
@@ -84,3 +87,7 @@ class MessageConsumer:
     def _execute_hook(self, hook_event_type: HookEventType, arg: HookArgType, /) -> None:
         for hook in self.hooks.get(hook_event_type, [self._default_hook]):
             hook(arg)
+
+    def shutdown(self) -> None:
+        self._execute_hook("on_shutdown", "MessageConsumer shutting down")
+        self.signal_handler.handle()
