@@ -4,6 +4,7 @@ from .messagebus import MessageBus
 from .model import EventMessage, SqsEventMessage
 from .publisher import EventPublisher
 from .queue import MessageQueue
+from .signal_handler import DefaultSignalHandler, SignalHandler, ThreadSignalHandler
 
 __all__ = [
     "EventMessage",
@@ -13,6 +14,9 @@ __all__ = [
     "MessageConsumerThreadRunner",
     "MessageBus",
     "EventPublisher",
+    "SignalHandler",
+    "DefaultSignalHandler",
+    "ThreadSignalHandler",
 ]
 
 try:
