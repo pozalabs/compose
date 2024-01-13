@@ -84,4 +84,12 @@ class Evaluable(Operator):
         self.op = op
 
     def expression(self) -> Any:
-        return self.op.expression() if isinstance(self.op, Operator) else self.op
+        match self.op:
+            case Operator():
+                return self.op.expression()
+            case dict():
+                return {k: Evaluable(v).expression() for k, v in self.op.items()}
+            case list():
+                return [Evaluable(v).expression() for v in self.op]
+            case _:
+                return self.op
