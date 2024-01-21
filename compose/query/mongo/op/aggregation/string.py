@@ -13,7 +13,7 @@ class ToString(Operator):
         self.expr = expr
 
     def expression(self) -> DictExpression:
-        return {"$toString": self.expr}
+        return Evaluable({"$toString": self.expr}).expression()
 
 
 class Split(Operator):
