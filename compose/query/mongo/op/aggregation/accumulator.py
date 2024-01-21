@@ -8,7 +8,7 @@ class First(Operator):
         self._expression = expression
 
     def expression(self) -> DictExpression:
-        return {"$first": Evaluable(self._expression).expression()}
+        return Evaluable({"$first": self._expression}).expression()
 
 
 class MergeObjects(Operator):
