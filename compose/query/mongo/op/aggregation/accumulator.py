@@ -8,7 +8,7 @@ class First(Operator):
         self._expression = expression
 
     def expression(self) -> DictExpression:
-        return {"$first": Evaluable(self._expression).expression()}
+        return Evaluable({"$first": self._expression}).expression()
 
 
 class MergeObjects(Operator):
@@ -18,3 +18,11 @@ class MergeObjects(Operator):
     def expression(self) -> DictExpression:
         expressions = [Evaluable(e).expression() for e in self._expressions]
         return {"$mergeObjects": expressions if len(expressions) > 1 else expressions[0]}
+
+
+class AddToSet(Operator):
+    def __init__(self, expression: Any, /):
+        self._expression = expression
+
+    def expression(self) -> DictExpression:
+        return Evaluable({"$addToSet": self._expression}).expression()
