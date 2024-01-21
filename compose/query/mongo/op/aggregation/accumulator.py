@@ -21,7 +21,7 @@ class MergeObjects(Operator):
 
 
 class AddToSet(Operator):
-    def __init__(self, expression: Any):
+    def __init__(self, expression: Any, /):
         self._expression = expression
 
     def expression(self) -> DictExpression:
