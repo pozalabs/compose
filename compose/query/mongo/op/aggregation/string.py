@@ -1,6 +1,6 @@
 from typing import Any
 
-from ..base import GeneralAggregationOperator, Operator
+from ..base import Evaluable, GeneralAggregationOperator, Operator
 from ..types import DictExpression
 
 
@@ -14,3 +14,12 @@ class ToString(Operator):
 
     def expression(self) -> DictExpression:
         return {"$toString": self.expr}
+
+
+class Split(Operator):
+    def __init__(self, expr: Any, delimiter: str):
+        self.expr = expr
+        self.delimiter = delimiter
+
+    def expression(self) -> DictExpression:
+        return Evaluable({"$split": [self.expr, self.delimiter]}).expression()
