@@ -44,7 +44,7 @@ class GeneralAggregationOperator(Operator):
         self.expressions = list(expressions)
 
     def expression(self) -> DictExpression:
-        return {self.mongo_operator: [Evaluable(expr).expression() for expr in self.expressions]}
+        return Evaluable({self.mongo_operator: self.expressions}).expression()
 
 
 class Stage(Operator):
