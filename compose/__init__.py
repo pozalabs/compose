@@ -6,6 +6,7 @@ from . import (
     dependency,
     entity,
     event,
+    exceptions,
     field,
     messaging,
     pagination,
@@ -37,6 +38,7 @@ __all__ = [
     "messaging",
     "concurrent",
     "signal",
+    "exceptions",
 ]
 
 try:
