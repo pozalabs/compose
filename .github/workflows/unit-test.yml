@@ -25,6 +25,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install extra dependencies
+        run: poetry install --all-extras
+
       - name: Install pydantic ${{ matrix.pydantic-version }}
         run: poetry add pydantic@${{ matrix.pydantic-version }}
 
