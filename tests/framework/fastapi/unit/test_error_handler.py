@@ -4,7 +4,7 @@ from unittest import mock
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
-import compose.exceptions
+import compose
 from compose.framework.fastapi.error_handler import ErrorHandlerInfo
 
 
