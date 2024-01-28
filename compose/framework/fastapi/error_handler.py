@@ -20,6 +20,25 @@ class ErrorHandlerInfo(BaseModel):
     exc_class_or_status_code: int | type[Exception]
     handler: ErrorHandler
 
+    @classmethod
+    def for_status_code(cls, status_code: int, error_type: str) -> ErrorHandlerInfo:
+        return cls(
+            exc_class_or_status_code=status_code,
+            handler=create_error_handler(status_code=status_code, error_type=error_type),
+        )
+
+    @classmethod
+    def with_exc(
+        cls,
+        exc_type: type[Exception],
+        status_code: int,
+        error_type: str,
+    ) -> ErrorHandlerInfo:
+        return cls(
+            exc_class_or_status_code=exc_type,
+            handler=create_error_handler(status_code=status_code, error_type=error_type),
+        )
+
 
 def create_error_handler(status_code: int, error_type: str) -> ErrorHandler:
     def error_handler(request: Request, exc: Exception) -> Response:
