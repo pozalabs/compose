@@ -43,6 +43,10 @@ class ErrorHandlerInfo(BaseModel):
             handler=create_error_handler(status_code=status_code, error_type=error_type),
         )
 
+    @classmethod
+    def for_http_exception(cls, exc: HTTPException) -> ErrorHandlerInfo:
+        return cls.from_status_code(http.HTTPStatus(exc.status_code))
+
 
 def create_error_handler(status_code: int, error_type: str) -> ErrorHandler:
     def error_handler(request: Request, exc: Exception) -> Response:
