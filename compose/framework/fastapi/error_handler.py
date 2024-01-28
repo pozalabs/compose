@@ -28,7 +28,7 @@ class ErrorHandlerInfo(BaseModel):
         )
 
     @classmethod
-    def with_exc(
+    def for_exc(
         cls,
         exc_type: type[Exception],
         status_code: int,
