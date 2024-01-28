@@ -16,7 +16,7 @@ from compose.container import BaseModel
 ErrorHandler: TypeAlias = Callable[[Request, Exception], Response]
 
 
-class ExceptionHandlerInfo(BaseModel):
+class ErrorHandlerInfo(BaseModel):
     exc_class_or_status_code: int | type[Exception]
     handler: ErrorHandler
 
