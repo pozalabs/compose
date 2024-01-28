@@ -28,6 +28,10 @@ class ErrorHandlerInfo(BaseModel):
         )
 
     @classmethod
+    def from_status_code(cls, status_code: http.HTTPStatus) -> ErrorHandlerInfo:
+        return cls.for_status_code(status_code=status_code, error_type=status_code.name.lower())
+
+    @classmethod
     def for_exc(
         cls,
         exc_type: type[Exception],
@@ -38,10 +42,6 @@ class ErrorHandlerInfo(BaseModel):
             exc_class_or_status_code=exc_type,
             handler=create_error_handler(status_code=status_code, error_type=error_type),
         )
-
-    @classmethod
-    def from_status_code(cls, status_code: http.HTTPStatus) -> ErrorHandlerInfo:
-        return cls.for_status_code(status_code=status_code, error_type=status_code.name.lower())
 
 
 def create_error_handler(status_code: int, error_type: str) -> ErrorHandler:
