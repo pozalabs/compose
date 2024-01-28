@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 import http
 from collections.abc import Callable
 from typing import TypeAlias
 
 from fastapi import Request, Response
 from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-from compose import schema
+from compose import compat, schema
 from compose.container import BaseModel
 
 ErrorHandler: TypeAlias = Callable[[Request, Exception], Response]
@@ -17,6 +19,31 @@ ErrorHandler: TypeAlias = Callable[[Request, Exception], Response]
 class ExceptionHandlerInfo(BaseModel):
     exc_class_or_status_code: int | type[Exception]
     handler: ErrorHandler
+
+
+def create_error_handler(status_code: int, error_type: str) -> ErrorHandler:
+    def error_handler(request: Request, exc: Exception) -> Response:
+        if isinstance(exc, HTTPException):
+            return JSONResponse(
+                content=jsonable_encoder(getattr(exc, "detail")),
+                status_code=exc.status_code,
+            )
+
+        response = schema.Error(
+            title=str(exc),
+            type=error_type,
+            detail=getattr(exc, "detail", None),
+            invalid_params=(
+                (invalid_params := getattr(exc, "invalid_params", None))
+                and [
+                    compat.model_validate(t=schema.InvalidParam, obj=invalid_param)
+                    for invalid_param in invalid_params
+                ]
+            ),
+        )
+        return JSONResponse(content=jsonable_encoder(response), status_code=status_code)
+
+    return error_handler
 
 
 def validation_exception_handler(
