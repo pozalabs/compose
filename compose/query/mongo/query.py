@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import Field
 
@@ -13,8 +13,8 @@ class MongoQuery(base.Query, abc.ABC):
 
 
 class MongoFilterQuery(MongoQuery):
-    page: Optional[int] = Field(None, ge=1)
-    per_page: Optional[int] = Field(None, ge=1)
+    page: int | None = Field(None, ge=1)
+    per_page: int | None = Field(None, ge=1)
 
     @abc.abstractmethod
     def to_query(self) -> list[dict[str, Any]]:

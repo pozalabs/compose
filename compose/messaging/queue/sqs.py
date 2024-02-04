@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 import compose
 from compose import utils
@@ -42,7 +40,7 @@ class SqsMessageQueue(MessageQueue):
         queue_name: str,
         wait_time_seconds: int,
         event_cls: type[compose.event.Event],
-    ) -> SqsMessageQueue:
+    ) -> Self:
         return cls(
             sqs_client=sqs_client,
             queue_name=queue_name,

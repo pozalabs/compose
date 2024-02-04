@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 import inspect
-from typing import Any, ClassVar, Generic, Optional, TypeVar, get_args, get_type_hints
+from typing import Any, ClassVar, Generic, TypeVar, get_args, get_type_hints
 
 import pendulum
 import pymongo
@@ -50,7 +50,7 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
     """
 
     __collection_name__: ClassVar[str] = ""
-    __indexes__: ClassVar[Optional[list[pymongo.IndexModel]]] = None
+    __indexes__: ClassVar[list[pymongo.IndexModel] | None] = None
 
     def __init__(self, collection: Collection):
         self.collection = collection
@@ -99,12 +99,12 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         entity_id: types.PyObjectId,
         session: ClientSession | None = None,
         **kwargs,
-    ) -> Optional[EntityType]:
+    ) -> EntityType | None:
         return self.find_by({"_id": entity_id}, session=session, **kwargs)
 
     def find_by(
         self, filter_: dict[str, Any], session: ClientSession | None = None, **kwargs
-    ) -> Optional[EntityType]:
+    ) -> EntityType | None:
         """https://stackoverflow.com/a/73746554/9331155"""
         entity_type: EntityType = get_args(self.__class__.__orig_bases__[0])[0]  # type: ignore
         result = self.collection.find_one(filter=filter_, session=session, **kwargs)
@@ -112,7 +112,7 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
 
     def find_by_query(
         self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         query_result = self.collection.aggregate(qry.to_query(), session=session, **kwargs)
         return next(query_result, None)
 

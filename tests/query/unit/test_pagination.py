@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 
 from compose.query.mongo.op import DictExpression, Pagination, Set, Spec
@@ -51,7 +49,8 @@ def test_pagination_expression(pagination: Pagination, expected: DictExpression)
     ids=("`per_page`만 None", "`page`만 None"),
 )
 def test_cannot_instantiate_mutually_exclusive_pagination(
-    page: Optional[int], per_page: Optional[int]
+    page: int | None,
+    per_page: int | None,
 ):
     with pytest.raises(ValueError):
         Pagination(page=page, per_page=per_page)

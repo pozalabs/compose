@@ -1,8 +1,6 @@
-from __future__ import annotations
-
 import json
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, Self, TypeAlias, TypeVar
 
 import bson
 from pydantic import BaseModel as PydanticBaseModel
@@ -80,7 +78,7 @@ class BaseModel(PydanticBaseModel):
             update: DictStrAny | None = None,
             deep: bool = False,
             strict: bool = True,
-        ) -> BaseModel:
+        ) -> Self:
             if strict and (diff := set((update or {}).keys()) - set(self.__fields__.keys())):
                 raise AttributeError(
                     f"{self.__class__.__name__} has no attributes: {', '.join(diff)}"

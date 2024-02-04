@@ -1,5 +1,4 @@
 import datetime
-from typing import Union
 
 import pendulum
 import pytest
@@ -14,13 +13,13 @@ class Model(compose.BaseModel):
 
 @pytest.fixture
 def model(request: pytest.FixtureRequest) -> Model:
-    dt: Union[datetime.datetime, pendulum.DateTime] = getattr(request, "param")
+    dt: datetime.datetime | pendulum.DateTime = getattr(request, "param")
     return Model(created_at=dt)
 
 
 @pytest.fixture
 def expected(request: pytest.FixtureRequest) -> Model:
-    dt: Union[pendulum.DateTime, compose.types.DateTime] = getattr(request, "param")
+    dt: datetime.datetime | pendulum.DateTime = getattr(request, "param")
     return Model(created_at=dt)
 
 

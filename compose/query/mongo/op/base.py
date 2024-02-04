@@ -4,7 +4,7 @@ import abc
 import functools
 import operator
 from collections.abc import Callable
-from typing import Any, ClassVar, Optional
+from typing import Any, ClassVar
 
 from .types import DictExpression, ListExpression
 
@@ -19,7 +19,7 @@ class Operator:
 
 
 class ComparisonOperator(Operator):
-    def __init__(self, field: str, value: Optional[Any] = None):
+    def __init__(self, field: str, value: Any | None = None):
         self.field = field
         self.value = value
 

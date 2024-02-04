@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Any, Generic, Optional, TypeVar, get_args, get_origin
+from typing import Any, Generic, Self, TypeVar, get_args, get_origin
 
 from pydantic import ValidationError
 
@@ -42,7 +40,7 @@ if compat.IS_PYDANTIC_V2:
             pagination: Pagination,
             parser_name: str = "model_validate",
             **parser_kwargs: Any,
-        ) -> ListSchema:
+        ) -> Self:
             if not pagination.items:
                 return cls(**pagination.model_dump())
 
@@ -74,7 +72,7 @@ else:
             pagination: Pagination,
             parser_name: str = "parse_obj",
             **parser_kwargs: Any,
-        ) -> ListSchema:
+        ) -> Self:
             if not pagination.items:
                 return cls(**pagination.dict())
 
@@ -112,11 +110,11 @@ class InvalidParam(container.BaseModel):
 class Error(container.BaseModel):
     title: str
     type: str
-    detail: Optional[str] = None
-    invalid_params: Optional[list[InvalidParam]] = None
+    detail: str | None = None
+    invalid_params: list[InvalidParam] | None = None
 
     @classmethod
-    def from_validation_error(cls, exc: ValidationError) -> Error:
+    def from_validation_error(cls, exc: ValidationError) -> Self:
         invalid_params = []
         for error in exc.errors():
             invalid_params.append(

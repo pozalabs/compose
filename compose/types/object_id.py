@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 from collections.abc import Callable, Generator
-from typing import Any
+from typing import Any, Self
 
 import bson
 
@@ -21,7 +19,7 @@ class PyObjectId(bson.ObjectId):
             return cls._validate(v)
 
         @classmethod
-        def __get_pydantic_core_schema__(cls, source_type: type[PyObjectId]) -> CoreSchema:
+        def __get_pydantic_core_schema__(cls, source_type: type[Self]) -> CoreSchema:
             return core_schema.general_plain_validator_function(
                 cls.validate, serialization=core_schema.to_string_ser_schema()
             )

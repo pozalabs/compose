@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Any, Optional
+from typing import Any, Self
 
 from ..base import Evaluable, Operator
 from ..types import DictExpression
@@ -11,7 +9,7 @@ class IfNull(Operator):
         self,
         input_expr: str,
         non_null_input_expr: Any,
-        replacement_expr: Optional[Any] = None,
+        replacement_expr: Any | None = None,
         /,
     ):
         """
@@ -26,13 +24,11 @@ class IfNull(Operator):
         self.replacement_expr = replacement_expr
 
     @classmethod
-    def single(cls, input_expr: str, non_null_input_expr: Any, /) -> IfNull:
+    def single(cls, input_expr: str, non_null_input_expr: Any, /) -> Self:
         return cls(input_expr, non_null_input_expr)
 
     @classmethod
-    def multiple(
-        cls, input_expr: str, non_null_input_expr: Any, replacement_expr: Any, /
-    ) -> IfNull:
+    def multiple(cls, input_expr: str, non_null_input_expr: Any, replacement_expr: Any, /) -> Self:
         return cls(input_expr, non_null_input_expr, replacement_expr)
 
     def expression(self) -> DictExpression:

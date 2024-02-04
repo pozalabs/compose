@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Any, Optional, Union
+from typing import Any, Self
 
 from .base import Evaluable, Merge, Operator, Stage
 from .logical import And, LogicalOperator, Or
@@ -18,11 +16,11 @@ class Match(Stage):
         return {"$match": expression}
 
     @classmethod
-    def and_(cls, *ops: Operator) -> Match:
+    def and_(cls, *ops: Operator) -> Self:
         return cls(And(*ops))
 
     @classmethod
-    def or_(cls, *ops: Operator) -> Match:
+    def or_(cls, *ops: Operator) -> Self:
         return cls(Or(*ops))
 
 
@@ -45,15 +43,15 @@ class Spec(Operator):
         return {self.field: Evaluable(self.spec).expression()}
 
     @classmethod
-    def include(cls, field: str) -> Spec:
+    def include(cls, field: str) -> Self:
         return cls(field=field, spec=1)
 
     @classmethod
-    def exclude(cls, field: str) -> Spec:
+    def exclude(cls, field: str) -> Self:
         return cls(field=field, spec=0)
 
     @classmethod
-    def ref(cls, field: str, spec: str) -> Spec:
+    def ref(cls, field: str, spec: str) -> Self:
         return cls(field=field, spec=_FieldPath(spec))
 
 
@@ -106,8 +104,8 @@ class Unwind(Stage):
     def __init__(
         self,
         path: str,
-        include_array_index: Optional[str] = None,
-        preserve_null_and_empty_arrays: Optional[bool] = None,
+        include_array_index: str | None = None,
+        preserve_null_and_empty_arrays: bool | None = None,
     ):
         self.path = _FieldPath(path)
         self.include_array_index = include_array_index
@@ -123,7 +121,7 @@ class Unwind(Stage):
         }
 
     @classmethod
-    def preserve_missing(cls, path: str, include_array_index: Optional[str] = None) -> Unwind:
+    def preserve_missing(cls, path: str, include_array_index: str | None = None) -> Self:
         return cls(
             path=path,
             include_array_index=include_array_index,
@@ -173,7 +171,7 @@ class Limit(Stage):
 
 
 class TextSearchOperator(Operator):
-    def __init__(self, query: str, path: Union[str, list[str]]):
+    def __init__(self, query: str, path: str | list[str]):
         self.query = query
         self.path = path
 
@@ -193,9 +191,9 @@ class Search(Stage):
 class Pagination(Stage):
     def __init__(
         self,
-        page: Optional[int] = None,
-        per_page: Optional[int] = None,
-        metadata_ops: Optional[list[Operator]] = None,
+        page: int | None = None,
+        per_page: int | None = None,
+        metadata_ops: list[Operator] | None = None,
     ):
         if not ((page is not None and per_page is not None) or (page is None and per_page is None)):
             raise ValueError("`page` and `per_page` are mutual inclusive")
@@ -233,7 +231,7 @@ class ReplaceRoot(Stage):
 
 
 class Group(Stage):
-    def __init__(self, *ops: Operator, key: Optional[Any]):
+    def __init__(self, *ops: Operator, key: Any | None = None):
         self.ops = list(ops)
         self.key = key
 
@@ -246,5 +244,5 @@ class Group(Stage):
         }
 
     @classmethod
-    def by_null(cls, *ops: Operator) -> Group:
+    def by_null(cls, *ops: Operator) -> Self:
         return cls(*ops, key=None)

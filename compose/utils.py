@@ -6,7 +6,7 @@ T = TypeVar("T")
 RT = TypeVar("RT")
 
 
-def descendants_of(cls: type[T]) -> Generator[T, None, None]:
+def descendants_of(cls: type[T]) -> Generator[type[T], None, None]:
     stack = cls.__subclasses__()
     while stack:
         current_cls = stack.pop()

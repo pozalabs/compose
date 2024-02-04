@@ -1,11 +1,9 @@
-from __future__ import annotations
-
 import asyncio
 import collections
 import functools
 import re
 from collections.abc import Callable
-from typing import Protocol
+from typing import Protocol, Self
 
 from compose.dependency.wiring import create_lazy_resolver
 from compose.event import Event
@@ -23,7 +21,7 @@ class MessageBus:
         self._event_handlers: dict[str, set[str]] = collections.defaultdict(set)
 
     @classmethod
-    def with_container(cls, container_path: str) -> MessageBus:
+    def with_container(cls, container_path: str) -> Self:
         container_path_pattern = re.compile("^(?P<module_path>.+):(?P<container_name>.+)$")
         if container_path_pattern.match(container_path) is None:
             raise ValueError(
