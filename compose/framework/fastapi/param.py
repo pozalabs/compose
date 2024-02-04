@@ -48,7 +48,7 @@ def to_query(q: type[Q], /) -> type[Q]:
                 arbitrary_types_allowed = True
 
         return create_model(
-            f"_{q.__name__}Query",
+            f"{q.__name__}Query",
             **field_definitions,
             __base__=Child,
         )
