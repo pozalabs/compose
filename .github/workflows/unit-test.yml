@@ -9,7 +9,6 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - "3.10"
           - "3.11"
         pydantic-version:
           - "^1.10.13"
