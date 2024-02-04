@@ -18,6 +18,7 @@ from . import (
     uow,
 )
 from .container import BaseModel, TimeStampedModel
+from .framework import fastapi
 
 __all__ = [
     "BaseModel",
@@ -39,6 +40,7 @@ __all__ = [
     "concurrent",
     "signal",
     "exceptions",
+    "fastapi",
 ]
 
 try:
