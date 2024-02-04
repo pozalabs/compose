@@ -34,8 +34,6 @@ def to_query(q: type[Q], /) -> type[Q]:
         return create_model(f"{q.__name__}Query", **field_definitions, __base__=q)
 
     else:
-        from pydantic.config import get_config, inherit_config
-
         field_definitions = {
             field_name: (
                 field
@@ -45,9 +43,12 @@ def to_query(q: type[Q], /) -> type[Q]:
             for field_name, field in q.__fields__.items()
         }
 
+        class Child(q):
+            class Config:
+                arbitrary_types_allowed = True
+
         return create_model(
             f"_{q.__name__}Query",
             **field_definitions,
-            __base__=q,
-            __config__=inherit_config(get_config({"arbitrary_types_allowed": True}), q.__config__),
+            __base__=Child,
         )

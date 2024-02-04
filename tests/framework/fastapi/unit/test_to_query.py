@@ -1,3 +1,4 @@
+import http
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
@@ -34,5 +35,5 @@ def test_to_query():
         "per_page": 20,
     }
 
-    assert response.status_code == 200
+    assert response.status_code == http.HTTPStatus.OK
     assert response.json() == expected_response
