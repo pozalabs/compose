@@ -36,9 +36,12 @@ def to_query(q: type[Q], /) -> type[Q]:
     else:
         field_definitions = {
             field_name: (
-                field
-                if field_annotation_is_scalar(field.outer_type_)
-                else Field(Query(**{arg: getattr(field, arg, None) for arg in field_args}))
+                field.outer_type_,
+                (
+                    field.field_info
+                    if field_annotation_is_scalar(field.outer_type_)
+                    else Field(Query(**{arg: getattr(field, arg, None) for arg in field_args}))
+                ),
             )
             for field_name, field in q.__fields__.items()
         }
