@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Optional
+from typing import Any
 
 from . import utils
 from .base import ComparisonOperator, Operator
@@ -45,7 +45,7 @@ class Regex(ComparisonOperator):
     def __init__(
         self,
         field: str,
-        value: Optional[Any] = None,
+        value: Any | None = None,
         options: str = "ms",
     ):
         super().__init__(field=field, value=value)

@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 import pytest
 
@@ -6,7 +6,7 @@ from compose.query.mongo.op import ComparisonOperator, EmptyOnNull
 
 
 class CustomOp(ComparisonOperator):
-    def __init__(self, field: str, value: Optional[Any] = None):
+    def __init__(self, field: str, value: Any | None = None):
         super().__init__(field=field, value=value)
 
     def expression(self) -> dict[str, Any]:

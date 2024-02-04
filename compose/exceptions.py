@@ -1,15 +1,15 @@
 import enum
-from typing import Any, ClassVar, Optional, Union
+from typing import Any, ClassVar
 
 
 class BaseError(Exception):
-    default_message: ClassVar[Optional[str]] = None
+    default_message: ClassVar[str | None] = None
 
     def __init__(
         self,
-        message: Optional[Union[str, enum.Enum]] = None,
-        detail: Optional[Any] = None,
-        invalid_params: Optional[list[dict[str, Any]]] = None,
+        message: str | enum.Enum | None = None,
+        detail: Any | None = None,
+        invalid_params: list[dict[str, Any]] | None = None,
     ):
         if isinstance(message, enum.Enum):
             message = message.value

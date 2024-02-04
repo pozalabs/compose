@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Any
+from typing import Any, Self
 
 import pytest
 
@@ -21,7 +19,7 @@ class ItemWithCustomParser(compose.schema.Schema):
     is_legacy: bool
 
     @classmethod
-    def from_(cls, data: dict[str, Any]) -> ItemWithCustomParser:
+    def from_(cls, data: dict[str, Any]) -> Self:
         return cls(
             id=data["id"],
             version=data["version"],

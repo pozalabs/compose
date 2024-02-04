@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Any, ClassVar, TypeVar, Union
+from typing import Any, ClassVar, Self, TypeVar
 
 import inflection
 
@@ -20,7 +20,7 @@ class MongoKeyword(str):
         return super().__new__(cls, v)
 
     @classmethod
-    def from_py(cls, v: str) -> MongoKeyword:
+    def from_py(cls, v: str) -> Self:
         return cls(_camelize(v))
 
 
@@ -33,7 +33,7 @@ class AggVar(str):
 
     prefix: ClassVar[str] = "$"
 
-    def __new__(cls, v: Union[str, AggVar]):
+    def __new__(cls, v: str | AggVar):
         copied = copy.deepcopy(v)
         num_prefixes = 0
         prefix_removed = not v.startswith(cls.prefix)
@@ -48,21 +48,21 @@ class AggVar(str):
         return super().__new__(cls, v)
 
     @classmethod
-    def from_(cls, v: str) -> AggVar:
+    def from_(cls, v: str) -> Self:
         if v.startswith(cls.prefix):
             raise ValueError(f"`v` must not start with `{cls.prefix}`")
 
         return cls(f"{cls.prefix * 2}{v}")
 
     @classmethod
-    def current(cls, v: str) -> AggVar:
+    def current(cls, v: str) -> Self:
         if v.startswith(cls.prefix):
             raise ValueError(f"`v` must not start with `{cls.prefix}`")
 
-        return AggVar(f"{cls.prefix}{v}")
+        return cls(f"{cls.prefix}{v}")
 
     @classmethod
-    def root(cls) -> AggVar:
+    def root(cls) -> Self:
         return cls.current("ROOT")
 
 

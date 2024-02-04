@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Any, Optional
+from typing import Any
 
 from .. import utils
 from ..base import ComparisonOperator
@@ -8,7 +6,7 @@ from ..types import DictExpression
 
 
 class AEqual(ComparisonOperator):
-    def __init__(self, field: str, value: Optional[Any] = None):
+    def __init__(self, field: str, value: Any | None = None):
         super().__init__(field=field, value=value)
 
     def expression(self) -> DictExpression:

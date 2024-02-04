@@ -1,4 +1,5 @@
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 import pytest
 
@@ -11,8 +12,8 @@ PaginationFactory = Callable[..., Pagination]
 def pagination_factory() -> PaginationFactory:
     def inner(
         num_items: int = 5,
-        page: Optional[int] = None,
-        per_page: Optional[int] = None,
+        page: int | None = None,
+        per_page: int | None = None,
     ) -> Pagination:
         return Pagination(
             total=num_items,
@@ -97,7 +98,7 @@ def test_pages(
 def test_prev_page(
     pagination_factory: PaginationFactory,
     pagination_params: dict[str, Any],
-    expected: Optional[int],
+    expected: int | None,
 ):
     pagination = pagination_factory(**pagination_params)
 
@@ -137,7 +138,7 @@ def test_prev_page(
 def test_next_page(
     pagination_factory: PaginationFactory,
     pagination_params: dict[str, Any],
-    expected: Optional[int],
+    expected: int | None,
 ):
     pagination = pagination_factory(**pagination_params)
 

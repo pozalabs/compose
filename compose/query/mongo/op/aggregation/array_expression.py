@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Any
+from typing import Any, Self
 
 from ..base import Evaluable, Operator
 from ..types import DictExpression, MongoKeyword, _String
@@ -61,9 +59,9 @@ class Reduce(Operator):
         }
 
     @classmethod
-    def list(cls, input_: Any, in_: Any) -> Reduce:
+    def list(cls, input_: Any, in_: Any) -> Self:
         return cls(input_=input_, initial_value=[], in_=in_)
 
     @classmethod
-    def int(cls, input_: Any, in_: Any) -> Reduce:
+    def int(cls, input_: Any, in_: Any) -> Self:
         return cls(input_=input_, initial_value=0, in_=in_)

@@ -1,8 +1,6 @@
-from __future__ import annotations
-
 import http
 from collections.abc import Callable
-from typing import TypeAlias
+from typing import Self, TypeAlias
 
 from fastapi import Request, Response
 from fastapi.encoders import jsonable_encoder
@@ -21,14 +19,14 @@ class ErrorHandlerInfo(BaseModel):
     handler: ErrorHandler
 
     @classmethod
-    def for_status_code(cls, status_code: int, error_type: str) -> ErrorHandlerInfo:
+    def for_status_code(cls, status_code: int, error_type: str) -> Self:
         return cls(
             exc_class_or_status_code=status_code,
             handler=create_error_handler(status_code=status_code, error_type=error_type),
         )
 
     @classmethod
-    def from_status_code(cls, status_code: http.HTTPStatus) -> ErrorHandlerInfo:
+    def from_status_code(cls, status_code: http.HTTPStatus) -> Self:
         return cls.for_status_code(status_code=status_code, error_type=status_code.name.lower())
 
     @classmethod
@@ -37,14 +35,14 @@ class ErrorHandlerInfo(BaseModel):
         exc_type: type[Exception],
         status_code: int,
         error_type: str,
-    ) -> ErrorHandlerInfo:
+    ) -> Self:
         return cls(
             exc_class_or_status_code=exc_type,
             handler=create_error_handler(status_code=status_code, error_type=error_type),
         )
 
     @classmethod
-    def for_http_exception(cls, exc: HTTPException) -> ErrorHandlerInfo:
+    def for_http_exception(cls, exc: HTTPException) -> Self:
         return cls.from_status_code(http.HTTPStatus(exc.status_code))
 
 

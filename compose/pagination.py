@@ -1,5 +1,5 @@
 import math
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import Field
 
@@ -9,16 +9,16 @@ from . import container
 class Pagination(container.BaseModel):
     items: list[Any]
     total: int
-    page: Optional[int] = Field(None, ge=1)
-    per_page: Optional[int] = Field(None, ge=1)
+    page: int | None = Field(None, ge=1)
+    per_page: int | None = Field(None, ge=1)
     extra: dict[str, Any] = Field(default_factory=dict)
 
     @property
-    def prev_page(self) -> Optional[int]:
+    def prev_page(self) -> int | None:
         return self.page - 1 if self.has_prev else None  # type: ignore
 
     @property
-    def next_page(self) -> Optional[int]:
+    def next_page(self) -> int | None:
         return self.page + 1 if self.has_next else None  # type: ignore
 
     @property

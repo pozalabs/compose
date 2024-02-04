@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import Callable, Generator
-from typing import Any, Union
+from typing import Any
 
 import pendulum
 
@@ -37,5 +37,5 @@ class DateTime(pendulum.DateTime):
             yield cls._instance
 
     @classmethod
-    def _instance(cls, v: Union[datetime.datetime, pendulum.DateTime]) -> pendulum.DateTime:
+    def _instance(cls, v: datetime.datetime | pendulum.DateTime) -> pendulum.DateTime:
         return pendulum.instance(dt=v, tz=pendulum.UTC)
