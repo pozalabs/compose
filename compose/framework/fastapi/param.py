@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from typing import TypeVar
 
 from fastapi import Query
@@ -8,7 +7,6 @@ from pydantic import BaseModel, Field, create_model
 from compose import compat
 
 Q = TypeVar("Q", bound=BaseModel)
-SequenceTypes = (list, set, tuple, frozenset, Sequence)
 
 
 def to_query(q: type[Q], /) -> type[Q]:
