@@ -10,8 +10,8 @@ from compose.query.mongo.op import ForEach, Operator, Spec, Split
     [
         (
             lambda: ForEach(
-                inputs=["field1", "field2"],
-                callback=lambda v: Spec(field=v, spec=Split(expr=v, delimiter=" ")),
+                ["field1", "field2"],
+                lambda v: Spec(field=v, spec=Split(expr=v, delimiter=" ")),
             ),
             [
                 Spec(field="field1", spec=Split(expr="field1", delimiter=" ")),
@@ -20,8 +20,8 @@ from compose.query.mongo.op import ForEach, Operator, Spec, Split
         ),
         (
             lambda: ForEach(
-                inputs=[("field1", "value1"), ("field2", "value2")],
-                callback=lambda v: Spec(field=v[0], spec=Split(expr=v[1], delimiter=" ")),
+                [("field1", "value1"), ("field2", "value2")],
+                lambda v: Spec(field=v[0], spec=Split(expr=v[1], delimiter=" ")),
             ),
             [
                 Spec(field="field1", spec=Split(expr="value1", delimiter=" ")),
@@ -30,8 +30,8 @@ from compose.query.mongo.op import ForEach, Operator, Spec, Split
         ),
         (
             lambda: ForEach(
-                inputs=[dict(key="field1", value="value1"), dict(key="field2", value="value2")],
-                callback=lambda v: Spec(field=v["key"], spec=Split(expr=v["value"], delimiter=" ")),
+                [dict(key="field1", value="value1"), dict(key="field2", value="value2")],
+                lambda v: Spec(field=v["key"], spec=Split(expr=v["value"], delimiter=" ")),
             ),
             [
                 Spec(field="field1", spec=Split(expr="value1", delimiter=" ")),
