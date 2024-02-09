@@ -1,3 +1,4 @@
+from . import func  # noqa: F401
 from .aggregation import *  # noqa: F401, F403
 from .base import *  # noqa: F401, F403
 from .comparison import *  # noqa: F401, F403
