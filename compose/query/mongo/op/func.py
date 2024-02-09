@@ -6,14 +6,11 @@ from .base import Operator
 T = TypeVar("T")
 
 
-class _ForEach:
+class _Map:
     def __call__(
-        self,
-        collection: Iterable[T],
-        callback: Callable[[T], Operator],
-        /,
+        self, collection: Iterable[T], callback: Callable[[T], Operator], /
     ) -> list[Operator]:
         return [callback(item) for item in collection]
 
 
-ForEach = _ForEach()
+Map = _Map()
