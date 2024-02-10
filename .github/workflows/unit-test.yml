@@ -20,12 +20,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: POZAlabs/actions/.github/actions/setup-python@v1
+      - uses: POZAlabs/actions/.github/actions/setup-python@v1-beta
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Install extra dependencies
-        run: poetry install --all-extras
+          setup-command: |
+            poetry install --all-extras --no-interaction
 
       - name: Install pydantic ${{ matrix.pydantic-version }}
         run: poetry add pydantic@${{ matrix.pydantic-version }}
