@@ -31,7 +31,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
     ],
 )
 def test_resolve_by_object_name(object_name: str, expected: type[Any]):
-    actual = resolve_by_object_name(name=object_name, container_cls=ApplicationContainer)
+    actual = resolve_by_object_name(name=object_name, container=ApplicationContainer)
 
     assert isinstance(actual, expected)
 
@@ -42,8 +42,11 @@ def test_resolve_by_object_name(object_name: str, expected: type[Any]):
         ("adder", ApplicationContainer),
         ("RepositoryA", ApplicationContainer),
     ],
-    ids=("함수는 의존성을 해결할 수 없다", "동일한 클래스가 여러 개 등록되어 있으면 의존성을 해결할 수 없다"),
+    ids=(
+        "함수는 의존성을 해결할 수 없다",
+        "동일한 클래스가 여러 개 등록되어 있으면 의존성을 해결할 수 없다",
+    ),
 )
 def test_cannot_resolve_by_object_name(object_name: str, container_cls: type[containers.Container]):
     with pytest.raises(ValueError):
-        resolve_by_object_name(name=object_name, container_cls=container_cls)
+        resolve_by_object_name(name=object_name, container=container_cls)
