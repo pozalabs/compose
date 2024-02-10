@@ -8,14 +8,6 @@ class Concat(GeneralAggregationOperator):
     mongo_operator = "$concat"
 
 
-class ToString(Operator):
-    def __init__(self, expr: Any):
-        self.expr = expr
-
-    def expression(self) -> DictExpression:
-        return Evaluable({"$toString": self.expr}).expression()
-
-
 class Split(Operator):
     def __init__(self, expr: Any, delimiter: str):
         self.expr = expr
