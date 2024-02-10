@@ -17,4 +17,4 @@ class ToBool(Operator):
         self._expression = expression
 
     def expression(self) -> DictExpression:
-        return {"$toBool": Evaluable(self._expression).expression()}
+        return Evaluable({"$toBool": self._expression}).expression()
