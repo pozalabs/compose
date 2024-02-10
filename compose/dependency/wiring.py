@@ -3,7 +3,7 @@ import functools
 import importlib
 import inspect
 from collections.abc import Callable, Iterable
-from typing import Any, Protocol, TypeVar
+from typing import Any, NotRequired, Protocol, TypedDict, TypeVar, Unpack
 
 from dependency_injector import containers, providers
 from dependency_injector.wiring import Provide
@@ -180,3 +180,22 @@ def create_lazy_resolver(container_path: str) -> Callable[[str], Any]:
         return resolve_by_object_name(name=object_name, container=container_cls)
 
     return resolver
+
+
+class ProvideExtraArgs(TypedDict):
+    name: NotRequired[str]
+    conflict_resolution: NotRequired[ConflictResolution]
+
+
+def create_provider(
+    container: type[containers.Container],
+) -> Callable[[type[T], Unpack[ProvideExtraArgs]], Provide[T]]:
+    def provider(
+        type_: type[T],
+        /,
+        name: str | None = None,
+        conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
+    ) -> Provide[T]:
+        return provide(type_, container, name=name, conflict_resolution=conflict_resolution)
+
+    return provider
