@@ -3,12 +3,13 @@ import functools
 import importlib
 import inspect
 from collections.abc import Callable, Iterable
-from typing import Any, Protocol, TypeVar
+from typing import Any, NotRequired, Protocol, TypedDict, TypeVar, Unpack
 
 from dependency_injector import containers, providers
 from dependency_injector.wiring import Provide
 
 T = TypeVar("T")
+Container = type[containers.Container] | containers.Container
 
 
 class Wirer(Protocol):
@@ -50,14 +51,11 @@ def resolve_by_name_from_container_provider(
             return resolve_by_name_from_container_provider(name=name, container=provider)
 
 
-def resolve_by_name(
-    name: str,
-    container_cls: type[containers.Container],
-) -> providers.Factory:
+def resolve_by_name(name: str, container: Container) -> providers.Factory:
     if not isinstance(name, str):
         raise ValueError("`name` must be string")
 
-    for provider_name, provider in container_cls.providers.items():
+    for provider_name, provider in container.providers.items():
         if not isinstance(provider, (providers.Container, providers.Factory)):
             continue
 
@@ -72,9 +70,9 @@ def resolve_by_name(
     raise ValueError(f"Cannot find {name} from given container")
 
 
-def resolve_by_object_name(name: str, container_cls: type[containers.Container]) -> Any:
+def resolve_by_object_name(name: str, container: Container) -> Any:
     candidates: list[providers.Factory] = []
-    for provider in container_cls.traverse([providers.Factory]):
+    for provider in container.traverse([providers.Factory]):
         if not inspect.isclass(provider.cls):
             continue
 
@@ -98,7 +96,7 @@ class ConflictResolution(str, enum.Enum):
 @functools.lru_cache(32)
 def resolve(
     type_: type[Any] | str,
-    container_cls: type[containers.Container],
+    container: Container,
     *,
     name: str | None = None,
     conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
@@ -112,10 +110,10 @@ def resolve(
         raise ValueError("Only class or string can be resolved")
 
     if isinstance(type_, str):
-        return resolve_by_name(name=type_, container_cls=container_cls)
+        return resolve_by_name(name=type_, container=container)
 
     candidates = []
-    for provider in container_cls.traverse([providers.Factory]):
+    for provider in container.traverse([providers.Factory]):
         provider_cls = provider.cls
         if not (inspect.isclass(provider_cls) or inspect.ismethod(provider_cls)):
             continue
@@ -140,7 +138,7 @@ def resolve(
     if name is None and conflict_resolution == ConflictResolution.FIRST:
         return candidates[0]
 
-    return resolve_by_name(name=name, container_cls=container_cls)
+    return resolve_by_name(name=name, container=container)
 
 
 def provide(
@@ -154,16 +152,16 @@ def provide(
     return Provide[
         resolve(
             type_=type_,
-            container_cls=from_,
+            container=from_,
             name=name,
             conflict_resolution=conflict_resolution,
         )
     ]
 
 
-def create_resolver(container_cls: type[containers.Container]) -> Callable[[str], Any]:
+def create_resolver(container: Container) -> Callable[[str], Any]:
     def resolver(name: str) -> Any:
-        return resolve(type_=name, container_cls=container_cls)
+        return resolve(type_=name, container=container)
 
     return resolver
 
@@ -179,6 +177,25 @@ def create_lazy_resolver(container_path: str) -> Callable[[str], Any]:
         if (container_cls := getattr(container, container_name, None)) is None:
             raise ValueError(f"Cannot find container {container_name} in {module_path}")
 
-        return resolve_by_object_name(name=object_name, container_cls=container_cls)
+        return resolve_by_object_name(name=object_name, container=container_cls)
 
     return resolver
+
+
+class ProvideExtraArgs(TypedDict):
+    name: NotRequired[str]
+    conflict_resolution: NotRequired[ConflictResolution]
+
+
+def create_provider(
+    container: type[containers.Container],
+) -> Callable[[type[T], Unpack[ProvideExtraArgs]], Provide[T]]:
+    def provider(
+        type_: type[T],
+        /,
+        name: str | None = None,
+        conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
+    ) -> Provide[T]:
+        return provide(type_, container, name=name, conflict_resolution=conflict_resolution)
+
+    return provider

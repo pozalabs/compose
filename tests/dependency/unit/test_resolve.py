@@ -76,7 +76,7 @@ def test_resolve(
     container_cls: type[containers.Container],
     expected: type[Any],
 ):
-    resolved = resolve(type_=type_, container_cls=container_cls)  # type: ignore
+    resolved = resolve(type_=type_, container=container_cls)
 
     assert isinstance(resolved.cls(), expected)
 
@@ -96,7 +96,7 @@ def test_resolve_from_multiple_candidates(
 ):
     resolved = resolve(
         type_=type_,
-        container_cls=container_cls,
+        container=container_cls,
         name=name,
         conflict_resolution=ConflictResolution.ERROR,
     )
@@ -140,7 +140,7 @@ def test_resolve_func_by_name(
 )
 def test_cannot_resolve(type_: type[Any], container_cls: type[containers.Container]):
     with pytest.raises(ValueError):
-        resolve(type_=type_, container_cls=container_cls)  # type: ignore
+        resolve(type_=type_, container=container_cls)
 
 
 def test_cannot_resolve_without_name_from_multiple_candidates():
