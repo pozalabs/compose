@@ -18,3 +18,11 @@ class ToBool(Operator):
 
     def expression(self) -> DictExpression:
         return Evaluable({"$toBool": self._expression}).expression()
+
+
+class ToInt(Operator):
+    def __init__(self, expression: Any):
+        self._expression = expression
+
+    def expression(self) -> DictExpression:
+        return Evaluable({"$toInt": self._expression}).expression()
