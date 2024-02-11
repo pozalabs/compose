@@ -7,10 +7,13 @@ T = TypeVar("T")
 
 
 class _Map:
-    def __call__(
-        self, collection: Iterable[T], callback: Callable[[T], Operator], /
-    ) -> list[Operator]:
-        return [callback(item) for item in collection]
+    def __init__(self, collection: Iterable[T], callback: Callable[[T], Operator]):
+        self.collection = collection
+        self.callback = callback
+
+    def __call__(self) -> list[Operator]:
+        return [self.callback(item) for item in self.collection]
 
 
-Map = _Map()
+def Map(collection: Iterable[T], callback: Callable[[T], Operator]) -> list[Operator]:  # noqa: N802
+    return _Map(collection, callback)()
