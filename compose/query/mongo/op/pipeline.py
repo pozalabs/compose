@@ -1,11 +1,9 @@
-from typing import Self
-
 from . import func
-from .base import Flatten, ListExpression, Operator, Stage
+from .base import Flatten, ListExpression, Operator
 
 
 class Pipeline(Operator):
-    def __init__(self, *ops: Stage | Self):
+    def __init__(self, *ops: Operator):
         self.ops = list(ops)
 
     def expression(self) -> ListExpression:
