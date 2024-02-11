@@ -9,4 +9,4 @@ class Expr(Operator):
         self.op = op
 
     def expression(self) -> DictExpression:
-        return Evaluable(self.op).expression()
+        return Evaluable({"$expr": self.op}).expression()
