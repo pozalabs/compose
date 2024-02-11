@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "pozalabs-compose"
 version = "0.31.0"
-description = "Backend components for POZAlabs"
+description = "Backend components for Pozalabs"
 license = "MIT"
 authors = ["sunwoong <sunwoong@pozalabs.com>"]
 packages = [{include = "compose"}]
