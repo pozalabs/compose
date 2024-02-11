@@ -1,6 +1,6 @@
 from typing import Self
 
-from .base import ListExpression, Operator, OpFilter, Stage, Unpack
+from .base import Flatten, ListExpression, Operator, OpFilter, Stage
 
 
 class Pipeline(Operator):
@@ -8,4 +8,4 @@ class Pipeline(Operator):
         self.ops = list(ops)
 
     def expression(self) -> ListExpression:
-        return Unpack(OpFilter.non_empty(*self.ops)).expression()
+        return Flatten(OpFilter.non_empty(*self.ops)).expression()

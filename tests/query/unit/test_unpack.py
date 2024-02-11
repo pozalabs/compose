@@ -2,13 +2,13 @@ import pytest
 
 from compose.query.mongo.op import (
     Eq,
+    Flatten,
     ListExpression,
     Match,
     MatchLookup,
     Pipeline,
     Set,
     Spec,
-    Unpack,
 )
 
 
@@ -16,7 +16,7 @@ from compose.query.mongo.op import (
     "op,expected",
     [
         (
-            Unpack(
+            Flatten(
                 Match.and_(
                     Eq(field="field", value="value"),
                 ),
@@ -45,5 +45,5 @@ from compose.query.mongo.op import (
         ),
     ],
 )
-def test_expression(op: Unpack, expected: ListExpression):
+def test_expression(op: Flatten, expected: ListExpression):
     assert op.expression() == expected

@@ -66,7 +66,7 @@ class Merge(Operator):
         return cls(*ops, initial={})
 
 
-class Unpack(Operator):
+class Flatten(Operator):
     def __init__(self, *ops: Operator):
         self.ops = list(ops)
 
