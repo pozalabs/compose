@@ -30,3 +30,8 @@ class _Filter:
 
 def Filter(collection: list[Operator], predicate: Callable[[Operator], bool]) -> list[Operator]:  # noqa: N802
     return _Filter(collection, predicate=predicate).eval()
+
+
+class NonEmpty:
+    def __call__(self, op: Operator) -> bool:
+        return bool(op.expression())
