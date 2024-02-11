@@ -11,7 +11,7 @@ class _Map:
         self.collection = collection
         self.callback = callback
 
-    def __call__(self) -> list[Operator]:
+    def eval(self) -> list[Operator]:
         return [self.callback(item) for item in self.collection]
 
 
