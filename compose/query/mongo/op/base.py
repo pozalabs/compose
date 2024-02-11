@@ -74,7 +74,7 @@ class Unpack(Operator):
         result = []
         for op in self.ops:
             _expression = op.expression()
-            result.extend([_expression] if isinstance(_expression, dict) else [*_expression])
+            result.extend([_expression] if isinstance(_expression, dict) else _expression)
 
         return result
 
