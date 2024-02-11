@@ -87,19 +87,6 @@ class Flatten(Operator):
         return result
 
 
-class OpFilter(Operator):
-    def __init__(self, *ops: Operator, predicate: Callable[[Operator], bool]):
-        self.ops = list(ops)
-        self.predicate = predicate
-
-    def expression(self) -> ListExpression:
-        return [op.expression() for op in self.ops if self.predicate(op)]
-
-    @classmethod
-    def non_empty(cls, *ops: Operator) -> OpFilter:
-        return cls(*ops, predicate=lambda op: op.expression())
-
-
 class Evaluable(Operator):
     def __init__(self, op: Any):
         self.op = op
