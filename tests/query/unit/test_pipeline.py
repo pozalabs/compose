@@ -2,7 +2,6 @@ import pytest
 
 from compose.query.mongo.op import (
     Eq,
-    Flatten,
     ListExpression,
     Match,
     MatchLookup,
@@ -45,5 +44,5 @@ from compose.query.mongo.op import (
         ),
     ],
 )
-def test_expression(op: Flatten, expected: ListExpression):
+def test_expression(op: Pipeline, expected: ListExpression):
     assert op.expression() == expected

@@ -66,27 +66,6 @@ class Merge(Operator):
         return cls(*ops, initial={})
 
 
-class Flatten(Operator):
-    def __init__(self, *ops: Operator | DictExpression | ListExpression):
-        self.ops = list(ops)
-
-    def expression(self) -> ListExpression:
-        result = []
-        for op in self.ops:
-            exp = op.expression() if isinstance(op, Operator) else op
-
-            match exp:
-                case dict():
-                    result.append(exp)
-                case list():
-                    for e in exp:
-                        result.extend([e] if isinstance(e, dict) else Flatten(e).expression())
-                case _:
-                    raise ValueError(f"Expression must be dict or list, not {type(exp)} ({exp})")
-
-        return result
-
-
 class Evaluable(Operator):
     def __init__(self, op: Any):
         self.op = op
