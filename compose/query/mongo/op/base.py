@@ -66,6 +66,19 @@ class Merge(Operator):
         return cls(*ops, initial={})
 
 
+class Flatten(Operator):
+    def __init__(self, *ops: Operator):
+        self.ops = list(ops)
+
+    def expression(self) -> ListExpression:
+        result = []
+        for op in self.ops:
+            _expression = op.expression()
+            result.extend([_expression] if isinstance(_expression, dict) else _expression)
+
+        return result
+
+
 class OpFilter(Operator):
     def __init__(self, *ops: Operator, predicate: Callable[[Operator], bool]):
         self.ops = list(ops)
