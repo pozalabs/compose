@@ -1,11 +1,11 @@
-from typing import Any
+from typing import Self
 
-from .base import Operator, OpFilter, Stage
+from .base import ListExpression, Operator, OpFilter, Stage, Unpack
 
 
 class Pipeline(Operator):
-    def __init__(self, *stages: Stage):
-        self.stages = list(stages)
+    def __init__(self, *ops: Stage | Self):
+        self.ops = list(ops)
 
-    def expression(self) -> list[dict[str, Any]]:
-        return OpFilter.non_empty(*self.stages).expression()
+    def expression(self) -> ListExpression:
+        return OpFilter.non_empty(Unpack(*self.ops)).expression()
