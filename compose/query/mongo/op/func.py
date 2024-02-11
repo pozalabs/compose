@@ -1,9 +1,12 @@
 from collections.abc import Callable, Iterable
-from typing import TypeVar
+from typing import TypeAlias, TypeVar
 
 from .base import Operator
+from .raw import Raw
+from .types import DictExpression, ListExpression
 
 T = TypeVar("T")
+Expressionable: TypeAlias = Operator | DictExpression | ListExpression
 
 
 class _Map:
@@ -35,3 +38,28 @@ def Filter(collection: list[Operator], predicate: Callable[[Operator], bool]) ->
 class NonEmpty:
     def __call__(self, op: Operator) -> bool:
         return bool(op.expression())
+
+
+class _Flatten:
+    def __init__(self, ops: Iterable[Expressionable]):
+        self.ops = list(ops)
+
+    def eval(self) -> list[Operator]:
+        result = []
+        for op in self.ops:
+            exp = op.expression() if isinstance(op, Operator) else op
+
+            match exp:
+                case dict():
+                    result.append(Raw(exp))
+                case list():
+                    for e in exp:
+                        result.extend([Raw(e)] if isinstance(e, dict) else self.__class__(e).eval())
+                case _:
+                    raise ValueError(f"Expression must be dict or list, not {type(exp)} ({exp})")
+
+        return result
+
+
+def Flatten(ops: Iterable[Expressionable]) -> list[Operator]:  # noqa: N802
+    return _Flatten(ops).eval()
