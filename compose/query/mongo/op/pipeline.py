@@ -1,5 +1,5 @@
 from . import func
-from .base import Flatten, ListExpression, Operator
+from .base import Evaluable, ListExpression, Operator
 
 
 class Pipeline(Operator):
@@ -7,4 +7,4 @@ class Pipeline(Operator):
         self.ops = list(ops)
 
     def expression(self) -> ListExpression:
-        return Flatten(*func.Filter(self.ops, func.NonEmpty())).expression()
+        return Evaluable(func.Flatten(func.Filter(self.ops, func.NonEmpty()))).expression()
