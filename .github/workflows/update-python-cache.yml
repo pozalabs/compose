@@ -20,3 +20,5 @@ jobs:
       - uses: POZAlabs/actions/.github/actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
+          setup-command: |
+            poetry install --all-extras --no-interaction
