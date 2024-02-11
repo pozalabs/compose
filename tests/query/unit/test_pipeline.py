@@ -16,7 +16,7 @@ from compose.query.mongo.op import (
     "op,expected",
     [
         (
-            Flatten(
+            Pipeline(
                 Match.and_(
                     Eq(field="field", value="value"),
                 ),
