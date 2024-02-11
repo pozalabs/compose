@@ -4,7 +4,7 @@ import abc
 import functools
 import operator
 from collections.abc import Callable
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Self
 
 from .types import DictExpression, ListExpression
 
@@ -29,7 +29,7 @@ class ComparisonOperator(Operator):
 
 
 class LogicalOperator(Operator):
-    def __init__(self, *ops: Operator):
+    def __init__(self, *ops: *tuple[Operator]):
         self.ops = list(ops)
 
     @abc.abstractmethod
@@ -40,7 +40,7 @@ class LogicalOperator(Operator):
 class GeneralAggregationOperator(Operator):
     mongo_operator: ClassVar[str] = ""
 
-    def __init__(self, *expressions: Any):
+    def __init__(self, *expressions: *tuple[Any]):
         self.expressions = list(expressions)
 
     def expression(self) -> DictExpression:
@@ -54,7 +54,7 @@ class Stage(Operator):
 
 
 class Merge(Operator):
-    def __init__(self, *ops: Operator, initial: Any):
+    def __init__(self, *ops: *tuple[Operator], initial: Any):
         self.ops = list(ops)
         self.initial = initial
 
@@ -62,29 +62,8 @@ class Merge(Operator):
         return functools.reduce(operator.or_, [op.expression() for op in self.ops], self.initial)
 
     @classmethod
-    def dict(cls, *ops: Operator) -> Merge:
+    def dict(cls, *ops: *tuple[Operator]) -> Self:
         return cls(*ops, initial={})
-
-
-class Flatten(Operator):
-    def __init__(self, *ops: Operator | DictExpression | ListExpression):
-        self.ops = list(ops)
-
-    def expression(self) -> ListExpression:
-        result = []
-        for op in self.ops:
-            exp = op.expression() if isinstance(op, Operator) else op
-
-            match exp:
-                case dict():
-                    result.append(exp)
-                case list():
-                    for e in exp:
-                        result.extend([e] if isinstance(e, dict) else Flatten(e).expression())
-                case _:
-                    raise ValueError(f"Expression must be dict or list, not {type(exp)} ({exp})")
-
-        return result
 
 
 class Evaluable(Operator):
