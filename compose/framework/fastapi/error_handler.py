@@ -25,25 +25,18 @@ class ErrorHandlerInfo:
 
     @classmethod
     def for_status_code(
-        cls, status_code: int, error_type: str, response_cls: type[Response] | None = None
+        cls,
+        status_code: http.HTTPStatus,
+        error_type: str | None = None,
+        response_cls: type[Response] | None = None,
     ) -> Self:
         return cls(
             exc_class_or_status_code=status_code,
             handler=create_error_handler(
                 status_code=status_code,
-                error_type=error_type,
+                error_type=error_type or status_code.name.lower(),
                 response_cls=response_cls or cls.default_response_cls,
             ),
-        )
-
-    @classmethod
-    def from_status_code(
-        cls, status_code: http.HTTPStatus, response_cls: type[Response] | None = None
-    ) -> Self:
-        return cls.for_status_code(
-            status_code=status_code,
-            error_type=status_code.name.lower(),
-            response_cls=response_cls or cls.default_response_cls,
         )
 
     @classmethod
@@ -67,7 +60,7 @@ class ErrorHandlerInfo:
     def for_http_exception(
         cls, exc: HTTPException, response_cls: type[Response] | None = None
     ) -> Self:
-        return cls.from_status_code(
+        return cls.for_status_code(
             status_code=http.HTTPStatus(exc.status_code),
             response_cls=response_cls or cls.default_response_cls,
         )
