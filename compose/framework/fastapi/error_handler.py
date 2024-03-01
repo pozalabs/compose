@@ -66,14 +66,14 @@ class ErrorHandlerInfo:
         )
 
     @classmethod
-    def request_validation_error(cls, response_cls: type[Response] | None = None) -> Self:
+    def for_request_validation_error(cls, response_cls: type[Response] | None = None) -> Self:
         return cls(
             exc_class_or_status_code=RequestValidationError,
             handler=create_validation_error_handler(response_cls or cls.default_response_cls),
         )
 
     @classmethod
-    def pydantic_validation_error(cls, response_cls: type[Response] | None = None) -> Self:
+    def for_pydantic_validation_error(cls, response_cls: type[Response] | None = None) -> Self:
         return cls(
             exc_class_or_status_code=ValidationError,
             handler=create_validation_error_handler(response_cls or cls.default_response_cls),
