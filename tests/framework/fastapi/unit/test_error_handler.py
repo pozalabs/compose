@@ -33,7 +33,7 @@ def test_error_handler_info_for_exc():
         pass
 
     error_handler = ErrorHandlerInfo.for_exc(
-        exc_type=AuthorizationError,
+        exc_cls=AuthorizationError,
         status_code=http.HTTPStatus.UNAUTHORIZED,
         error_type=AuthorizationError.__name__.lower(),
     )
