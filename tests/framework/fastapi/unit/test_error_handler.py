@@ -13,10 +13,10 @@ def test_error_handler_info_for_status_code():
         status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR,
         error_type=http.HTTPStatus.INTERNAL_SERVER_ERROR.name.lower(),
     )
-    response = error_handler.handler(mock.Mock(spec=Request), ValueError())
+    response = error_handler.handler(mock.Mock(spec=Request), ValueError("Invalid value"))
 
     content = dict(
-        title="Internal Server Error",
+        title="Invalid value",
         type="internal_server_error",
         detail=None,
         invalid_params=None,
