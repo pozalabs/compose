@@ -35,7 +35,7 @@ def test_error_handler_info_for_exc():
     error_handler = ErrorHandlerInfo.for_exc(
         exc_cls=AuthorizationError,
         status_code=http.HTTPStatus.UNAUTHORIZED,
-        error_type=AuthorizationError.__name__.lower(),
+        error_type=http.HTTPStatus.UNAUTHORIZED.name.lower(),
     )
     response = error_handler.handler(
         mock.Mock(spec=Request),
@@ -44,7 +44,7 @@ def test_error_handler_info_for_exc():
 
     content = dict(
         title="Unauthorized",
-        type="authorization_error",
+        type="unauthorized",
         detail="Wrong password",
         invalid_params=None,
     )
