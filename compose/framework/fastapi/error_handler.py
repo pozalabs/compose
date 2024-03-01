@@ -45,6 +45,20 @@ class ErrorHandlerInfo(BaseModel):
     def for_http_exception(cls, exc: HTTPException) -> Self:
         return cls.from_status_code(http.HTTPStatus(exc.status_code))
 
+    @classmethod
+    def request_validation_error(cls) -> Self:
+        return cls(
+            exc_class_or_status_code=RequestValidationError,
+            handler=validation_exception_handler,
+        )
+
+    @classmethod
+    def pydantic_validation_error(cls) -> Self:
+        return cls(
+            exc_class_or_status_code=ValidationError,
+            handler=validation_exception_handler,
+        )
+
 
 def create_error_handler(status_code: int, error_type: str) -> ErrorHandler:
     def error_handler(request: Request, exc: Exception) -> Response:
