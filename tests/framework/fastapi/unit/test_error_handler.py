@@ -13,10 +13,10 @@ def test_error_handler_info_for_status_code():
         status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR,
         error_type=http.HTTPStatus.INTERNAL_SERVER_ERROR.name.lower(),
     )
-    response = error_handler.handler(mock.Mock(spec=Request), ValueError())
+    response = error_handler.handler(mock.Mock(spec=Request), ValueError("Invalid value"))
 
     content = dict(
-        title="Internal Server Error",
+        title="Invalid value",
         type="internal_server_error",
         detail=None,
         invalid_params=None,
@@ -24,7 +24,7 @@ def test_error_handler_info_for_status_code():
     expected = JSONResponse(content=content, status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR)
 
     assert isinstance(response, JSONResponse)
-    assert response.render(content) == expected.render(content)
+    assert response.body == expected.body
     assert response.status_code == expected.status_code
 
 
@@ -33,9 +33,9 @@ def test_error_handler_info_for_exc():
         pass
 
     error_handler = ErrorHandlerInfo.for_exc(
-        exc_type=AuthorizationError,
+        exc_cls=AuthorizationError,
         status_code=http.HTTPStatus.UNAUTHORIZED,
-        error_type=AuthorizationError.__name__.lower(),
+        error_type=http.HTTPStatus.UNAUTHORIZED.name.lower(),
     )
     response = error_handler.handler(
         mock.Mock(spec=Request),
@@ -44,12 +44,12 @@ def test_error_handler_info_for_exc():
 
     content = dict(
         title="Unauthorized",
-        type="authorization_error",
+        type="unauthorized",
         detail="Wrong password",
         invalid_params=None,
     )
     expected = JSONResponse(content=content, status_code=http.HTTPStatus.UNAUTHORIZED)
 
     assert isinstance(response, JSONResponse)
-    assert response.render(content) == expected.render(content)
+    assert response.body == expected.body
     assert response.status_code == expected.status_code
