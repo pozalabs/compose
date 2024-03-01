@@ -24,7 +24,7 @@ def test_error_handler_info_for_status_code():
     expected = JSONResponse(content=content, status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR)
 
     assert isinstance(response, JSONResponse)
-    assert response.render(content) == expected.render(content)
+    assert response.body == expected.body
     assert response.status_code == expected.status_code
 
 
@@ -51,5 +51,5 @@ def test_error_handler_info_for_exc():
     expected = JSONResponse(content=content, status_code=http.HTTPStatus.UNAUTHORIZED)
 
     assert isinstance(response, JSONResponse)
-    assert response.render(content) == expected.render(content)
+    assert response.body == expected.body
     assert response.status_code == expected.status_code
