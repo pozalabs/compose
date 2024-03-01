@@ -49,13 +49,13 @@ class ErrorHandlerInfo:
     @classmethod
     def for_exc(
         cls,
-        exc_type: type[Exception],
+        exc_cls: type[Exception],
         status_code: int,
         error_type: str,
         response_cls: type[Response] | None = None,
     ) -> Self:
         return cls(
-            exc_class_or_status_code=exc_type,
+            exc_class_or_status_code=exc_cls,
             handler=create_error_handler(
                 status_code=status_code,
                 error_type=error_type,
