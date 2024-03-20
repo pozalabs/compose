@@ -29,7 +29,7 @@ class ComparisonOperator(Operator):
 
 
 class LogicalOperator(Operator):
-    def __init__(self, *ops: *tuple[Operator]):
+    def __init__(self, *ops: Operator):
         self.ops = list(ops)
 
     @abc.abstractmethod
@@ -40,7 +40,7 @@ class LogicalOperator(Operator):
 class GeneralAggregationOperator(Operator):
     mongo_operator: ClassVar[str] = ""
 
-    def __init__(self, *expressions: *tuple[Any]):
+    def __init__(self, *expressions: Any):
         self.expressions = list(expressions)
 
     def expression(self) -> DictExpression:
@@ -54,7 +54,7 @@ class Stage(Operator):
 
 
 class Merge(Operator):
-    def __init__(self, *ops: *tuple[Operator], initial: Any):
+    def __init__(self, *ops: Operator, initial: Any):
         self.ops = list(ops)
         self.initial = initial
 
@@ -62,7 +62,7 @@ class Merge(Operator):
         return functools.reduce(operator.or_, [op.expression() for op in self.ops], self.initial)
 
     @classmethod
-    def dict(cls, *ops: *tuple[Operator]) -> Self:
+    def dict(cls, *ops: Operator) -> Self:
         return cls(*ops, initial={})
 
 
