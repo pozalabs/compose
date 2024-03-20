@@ -16,16 +16,16 @@ class Match(Stage):
         return {"$match": expression}
 
     @classmethod
-    def and_(cls, *ops: *tuple[Operator]) -> Self:
+    def and_(cls, *ops: Operator) -> Self:
         return cls(And(*ops))
 
     @classmethod
-    def or_(cls, *ops: *tuple[Operator]) -> Self:
+    def or_(cls, *ops: Operator) -> Self:
         return cls(Or(*ops))
 
 
 class Sort(Stage):
-    def __init__(self, *ops: *tuple[Operator]):
+    def __init__(self, *ops: Operator):
         self.ops = list(ops)
 
     def expression(self) -> DictExpression:
@@ -130,7 +130,7 @@ class Unwind(Stage):
 
 
 class Set(Stage):
-    def __init__(self, *specs: *tuple[Spec]):
+    def __init__(self, *specs: Spec):
         self.specs = list(specs)
 
     def expression(self) -> DictExpression:
@@ -147,7 +147,7 @@ class FacetSubPipeline(Operator):
 
 
 class Facet(Stage):
-    def __init__(self, *pipelines: *tuple[FacetSubPipeline]):
+    def __init__(self, *pipelines: FacetSubPipeline):
         self.pipelines = list(pipelines)
 
     def expression(self) -> DictExpression:
@@ -231,7 +231,7 @@ class ReplaceRoot(Stage):
 
 
 class Group(Stage):
-    def __init__(self, *ops: *tuple[Operator], key: Any | None = None):
+    def __init__(self, *ops: Operator, key: Any | None = None):
         self.ops = list(ops)
         self.key = key
 
@@ -244,5 +244,5 @@ class Group(Stage):
         }
 
     @classmethod
-    def by_null(cls, *ops: *tuple[Operator]) -> Self:
+    def by_null(cls, *ops: Operator) -> Self:
         return cls(*ops, key=None)
