@@ -18,7 +18,6 @@ from . import (
     uow,
 )
 from .container import BaseModel, TimeStampedModel
-from .framework import fastapi
 
 __all__ = [
     "BaseModel",
@@ -54,5 +53,12 @@ try:
     from . import testing  # noqa: F401
 
     __all__.append("testing")
+except ImportError:
+    pass
+
+try:
+    from .framework import fastapi  # noqa: F401
+
+    __all__.append("fastapi")
 except ImportError:
     pass
