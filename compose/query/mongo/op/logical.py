@@ -23,3 +23,4 @@ def create_logical_operator(name: str, mongo_operator: str) -> type[LogicalOpera
 
 And = create_logical_operator(name="And", mongo_operator="$and")
 Or = create_logical_operator(name="Or", mongo_operator="$or")
+Nor = create_logical_operator(name="Nor", mongo_operator="$nor")

@@ -1,8 +1,14 @@
+import base64
+import json
 from typing import Any, Self
 
-from .base import Evaluable, Merge, Operator, Stage
-from .logical import And, LogicalOperator, Or
+import pymongo
+
+from .base import Evaluable, ListStage, Merge, Operator, Stage
+from .comparison import Gt, Lt
+from .logical import And, LogicalOperator, Nor, Or
 from .pipeline import Pipeline
+from .sort import SortBy
 from .types import DictExpression, ListExpression, MongoKeyword, _FieldPath
 
 
@@ -23,13 +29,17 @@ class Match(Stage):
     def or_(cls, *ops: Operator) -> Self:
         return cls(Or(*ops))
 
+    @classmethod
+    def nor(cls, *ops: Operator) -> Self:
+        return cls(Nor(*ops))
+
 
 class Sort(Stage):
-    def __init__(self, *ops: Operator):
-        self.ops = list(ops)
+    def __init__(self, *criteria: SortBy):
+        self.criteria = list(criteria)
 
     def expression(self) -> DictExpression:
-        if not (merged := Merge.dict(*self.ops).expression()):
+        if not (merged := Merge.dict(*self.criteria).expression()):
             raise ValueError("Expression cannot be empty")
         return {"$sort": merged}
 
@@ -220,6 +230,38 @@ class Pagination(Stage):
             Skip((self.page - 1) * self.per_page).expression(),  # type: ignore
             Limit(self.per_page).expression(),  # type: ignore
         ]
+
+
+class CursorPagination(ListStage):
+    direction_to_op = {pymongo.ASCENDING: Gt, pymongo.DESCENDING: Lt}
+
+    def __init__(
+        self,
+        sort: Sort,
+        per_page: int,
+        cursor: str | None = None,
+    ):
+        self.sort = sort
+        self.cursor = cursor
+        self.per_page = per_page
+
+    def expression(self) -> ListExpression:
+        if self.cursor is None:
+            return [Limit(self.per_page).expression()]
+
+        cursor_values = json.loads(base64.b64decode(self.cursor).decode())
+        return Pipeline(
+            Match.nor(
+                *(
+                    self.direction_to_op[criterion.direction](
+                        field=criterion.field,
+                        value=cursor_values[criterion.field],
+                    )
+                    for criterion in self.sort.criteria
+                )
+            ),
+            Limit(self.per_page),
+        ).expression()
 
 
 class ReplaceRoot(Stage):

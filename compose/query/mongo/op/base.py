@@ -53,6 +53,11 @@ class Stage(Operator):
         raise NotImplementedError
 
 
+class ListStage(Operator):
+    def expression(self) -> ListExpression:
+        raise NotImplementedError
+
+
 class Merge(Operator):
     def __init__(self, *ops: Operator, initial: Any):
         self.ops = list(ops)
