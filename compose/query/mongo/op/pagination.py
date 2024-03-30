@@ -7,8 +7,8 @@ import pymongo
 
 from .comparison import Gt, Lt
 from .pipeline import Pipeline
-from .stage import Limit, Match, Sort, Stage
-from .types import DictExpression, ListExpression
+from .stage import Facet, FacetSubPipeline, Limit, Match, Set, Sort, Spec, Stage
+from .types import DictExpression
 
 
 class CursorDecoder:
@@ -25,26 +25,26 @@ class AfterCursor(Stage[DictExpression]):
 
     def __init__(self, sort: Sort, cursor_decoder: CursorDecoder, cursor: str | None = None):
         self.sort = sort
-        self.cursor = cursor
         self.cursor_decoder = cursor_decoder
+        self.cursor = cursor
 
     def expression(self) -> DictExpression:
         if self.cursor is None:
             return {}
 
-        cursor_values = self.cursor_decoder.decode(self.cursor)
+        cursor_params = self.cursor_decoder.decode(self.cursor)
         return Match.nor(
             *(
                 self.direction_to_op[criterion.direction](
                     field=criterion.field,
-                    value=cursor_values[criterion.field],
+                    value=cursor_params[criterion.field],
                 )
                 for criterion in self.sort.criteria
             )
         ).expression()
 
 
-class CursorPagination(Stage[ListExpression]):
+class CursorPagination(Stage[DictExpression]):
     def __init__(
         self,
         sort: Sort,
@@ -57,13 +57,29 @@ class CursorPagination(Stage[ListExpression]):
         self.cursor = cursor
         self.per_page = per_page
 
-    def expression(self) -> ListExpression:
-        return Pipeline(
-            AfterCursor(
-                sort=self.sort,
-                cursor_decoder=self.cursor_decoder,
-                cursor=self.cursor,
+    def expression(self) -> DictExpression:
+        return Facet(
+            FacetSubPipeline(
+                output_field="metadata",
+                pipeline=Pipeline(
+                    Set(
+                        Spec(
+                            field="cursor_keys",
+                            spec=[criterion.field for criterion in self.sort.criteria],
+                        )
+                    )
+                ),
             ),
-            self.sort,
-            Limit(self.per_page),
+            FacetSubPipeline(
+                output_field="items",
+                pipeline=Pipeline(
+                    AfterCursor(
+                        sort=self.sort,
+                        cursor_decoder=self.cursor_decoder,
+                        cursor=self.cursor,
+                    ),
+                    self.sort,
+                    Limit(self.per_page),
+                ),
+            ),
         ).expression()
