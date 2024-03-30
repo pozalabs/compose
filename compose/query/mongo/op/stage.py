@@ -1,11 +1,6 @@
-import base64
-import json
 from typing import Any, Self
 
-import pymongo
-
 from .base import Evaluable, Merge, Operator, Stage
-from .comparison import Gt, Lt
 from .logical import And, LogicalOperator, Nor, Or
 from .pipeline import Pipeline
 from .sort import SortBy
@@ -230,38 +225,6 @@ class Pagination(Stage[DictExpression]):
             Skip((self.page - 1) * self.per_page).expression(),  # type: ignore
             Limit(self.per_page).expression(),  # type: ignore
         ]
-
-
-class CursorPagination(Stage[ListExpression]):
-    direction_to_op = {pymongo.ASCENDING: Gt, pymongo.DESCENDING: Lt}
-
-    def __init__(
-        self,
-        sort: Sort,
-        per_page: int,
-        cursor: str | None = None,
-    ):
-        self.sort = sort
-        self.cursor = cursor
-        self.per_page = per_page
-
-    def expression(self) -> ListExpression:
-        if self.cursor is None:
-            return [Limit(self.per_page).expression()]
-
-        cursor_values = json.loads(base64.b64decode(self.cursor).decode())
-        return Pipeline(
-            Match.nor(
-                *(
-                    self.direction_to_op[criterion.direction](
-                        field=criterion.field,
-                        value=cursor_values[criterion.field],
-                    )
-                    for criterion in self.sort.criteria
-                )
-            ),
-            Limit(self.per_page),
-        ).expression()
 
 
 class ReplaceRoot(Stage[DictExpression]):
