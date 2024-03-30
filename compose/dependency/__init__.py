@@ -1,3 +1,4 @@
+from .container import DeclarativeContainer
 from .wiring import (
     ConflictResolution,
     create_provider,
@@ -14,4 +15,5 @@ __all__ = [
     "ConflictResolution",
     "resolve_by_object_name",
     "create_provider",
+    "DeclarativeContainer",
 ]
