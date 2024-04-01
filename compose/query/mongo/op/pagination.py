@@ -11,6 +11,20 @@ from .stage import Limit, Match, Sort, Stage
 from .types import DictExpression, ListExpression
 
 
+class CursorEncoder:
+    def __init__(
+        self,
+        cursor_keys: list[str],
+        json_encoder: type[json.JSONEncoder] | None = None,
+    ):
+        self.cursor_keys = cursor_keys
+        self.json_encoder = json_encoder or json.JSONEncoder
+
+    def encode(self, document: dict[str, Any]) -> str:
+        cursor_params = {key: document[key] for key in self.cursor_keys}
+        return base64.b64encode(json.dumps(cursor_params, cls=self.json_encoder).encode()).decode()
+
+
 class CursorDecoder:
     def __init__(self, parsers: dict[str, Callable[[Any], Any]] | None = None):
         self.parsers = parsers or {}
