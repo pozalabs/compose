@@ -7,8 +7,8 @@ import pymongo
 
 from .comparison import Gt, Lt
 from .pipeline import Pipeline
-from .stage import Facet, FacetSubPipeline, Limit, Match, Set, Sort, Spec, Stage
-from .types import DictExpression
+from .stage import Limit, Match, Sort, Stage
+from .types import DictExpression, ListExpression
 
 
 class CursorDecoder:
@@ -44,7 +44,7 @@ class AfterCursor(Stage[DictExpression]):
         ).expression()
 
 
-class CursorPagination(Stage[DictExpression]):
+class CursorPagination(Stage[ListExpression]):
     def __init__(
         self,
         sort: Sort,
@@ -57,29 +57,13 @@ class CursorPagination(Stage[DictExpression]):
         self.cursor = cursor
         self.per_page = per_page
 
-    def expression(self) -> DictExpression:
-        return Facet(
-            FacetSubPipeline(
-                output_field="metadata",
-                pipeline=Pipeline(
-                    Set(
-                        Spec(
-                            field="cursor_keys",
-                            spec=[criterion.field for criterion in self.sort.criteria],
-                        )
-                    )
-                ),
+    def expression(self) -> ListExpression:
+        return Pipeline(
+            AfterCursor(
+                sort=self.sort,
+                cursor_decoder=self.cursor_decoder,
+                cursor=self.cursor,
             ),
-            FacetSubPipeline(
-                output_field="items",
-                pipeline=Pipeline(
-                    AfterCursor(
-                        sort=self.sort,
-                        cursor_decoder=self.cursor_decoder,
-                        cursor=self.cursor,
-                    ),
-                    self.sort,
-                    Limit(self.per_page),
-                ),
-            ),
+            self.sort,
+            Limit(self.per_page),
         ).expression()
