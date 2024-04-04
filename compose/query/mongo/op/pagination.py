@@ -5,9 +5,10 @@ from typing import Any
 
 import pymongo
 
+from .aggregation import Push
 from .comparison import Gt, Lt
 from .pipeline import Pipeline
-from .stage import Limit, Match, Sort, Stage
+from .stage import Group, Limit, Match, Project, Sort, Spec, Stage
 from .types import DictExpression, ListExpression
 
 
@@ -80,4 +81,13 @@ class CursorPagination(Stage[ListExpression]):
             ),
             self.sort,
             Limit(self.per_page),
+            Group.by_null(Spec(field="items", spec=Push("$$ROOT"))),
+            Project(
+                Spec.exclude("_id"),
+                Spec.include("items"),
+                Spec(
+                    field="metadata",
+                    spec={"cursor_keys": [criterion.field for criterion in self.sort.criteria]},
+                ),
+            ),
         ).expression()

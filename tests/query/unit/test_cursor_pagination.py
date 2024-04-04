@@ -33,6 +33,19 @@ from compose.query.mongo.op import (
                 },
                 {"$sort": {"created_at": -1}},
                 {"$limit": 10},
+                {
+                    "$group": {
+                        "_id": None,
+                        "items": {"$push": "$$ROOT"},
+                    }
+                },
+                {
+                    "$project": {
+                        "_id": 0,
+                        "items": 1,
+                        "metadata": {"cursor_keys": ["created_at"]},
+                    }
+                },
             ],
         )
     ],
