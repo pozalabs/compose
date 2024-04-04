@@ -64,7 +64,7 @@ class CursorPagination(Stage[ListExpression]):
         self,
         sort: Sort,
         cursor_decoder: CursorDecoder,
-        cursor: str | None | None = None,
+        cursor: str | None = None,
         per_page: int | None = None,
     ):
         self.cursor_decoder = cursor_decoder
