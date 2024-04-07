@@ -44,14 +44,14 @@ class ErrorHandlerInfo:
         cls,
         exc_cls: type[Exception],
         status_code: int,
-        error_type: str,
+        error_type: str | None = None,
         response_cls: type[Response] | None = None,
     ) -> Self:
         return cls(
             exc_class_or_status_code=exc_cls,
             handler=create_error_handler(
                 status_code=status_code,
-                error_type=error_type,
+                error_type=error_type or http.HTTPStatus(status_code).name.lower(),
                 response_cls=response_cls or cls.default_response_cls,
             ),
         )
