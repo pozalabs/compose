@@ -1,12 +1,18 @@
 from typing import Any, Self
 
 from .base import Evaluable, Merge, Operator, Stage
-from .logical import And, LogicalOperator, Or
+from .logical import And, LogicalOperator, Nor, Or
 from .pipeline import Pipeline
+from .sort import SortBy
 from .types import DictExpression, ListExpression, MongoKeyword, _FieldPath
 
 
-class Match(Stage):
+class EmptyStage(Stage[DictExpression]):
+    def expression(self) -> DictExpression:
+        return {}
+
+
+class Match(Stage[DictExpression]):
     def __init__(self, op: LogicalOperator):
         self.op = op
 
@@ -23,13 +29,17 @@ class Match(Stage):
     def or_(cls, *ops: Operator) -> Self:
         return cls(Or(*ops))
 
+    @classmethod
+    def nor(cls, *ops: Operator) -> Self:
+        return cls(Nor(*ops))
 
-class Sort(Stage):
-    def __init__(self, *ops: Operator):
-        self.ops = list(ops)
+
+class Sort(Stage[DictExpression]):
+    def __init__(self, *criteria: SortBy):
+        self.criteria = list(criteria)
 
     def expression(self) -> DictExpression:
-        if not (merged := Merge.dict(*self.ops).expression()):
+        if not (merged := Merge.dict(*self.criteria).expression()):
             raise ValueError("Expression cannot be empty")
         return {"$sort": merged}
 
@@ -58,7 +68,7 @@ class Spec(Operator):
 Specification = Spec
 
 
-class Project(Stage):
+class Project(Stage[DictExpression]):
     def __init__(self, *specs: Spec):
         self.specs = list(specs)
 
@@ -66,7 +76,7 @@ class Project(Stage):
         return {"$project": Merge.dict(*self.specs).expression()}
 
 
-class Lookup(Stage):
+class Lookup(Stage[DictExpression]):
     def __init__(self, from_: str, as_: str):
         self.from_ = from_
         self.as_ = as_
@@ -100,7 +110,7 @@ class SubqueryLookup(Lookup):
         self.pipeline = pipeline
 
 
-class Unwind(Stage):
+class Unwind(Stage[DictExpression]):
     def __init__(
         self,
         path: str,
@@ -129,7 +139,7 @@ class Unwind(Stage):
         )
 
 
-class Set(Stage):
+class Set(Stage[DictExpression]):
     def __init__(self, *specs: Spec):
         self.specs = list(specs)
 
@@ -146,7 +156,7 @@ class FacetSubPipeline(Operator):
         return {self.output_field: self.pipeline.expression()}
 
 
-class Facet(Stage):
+class Facet(Stage[DictExpression]):
     def __init__(self, *pipelines: FacetSubPipeline):
         self.pipelines = list(pipelines)
 
@@ -154,7 +164,7 @@ class Facet(Stage):
         return {"$facet": Merge.dict(*self.pipelines).expression()}
 
 
-class Skip(Stage):
+class Skip(Stage[DictExpression]):
     def __init__(self, skip: int):
         self.skip = skip
 
@@ -162,7 +172,7 @@ class Skip(Stage):
         return {"$skip": self.skip}
 
 
-class Limit(Stage):
+class Limit(Stage[DictExpression]):
     def __init__(self, limit: int):
         self.limit = limit
 
@@ -179,7 +189,7 @@ class TextSearchOperator(Operator):
         return {"text": {"query": self.query, "path": self.path}}
 
 
-class Search(Stage):
+class Search(Stage[DictExpression]):
     def __init__(self, index: str, op: Operator):
         self.index = index
         self.op = op
@@ -188,7 +198,7 @@ class Search(Stage):
         return {"$search": {"index": self.index} | self.op.expression()}
 
 
-class Pagination(Stage):
+class Pagination(Stage[DictExpression]):
     def __init__(
         self,
         page: int | None = None,
@@ -222,7 +232,7 @@ class Pagination(Stage):
         ]
 
 
-class ReplaceRoot(Stage):
+class ReplaceRoot(Stage[DictExpression]):
     def __init__(self, new_root: Any):
         self.new_root = new_root
 
@@ -230,7 +240,7 @@ class ReplaceRoot(Stage):
         return {"$replaceRoot": {"newRoot": Evaluable(self.new_root).expression()}}
 
 
-class Group(Stage):
+class Group(Stage[DictExpression]):
     def __init__(self, *ops: Operator, key: Any | None = None):
         self.ops = list(ops)
         self.key = key

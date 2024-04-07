@@ -26,3 +26,11 @@ class AddToSet(Operator):
 
     def expression(self) -> DictExpression:
         return Evaluable({"$addToSet": self._expression}).expression()
+
+
+class Push(Operator):
+    def __init__(self, expression: Any, /):
+        self._expression = expression
+
+    def expression(self) -> DictExpression:
+        return Evaluable({"$push": self._expression}).expression()

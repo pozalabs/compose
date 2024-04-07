@@ -23,3 +23,6 @@ class MongoFilterQuery(MongoQuery):
     @property
     def can_paginate(self) -> bool:
         return self.page is not None and self.per_page is not None
+
+
+MongoOffsetFilterQuery = MongoFilterQuery
