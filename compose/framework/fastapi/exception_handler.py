@@ -58,6 +58,17 @@ class ExceptionHandlerInfo:
         )
 
     @classmethod
+    def default(cls) -> Self:
+        return cls(
+            exc_class_or_status_code=Exception,
+            handler=create_exception_handler(
+                status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR,
+                error_type=http.HTTPStatus.INTERNAL_SERVER_ERROR.name.lower(),
+                response_cls=cls.default_response_cls,
+            ),
+        )
+
+    @classmethod
     def for_http_exception(
         cls, exc: HTTPException, response_cls: type[Response] | None = None
     ) -> Self:
