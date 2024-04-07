@@ -102,7 +102,7 @@ def test_cursor_pagination_clause_expression(
                     }
                 },
                 {"$sort": {"created_at": -1, "_id": 1}},
-                {"$limit": 11},
+                {"$limit": 10},
                 {
                     "$group": {
                         "_id": None,
