@@ -20,7 +20,7 @@ class PyObjectId(bson.ObjectId):
 
         @classmethod
         def __get_pydantic_core_schema__(cls, source_type: type[Self]) -> CoreSchema:
-            return core_schema.general_plain_validator_function(
+            return core_schema.with_info_plain_validator_function(
                 cls.validate, serialization=core_schema.to_string_ser_schema()
             )
 
