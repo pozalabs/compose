@@ -30,8 +30,8 @@ class BaseError(Exception):
     @classmethod
     def with_default_message(cls, message: str) -> type[BaseError]:
         return cast(
+            type[Self],
             type(cls.__name__, (cls,), {"default_message": message}),
-            Self,
         )
 
 
