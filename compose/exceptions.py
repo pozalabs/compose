@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import enum
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Self, cast
 
 
 class BaseError(Exception):
@@ -24,3 +26,16 @@ class BaseError(Exception):
 
     def __str__(self):
         return self.message
+
+    @classmethod
+    def with_default_message(cls, message: str) -> type[BaseError]:
+        return cast(
+            type(cls.__name__, (cls,), {"default_message": message}),
+            Self,
+        )
+
+
+AuthorizationError = BaseError.with_default_message("Authorization failed")
+NotAllowedError = BaseError.with_default_message("Not allowed")
+DoesNotExistError = BaseError.with_default_message("Resource not found")
+DomainValidationError = BaseError.with_default_message("Validation failed")
