@@ -3,6 +3,7 @@ try:
 except ImportError:
     raise ImportError("Install `fastapi` to use fastapi helpers")
 
+from .endpoint import health_check
 from .error_handler import (
     ErrorHandler,
     ErrorHandlerInfo,
@@ -17,4 +18,5 @@ __all__ = [
     "create_error_handler",
     "validation_exception_handler",
     "to_query",
+    "health_check",
 ]
