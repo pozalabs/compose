@@ -33,3 +33,7 @@ def unordered_partial(p: functools.partial[RT], t: T) -> Callable[..., RT]:
         return p(**{arg_name: arg})
 
     return functools.partial(wrapper)
+
+
+def ident(x: T) -> T:
+    return x
