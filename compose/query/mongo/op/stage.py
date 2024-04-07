@@ -7,6 +7,11 @@ from .sort import SortBy
 from .types import DictExpression, ListExpression, MongoKeyword, _FieldPath
 
 
+class EmptyStage(Stage[DictExpression]):
+    def expression(self) -> DictExpression:
+        return {}
+
+
 class Match(Stage[DictExpression]):
     def __init__(self, op: LogicalOperator):
         self.op = op

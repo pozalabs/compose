@@ -1,9 +1,9 @@
 import pendulum
 import pytest
 
+import compose
 from compose.query.mongo.op import (
-    CursorDecoder,
-    CursorEncoder,
+    Cursor,
     CursorPagination,
     ListExpression,
     Sort,
@@ -11,28 +11,42 @@ from compose.query.mongo.op import (
 )
 
 
+class TCursor(Cursor):
+    created_at: compose.types.DateTime
+    id: compose.types.PyObjectId = compose.field.IdField()
+
+
 @pytest.mark.parametrize(
     "pagination, expected",
     [
         (
             CursorPagination(
-                sort=Sort(SortBy.desc(field="created_at")),
-                cursor_decoder=CursorDecoder(parsers={"created_at": pendulum.parse}),
-                cursor=CursorEncoder(cursor_keys=["created_at"]).encode(
-                    {"created_at": pendulum.datetime(2024, 4, 1).isoformat()}
+                sort=Sort(
+                    SortBy.desc("created_at"),
+                    SortBy.asc("_id"),
+                ),
+                cursor=TCursor(
+                    created_at=pendulum.datetime(2024, 4, 1),
+                    id=compose.types.PyObjectId(b"test-id-0001"),
                 ),
                 per_page=10,
             ),
             [
                 {
                     "$match": {
-                        "$nor": [
-                            {"created_at": {"$lt": pendulum.datetime(2024, 4, 1)}},
+                        "$or": [
+                            {"$and": [{"created_at": {"$lt": pendulum.datetime(2024, 4, 1)}}]},
+                            {
+                                "$and": [
+                                    {"created_at": {"$eq": pendulum.datetime(2024, 4, 1)}},
+                                    {"_id": {"$gt": compose.types.PyObjectId(b"test-id-0001")}},
+                                ]
+                            },
                         ]
                     }
                 },
-                {"$sort": {"created_at": -1}},
-                {"$limit": 10},
+                {"$sort": {"created_at": -1, "_id": 1}},
+                {"$limit": 11},
                 {
                     "$group": {
                         "_id": None,
@@ -43,7 +57,6 @@ from compose.query.mongo.op import (
                     "$project": {
                         "_id": 0,
                         "items": 1,
-                        "metadata": {"cursor_keys": ["created_at"]},
                     }
                 },
             ],
