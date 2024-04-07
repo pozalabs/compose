@@ -16,6 +16,15 @@ class TCursor(Cursor):
     id: compose.types.PyObjectId = compose.field.IdField()
 
 
+def test_cursor_encode_decode():
+    cursor = TCursor(
+        created_at=pendulum.datetime(2024, 4, 1),
+        id=compose.types.PyObjectId(b"test-id-0001"),
+    )
+
+    assert TCursor.from_str(cursor.to_str()) == cursor
+
+
 @pytest.mark.parametrize(
     "pagination, expected",
     [
