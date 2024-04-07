@@ -40,6 +40,7 @@ __all__ = [
     "signal",
     "exceptions",
     "fastapi",
+    "settings",
 ]
 
 try:
