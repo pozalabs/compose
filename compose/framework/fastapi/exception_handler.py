@@ -1,17 +1,18 @@
 import functools
 import http
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from typing import ClassVar, Self, TypeAlias
 
 from fastapi import Request, Response
 from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import HTTPException, RequestValidationError
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+from starlette.exceptions import HTTPException
 
 from compose import compat, schema
 
-ExceptionHandler: TypeAlias = Callable[[Request, Exception], Response]
+ExceptionHandler: TypeAlias = Callable[[Request, Exception], Response | Awaitable[Response]]
 
 
 class ExceptionHandlerInfo:
@@ -60,9 +61,9 @@ class ExceptionHandlerInfo:
     def for_http_exception(
         cls, exc: HTTPException, response_cls: type[Response] | None = None
     ) -> Self:
-        return cls.for_status_code(
-            status_code=http.HTTPStatus(exc.status_code),
-            response_cls=response_cls or cls.default_response_cls,
+        return cls(
+            exc_class_or_status_code=http.HTTPStatus(exc.status_code),
+            handler=create_http_exception_handler(response_cls or cls.default_response_cls),
         )
 
     @classmethod
@@ -85,13 +86,7 @@ def create_exception_handler(
     error_type: str,
     response_cls: type[Response],
 ) -> ExceptionHandler:
-    def error_handler(request: Request, exc: Exception) -> Response:
-        if isinstance(exc, HTTPException):
-            return response_cls(
-                content=jsonable_encoder(getattr(exc, "detail")),
-                status_code=exc.status_code,
-            )
-
+    def exception_handler(request: Request, exc: Exception) -> Response:
         response = schema.Error(
             title=str(exc),
             type=error_type,
@@ -106,7 +101,24 @@ def create_exception_handler(
         )
         return response_cls(content=jsonable_encoder(response), status_code=status_code)
 
-    return error_handler
+    return exception_handler
+
+
+def create_http_exception_handler(response_cls: type[Response]) -> ExceptionHandler:
+    def http_exception_handler(request: Request, exc: HTTPException) -> Response:
+        status_code = http.HTTPStatus(exc.status_code)
+        return response_cls(
+            content=jsonable_encoder(
+                schema.Error(
+                    title=exc.detail,
+                    type=status_code.name.lower(),
+                )
+            ),
+            status_code=status_code,
+            headers=exc.headers,
+        )
+
+    return http_exception_handler
 
 
 def validation_error_handler(
