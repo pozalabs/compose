@@ -5,6 +5,7 @@ from . import (
     concurrent,
     dependency,
     entity,
+    enums,
     event,
     exceptions,
     field,
@@ -14,6 +15,7 @@ from . import (
     repository,
     result,
     schema,
+    settings,
     types,
     uow,
 )
@@ -40,6 +42,8 @@ __all__ = [
     "signal",
     "exceptions",
     "fastapi",
+    "settings",
+    "enums",
 ]
 
 try:
