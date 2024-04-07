@@ -81,6 +81,31 @@ def test_cursor_pagination_clause_expression(
                     SortBy.desc("created_at"),
                     SortBy.asc("_id"),
                 ),
+                per_page=10,
+            ),
+            [
+                {"$sort": {"created_at": -1, "_id": 1}},
+                {"$limit": 10},
+                {
+                    "$group": {
+                        "_id": None,
+                        "items": {"$push": "$$ROOT"},
+                    }
+                },
+                {
+                    "$project": {
+                        "_id": 0,
+                        "items": 1,
+                    }
+                },
+            ],
+        ),
+        (
+            CursorPagination(
+                sort=Sort(
+                    SortBy.desc("created_at"),
+                    SortBy.asc("_id"),
+                ),
                 cursor=TCursor(
                     created_at=pendulum.datetime(2024, 4, 1),
                     id=compose.types.PyObjectId(b"test-id-0001"),
@@ -116,7 +141,7 @@ def test_cursor_pagination_clause_expression(
                     }
                 },
             ],
-        )
+        ),
     ],
 )
 def test_expression(pagination: CursorPagination, expected: ListExpression):

@@ -88,10 +88,7 @@ class CursorPagination(Stage[ListExpression]):
 
     def expression(self) -> ListExpression:
         return Pipeline(
-            CursorQuery(
-                sort=self.sort,
-                cursor=self.cursor,
-            ),
+            CursorQuery(sort=self.sort, cursor=self.cursor),
             self.sort,
             Limit(self.per_page),
             Group.by_null(Spec(field="items", spec=Push("$$ROOT"))),
