@@ -31,7 +31,11 @@ class ApplicationContainer(containers.DeclarativeContainer):
     ],
 )
 def test_resolve_by_object_name(object_name: str, expected: type[Any]):
-    actual = resolve_by_object_name(name=object_name, container=ApplicationContainer)
+    actual = resolve_by_object_name(
+        name=object_name,
+        container=ApplicationContainer,
+        provider_types=(providers.Factory, providers.Singleton),
+    )
 
     assert isinstance(actual, expected)
 
@@ -49,4 +53,8 @@ def test_resolve_by_object_name(object_name: str, expected: type[Any]):
 )
 def test_cannot_resolve_by_object_name(object_name: str, container_cls: type[containers.Container]):
     with pytest.raises(ValueError):
-        resolve_by_object_name(name=object_name, container=container_cls)
+        resolve_by_object_name(
+            name=object_name,
+            container=container_cls,
+            provider_types=(providers.Factory, providers.Singleton),
+        )
