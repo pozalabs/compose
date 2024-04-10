@@ -31,6 +31,11 @@ class RepositoryA:
         self.name = name
 
 
+class RepositoryB:
+    def __init__(self, name: str):
+        self.name = name
+
+
 class NestedRepository:
     ...
 
@@ -45,6 +50,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
     repository = providers.Factory(Repository)
     repository_a1 = providers.Factory(RepositoryA, name="repository_a1")
     repository_a2 = providers.Factory(RepositoryA, name="repository_a2")
+    repository_b1 = providers.Singleton(RepositoryB, name="repository_b1")
 
     nested = providers.Container(NestedContainer)
     adder = providers.Factory(adder, a=1, b=2)
@@ -57,6 +63,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         (NestedRepository, ApplicationContainer, NestedRepository),
         (NestedRepository, ApplicationContainer.nested, NestedRepository),
         (RepositoryWithFactoryMethod, ApplicationContainer, RepositoryWithFactoryMethod),
+        (Repository, ApplicationContainer, Repository),
         ("repository", ApplicationContainer, Repository),
         ("repository", ApplicationContainer.nested, NestedRepository),
         ("repository_with_factory_method", ApplicationContainer, RepositoryWithFactoryMethod),
@@ -66,6 +73,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         "최상위 컨테이너에서 중첩 의존성 해결",
         "중첩 컨테이너에서 해당 컨테이너에 선언된 의존성 해결",
         "팩토리 메서드로 등록한 의존성 해결",
+        "Factory 외의 Provider 의존성 해결",
         "의존성 등록 이름으로 의존성 해결",
         "중첩 컨테이너에서 의존성 등록 이름으로 의존성 해결",
         "의존성 등록 이름으로 팩토리 메서드 의존성 해결",
