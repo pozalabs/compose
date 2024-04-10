@@ -11,7 +11,7 @@ from dependency_injector.wiring import Provide
 T = TypeVar("T")
 Container = type[containers.Container] | containers.Container
 
-DEFAULT_RESOLUTION_PROVIDER_TYPES = (providers.Factory,)
+DEFAULT_RESOLVABLE_PROVIDER_TYPES = (providers.Factory, providers.Singleton)
 
 
 class Wirer(Protocol):
@@ -117,7 +117,7 @@ class ConflictResolution(str, enum.Enum):
 def resolve(
     type_: type[Any] | str,
     container: Container,
-    provider_types: Iterable[type[providers.Provider]] = DEFAULT_RESOLUTION_PROVIDER_TYPES,
+    provider_types: Iterable[type[providers.Provider]] = DEFAULT_RESOLVABLE_PROVIDER_TYPES,
     *,
     name: str | None = None,
     conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
@@ -167,7 +167,7 @@ def provide(
     from_: type[containers.Container],
     /,
     *,
-    provider_types: Iterable[type[providers.Provider]] = DEFAULT_RESOLUTION_PROVIDER_TYPES,
+    provider_types: Iterable[type[providers.Provider]] = DEFAULT_RESOLVABLE_PROVIDER_TYPES,
     name: str | None = None,
     conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
 ) -> Provide[T]:
@@ -208,16 +208,15 @@ def create_lazy_resolver(container_path: str) -> Callable[[str], Any]:
 class ProvideExtraArgs(TypedDict):
     name: NotRequired[str]
     conflict_resolution: NotRequired[ConflictResolution]
-    provider_types: NotRequired[Iterable[type[providers.Provider]]]
 
 
 def create_provider(
     container: type[containers.Container],
+    provider_types: Iterable[type[providers.Provider]] = DEFAULT_RESOLVABLE_PROVIDER_TYPES,
 ) -> Callable[[type[T], Unpack[ProvideExtraArgs]], Provide[T]]:
     def provider(
         type_: type[T],
         /,
-        provider_types: Iterable[type[providers.Provider]] = DEFAULT_RESOLUTION_PROVIDER_TYPES,
         name: str | None = None,
         conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
     ) -> Provide[T]:

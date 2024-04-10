@@ -1,5 +1,6 @@
 from .container import DeclarativeContainer
 from .wiring import (
+    DEFAULT_RESOLVABLE_PROVIDER_TYPES,
     ConflictResolution,
     create_provider,
     create_wirer,
@@ -16,4 +17,5 @@ __all__ = [
     "resolve_by_object_name",
     "create_provider",
     "DeclarativeContainer",
+    "DEFAULT_RESOLVABLE_PROVIDER_TYPES",
 ]
