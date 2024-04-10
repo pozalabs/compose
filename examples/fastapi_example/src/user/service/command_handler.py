@@ -1,4 +1,4 @@
-import compose.exceptions
+import compose
 from src.user import schema
 from src.user.adapter.repository import UserRepository
 from src.user.domain import command, model
