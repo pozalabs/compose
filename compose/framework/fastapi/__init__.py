@@ -11,6 +11,7 @@ from .exception_handler import (
     validation_error_handler,
 )
 from .param import to_query
+from .security import HTTPBasicAuth
 
 __all__ = [
     "ExceptionHandler",
@@ -19,4 +20,5 @@ __all__ = [
     "validation_error_handler",
     "to_query",
     "health_check",
+    "HTTPBasicAuth",
 ]
