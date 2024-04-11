@@ -1,5 +1,5 @@
 import enum
 
 
-class OpenApiTag(enum.StrEnum):
+class OpenAPITag(enum.StrEnum):
     USER = enum.auto()

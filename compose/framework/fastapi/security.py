@@ -1,10 +1,10 @@
 import http
 import secrets
 from collections.abc import Callable
-from typing import Annotated
+from typing import Annotated, Self
 
 from fastapi import Depends, HTTPException
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import APIKeyHeader, HTTPBasic, HTTPBasicCredentials
 
 
 class HTTPBasicAuth:
@@ -31,3 +31,54 @@ class HTTPBasicAuth:
                 )
 
         return authenticate
+
+
+class APIKeyAuth:
+    """API Key Authentication for FastAPI
+
+    Example:
+    ```python
+    import compose
+    from fastapi import Depends
+    from fastapi.security import APIKeyHeader
+
+    app = FastAPI()
+    api_key_header = APIKeyHeader("x-api-key", auto_error=False)
+
+    # 고정 API Key 인증
+    api_key_auth = compose.fastapi.APIKeyAuth.static(
+        api_key="api-key",
+        header=api_key_header,
+    ).authenticator()
+
+    # 동적 API Key 인증
+    api_key_auth = compose.fastapi.APIKeyAuth(
+        api_key_factory=api_key_factory,
+        header=api_key_header,
+    ).authenticator()
+
+    @app.get("/auth/api-key", dependencies=[Depends(api_key_auth)])
+    def authed_by_api_key():
+        return {"message": "Authenticated"}
+    """
+
+    def __init__(self, api_key_factory: Callable[[], str], header: APIKeyHeader):
+        self.api_key_factory = api_key_factory
+        self.header = header
+
+    def authenticator(self) -> Callable[[str], None]:
+        _header = self.header
+
+        def authenticate(header: Annotated[str, Depends(_header)]) -> None:
+            api_key = self.api_key_factory()
+            if header != api_key:
+                raise HTTPException(
+                    status_code=http.HTTPStatus.UNAUTHORIZED,
+                    detail="Not authenticated. Invalid API key",
+                )
+
+        return authenticate
+
+    @classmethod
+    def static(cls, api_key: str, header: APIKeyHeader) -> Self:
+        return cls(api_key_factory=lambda: api_key, header=header)
