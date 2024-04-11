@@ -12,7 +12,7 @@ from .exception_handler import (
 )
 from .openapi import openapi_tags
 from .param import to_query
-from .security import HTTPBasicAuth
+from .security import APIKeyAuth, HTTPBasicAuth
 
 __all__ = [
     "ExceptionHandler",
@@ -22,5 +22,6 @@ __all__ = [
     "to_query",
     "health_check",
     "HTTPBasicAuth",
+    "APIKeyAuth",
     "openapi_tags",
 ]

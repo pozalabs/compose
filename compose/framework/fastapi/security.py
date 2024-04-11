@@ -4,7 +4,7 @@ from collections.abc import Callable
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import APIKeyHeader, HTTPBasic, HTTPBasicCredentials
 
 
 class HTTPBasicAuth:
@@ -28,6 +28,25 @@ class HTTPBasicAuth:
                     status_code=http.HTTPStatus.UNAUTHORIZED,
                     detail="Incorrect username or password",
                     headers={"WWW-Authenticate": "Basic"},
+                )
+
+        return authenticate
+
+
+class APIKeyAuth:
+    def __init__(self, api_key_factory: Callable[[], str], header: APIKeyHeader):
+        self.api_key_factory = api_key_factory
+        self.header = header
+
+    def authenticator(self) -> Callable[[str], None]:
+        _header = self.header
+
+        def authenticate(header: Annotated[str, Depends(_header)]) -> None:
+            api_key = self.api_key_factory()
+            if header != api_key:
+                raise HTTPException(
+                    status_code=http.HTTPStatus.UNAUTHORIZED,
+                    detail="Not authenticated. Invalid API key",
                 )
 
         return authenticate
