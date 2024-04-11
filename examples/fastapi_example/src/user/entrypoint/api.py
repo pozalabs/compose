@@ -2,6 +2,7 @@ from dependency_injector.wiring import inject
 from fastapi import Depends
 
 import compose
+from src import constants
 from src.dependency import provide
 from src.user import schema, service
 from src.user.adapter.repository import UserRepository
@@ -13,6 +14,7 @@ from .router import router
 @router.get(
     "/v1/users/{name}",
     response_model=schema.User,
+    tags=[constants.OpenApiTag.USER],
     summary="유저 조회",
 )
 @inject
@@ -29,6 +31,7 @@ def retrieve_user(
 @router.post(
     "/v1/users",
     response_model=schema.User,
+    tags=[constants.OpenApiTag.USER],
     summary="유저 추가",
 )
 @inject
