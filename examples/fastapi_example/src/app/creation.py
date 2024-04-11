@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasic
 
 import compose
+from src import constants
 from src.dependency import ApplicationContainer, wirer
 from src.logging import logger  # noqa: F401
 from src.user.entrypoint.router import router as user_router
@@ -18,7 +19,9 @@ http_basic_auth = compose.fastapi.HTTPBasicAuth(
 
 
 def create_app() -> FastAPI:
-    _app = FastAPI()
+    _app = FastAPI(
+        openapi_tags=compose.fastapi.openapi_tags(constants.OpenApiTag),
+    )
     inject_dependencies(_app)
     add_middlewares(_app)
     add_exception_handlers(_app)

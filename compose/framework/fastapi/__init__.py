@@ -10,6 +10,7 @@ from .exception_handler import (
     create_exception_handler,
     validation_error_handler,
 )
+from .openapi import openapi_tags
 from .param import to_query
 from .security import HTTPBasicAuth
 
@@ -21,4 +22,5 @@ __all__ = [
     "to_query",
     "health_check",
     "HTTPBasicAuth",
+    "openapi_tags",
 ]
