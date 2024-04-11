@@ -38,4 +38,4 @@ class DateTime(pendulum.DateTime):
 
     @classmethod
     def _instance(cls, v: datetime.datetime | pendulum.DateTime) -> pendulum.DateTime:
-        return pendulum.instance(dt=v, tz=pendulum.UTC)
+        return pendulum.instance(obj=v, tz=pendulum.UTC)
