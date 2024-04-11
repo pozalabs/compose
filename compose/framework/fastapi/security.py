@@ -34,6 +34,34 @@ class HTTPBasicAuth:
 
 
 class APIKeyAuth:
+    """API Key Authentication for FastAPI
+
+    Example:
+    ```python
+    import compose
+    from fastapi import Depends
+    from fastapi.security import APIKeyHeader
+
+    app = FastAPI()
+    api_key_header = APIKeyHeader("x-api-key", auto_error=False)
+
+    # 고정 API Key 인증
+    api_key_auth = compose.fastapi.APIKeyAuth.static(
+        api_key="api-key",
+        header=api_key_header,
+    ).authenticator()
+
+    # 동적 API Key 인증
+    api_key_auth = compose.fastapi.APIKeyAuth(
+        api_key_factory=api_key_factory,
+        header=api_key_header,
+    ).authenticator()
+
+    @app.get("/auth/api-key", dependencies=[Depends(api_key_auth)])
+    def authed_by_api_key():
+        return {"message": "Authenticated"}
+    """
+
     def __init__(self, api_key_factory: Callable[[], str], header: APIKeyHeader):
         self.api_key_factory = api_key_factory
         self.header = header
