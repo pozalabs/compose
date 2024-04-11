@@ -9,7 +9,7 @@ packages = [{include = "compose"}]
 [tool.poetry.dependencies]
 python = ">=3.11,<4.0"
 pendulum = "^3.0.0"
-pymongo = {extras = ["aws"], version = "^4.3.3"}
+pymongo = {extras = ["aws"], version = "^4.6.3"}
 inflection = "^0.5.1"
 dependency-injector = "^4.41.0"
 pydantic = ">=1.10.0,<3"
