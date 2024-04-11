@@ -1,7 +1,7 @@
 import http
 import secrets
 from collections.abc import Callable
-from typing import Annotated
+from typing import Annotated, Self
 
 from fastapi import Depends, HTTPException
 from fastapi.security import APIKeyHeader, HTTPBasic, HTTPBasicCredentials
@@ -50,3 +50,7 @@ class APIKeyAuth:
                 )
 
         return authenticate
+
+    @classmethod
+    def static(cls, api_key: str, header: APIKeyHeader) -> Self:
+        return cls(api_key_factory=lambda: api_key, header=header)
