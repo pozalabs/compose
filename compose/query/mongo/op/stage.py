@@ -19,7 +19,7 @@ class Match(Stage[DictExpression]):
 
     def expression(self) -> DictExpression:
         if not (expression := self.op.expression()):
-            return {}
+            return EmptyStage().expression()
         return {"$match": expression}
 
     @classmethod
