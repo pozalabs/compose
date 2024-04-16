@@ -1,7 +1,8 @@
 from typing import Any, Self
 
 from .base import Evaluable, Merge, Operator, Stage
-from .logical import And, LogicalOperator, Nor, Or
+from .evaulation import Expr
+from .logical import And, Nor, Or
 from .pipeline import Pipeline
 from .sort import SortBy
 from .types import DictExpression, ListExpression, MongoKeyword, _FieldPath
@@ -13,12 +14,12 @@ class EmptyStage(Stage[DictExpression]):
 
 
 class Match(Stage[DictExpression]):
-    def __init__(self, op: LogicalOperator):
+    def __init__(self, op: Operator):
         self.op = op
 
     def expression(self) -> DictExpression:
         if not (expression := self.op.expression()):
-            return {}
+            return EmptyStage().expression()
         return {"$match": expression}
 
     @classmethod
@@ -32,6 +33,10 @@ class Match(Stage[DictExpression]):
     @classmethod
     def nor(cls, *ops: Operator) -> Self:
         return cls(Nor(*ops))
+
+    @classmethod
+    def expr(cls, op: Any) -> Self:
+        return cls(Expr(op))
 
 
 class Sort(Stage[DictExpression]):
