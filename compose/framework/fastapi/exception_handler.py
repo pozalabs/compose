@@ -13,7 +13,6 @@ from compose import compat, schema
 
 E: TypeAlias = TypeVar("E", bound=Exception)
 ExceptionHandler: TypeAlias = Callable[[Request, E], Response | Awaitable[Response]]
-FastAPIValidationError: TypeAlias = RequestValidationError | ValidationError
 
 
 class ExceptionHandlerInfo:
@@ -146,7 +145,9 @@ def create_http_exception_handler(response_cls: type[Response]) -> ExceptionHand
 
 
 def create_default_validation_error_handler(response_cls: type[Response]) -> ExceptionHandler:
-    def validation_error_handler(request: Request, exc: FastAPIValidationError) -> Response:
+    def validation_error_handler(
+        request: Request, exc: RequestValidationError | ValidationError
+    ) -> Response:
         return response_cls(
             content=jsonable_encoder(
                 schema.Error.from_validation_error(exc=exc, title="Validation failed"),
