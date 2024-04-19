@@ -20,12 +20,15 @@ def get_parameters_from_ssm(
     has_next = True
     next_token = None
     while has_next:
-        response = ssm_client.get_parameters_by_path(
-            Path=prefix,
-            WithDecryption=True,
-            Recursive=True,
-            NextToken=next_token,
-        )
+        params = {
+            "Path": prefix,
+            "WithDecryption": True,
+            "Recursive": True,
+        }
+        if next_token is not None:
+            params["NextToken"] = next_token
+
+        response = ssm_client.get_parameters_by_path(**params)
         for parameter in response["Parameters"]:
             key = parameter["Name"].split("/")[-1].lower()
             value = parameter["Value"]
