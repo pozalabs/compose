@@ -1,7 +1,6 @@
-import functools
 import http
 from collections.abc import Awaitable, Callable
-from typing import ClassVar, Self, TypeAlias
+from typing import ClassVar, Self, TypeAlias, TypeVar
 
 from fastapi import Request, Response
 from fastapi.encoders import jsonable_encoder
@@ -12,7 +11,8 @@ from starlette.exceptions import HTTPException
 
 from compose import compat, schema
 
-ExceptionHandler: TypeAlias = Callable[[Request, Exception], Response | Awaitable[Response]]
+E: TypeAlias = TypeVar("E", bound=Exception)
+ExceptionHandler: TypeAlias = Callable[[Request, E], Response | Awaitable[Response]]
 
 
 class ExceptionHandlerInfo:
@@ -76,17 +76,31 @@ class ExceptionHandlerInfo:
         )
 
     @classmethod
-    def for_request_validation_error(cls, response_cls: type[Response] | None = None) -> Self:
+    def for_request_validation_error(
+        cls,
+        exception_handler: ExceptionHandler | None = None,
+        response_cls: type[Response] | None = None,
+    ) -> Self:
         return cls(
             exc_class_or_status_code=RequestValidationError,
-            handler=create_validation_error_handler(response_cls or cls.default_response_cls),
+            handler=(
+                exception_handler
+                or create_default_validation_error_handler(response_cls or cls.default_response_cls)
+            ),
         )
 
     @classmethod
-    def for_pydantic_validation_error(cls, response_cls: type[Response] | None = None) -> Self:
+    def for_pydantic_validation_error(
+        cls,
+        exception_handler: ExceptionHandler | None = None,
+        response_cls: type[Response] | None = None,
+    ) -> Self:
         return cls(
             exc_class_or_status_code=ValidationError,
-            handler=create_validation_error_handler(response_cls or cls.default_response_cls),
+            handler=(
+                exception_handler
+                or create_default_validation_error_handler(response_cls or cls.default_response_cls)
+            ),
         )
 
 
@@ -130,28 +144,15 @@ def create_http_exception_handler(response_cls: type[Response]) -> ExceptionHand
     return http_exception_handler
 
 
-def validation_error_handler(
-    request: Request,
-    exc: RequestValidationError | ValidationError,
-    response_cls: type[Response],
-) -> Response:
-    response = schema.Error(
-        title="Validation failed",
-        type="validation_error",
-        invalid_params=[
-            schema.InvalidParam(
-                loc=".".join(str(v) for v in error["loc"]),
-                message=error["msg"],
-                type=error["type"],
-            )
-            for error in exc.errors()
-        ],
-    )
-    return response_cls(
-        content=jsonable_encoder(response),
-        status_code=http.HTTPStatus.UNPROCESSABLE_ENTITY,
-    )
+def create_default_validation_error_handler(response_cls: type[Response]) -> ExceptionHandler:
+    def validation_error_handler(
+        request: Request, exc: RequestValidationError | ValidationError
+    ) -> Response:
+        return response_cls(
+            content=jsonable_encoder(
+                schema.Error.from_validation_error(exc=exc, title="Validation failed"),
+            ),
+            status_code=http.HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
-
-def create_validation_error_handler(response_cls: type[Response]) -> ExceptionHandler:
-    return functools.partial(validation_error_handler, response_cls=response_cls)
+    return validation_error_handler
