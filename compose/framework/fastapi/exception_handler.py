@@ -1,4 +1,3 @@
-import functools
 import http
 from collections.abc import Awaitable, Callable
 from typing import ClassVar, Self, TypeAlias
@@ -86,7 +85,7 @@ class ExceptionHandlerInfo:
             exc_class_or_status_code=RequestValidationError,
             handler=(
                 exception_handler
-                or create_validation_error_handler(response_cls or cls.default_response_cls)
+                or create_default_validation_error_handler(response_cls or cls.default_response_cls)
             ),
         )
 
@@ -100,7 +99,7 @@ class ExceptionHandlerInfo:
             exc_class_or_status_code=ValidationError,
             handler=(
                 exception_handler
-                or create_validation_error_handler(response_cls or cls.default_response_cls)
+                or create_default_validation_error_handler(response_cls or cls.default_response_cls)
             ),
         )
 
@@ -145,18 +144,13 @@ def create_http_exception_handler(response_cls: type[Response]) -> ExceptionHand
     return http_exception_handler
 
 
-def default_validation_error_handler(
-    request: Request,
-    exc: FastAPIValidationError,
-    response_cls: type[Response],
-) -> Response:
-    return response_cls(
-        content=jsonable_encoder(
-            schema.Error.from_validation_error(exc=exc, title="Validation failed"),
-        ),
-        status_code=http.HTTPStatus.UNPROCESSABLE_ENTITY,
-    )
+def create_default_validation_error_handler(response_cls: type[Response]) -> ExceptionHandler:
+    def validation_error_handler(request: Request, exc: FastAPIValidationError) -> Response:
+        return response_cls(
+            content=jsonable_encoder(
+                schema.Error.from_validation_error(exc=exc, title="Validation failed"),
+            ),
+            status_code=http.HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
 
-
-def create_validation_error_handler(response_cls: type[Response]) -> ExceptionHandler:
-    return functools.partial(default_validation_error_handler, response_cls=response_cls)
+    return validation_error_handler
