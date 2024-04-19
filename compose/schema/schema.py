@@ -114,7 +114,7 @@ class Error(container.BaseModel):
     invalid_params: list[InvalidParam] | None = None
 
     @classmethod
-    def from_validation_error(cls, exc: ValidationError) -> Self:
+    def from_validation_error(cls, exc: ValidationError, title: str) -> Self:
         invalid_params = []
         for error in exc.errors():
             invalid_params.append(
@@ -125,7 +125,7 @@ class Error(container.BaseModel):
                 )
             )
         return cls(
-            title="검증 오류가 발생했습니다.",
+            title=title,
             type="validation_error",
             invalid_params=invalid_params,
         )
