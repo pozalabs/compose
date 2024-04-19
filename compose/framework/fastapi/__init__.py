@@ -8,7 +8,6 @@ from .exception_handler import (
     ExceptionHandler,
     ExceptionHandlerInfo,
     create_exception_handler,
-    validation_error_handler,
 )
 from .openapi import openapi_tags
 from .param import to_query
@@ -19,7 +18,6 @@ __all__ = [
     "ExceptionHandler",
     "ExceptionHandlerInfo",
     "create_exception_handler",
-    "validation_error_handler",
     "to_query",
     "health_check",
     "HTTPBasicAuth",
