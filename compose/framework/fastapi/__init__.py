@@ -11,7 +11,7 @@ from .exception_handler import (
 )
 from .openapi import openapi_tags
 from .param import to_query
-from .response import NoContentResponse
+from .response import NoContentResponse, ZipStreamingResponse
 from .security import APIKeyAuth, HTTPBasicAuth
 
 __all__ = [
@@ -24,4 +24,5 @@ __all__ = [
     "APIKeyAuth",
     "openapi_tags",
     "NoContentResponse",
+    "ZipStreamingResponse",
 ]
