@@ -2,6 +2,7 @@ import copy
 from collections.abc import Callable, Generator
 from typing import Any, Protocol
 
+from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
 
 
@@ -44,3 +45,11 @@ def chain(*validators: Callable[[Any], Any]) -> Callable[[Any], Any]:
         return result
 
     return apply_chain
+
+
+class CoreSchemaGettable:
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        return get_pydantic_core_schema(cls, handler(str))
