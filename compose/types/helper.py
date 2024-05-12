@@ -2,8 +2,11 @@ import copy
 from collections.abc import Callable, Generator
 from typing import Any, Generic, Protocol, TypeVar, get_args
 
-from pydantic import GetCoreSchemaHandler
-from pydantic_core import core_schema
+from compose import compat
+
+if compat.IS_PYDANTIC_V2:
+    from pydantic import GetCoreSchemaHandler
+    from pydantic_core import core_schema
 
 T = TypeVar("T")
 
