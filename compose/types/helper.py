@@ -1,9 +1,15 @@
-import copy
-from collections.abc import Callable, Generator
-from typing import Any, Generic, Protocol, TypeVar, get_args
+from __future__ import annotations
 
-from pydantic import GetCoreSchemaHandler
-from pydantic_core import core_schema
+import copy
+import inspect
+from collections.abc import Callable, Generator
+from typing import TYPE_CHECKING, Any, Generic, Protocol, TypeVar, get_args
+
+from compose import compat
+
+if compat.IS_PYDANTIC_V2 and TYPE_CHECKING:
+    from pydantic import GetCoreSchemaHandler
+    from pydantic_core import core_schema
 
 T = TypeVar("T")
 
@@ -16,8 +22,18 @@ class SupportsGetValidators(Protocol):
         ...
 
 
+def chain(*validators: Callable[[Any], Any]) -> Callable[[Any], Any]:
+    def apply_chain(v: Any) -> Any:
+        result = copy.deepcopy(v)
+        for validator in validators:
+            result = validator(result)
+        return result
+
+    return apply_chain
+
+
 def get_pydantic_core_schema(
-    t: SupportsGetValidators, schema: core_schema.CoreSchema, /
+    t: type[SupportsGetValidators], schema: core_schema.CoreSchema, /
 ) -> core_schema.CoreSchema:
     """Pydantic v1 커스텀 타입에 구현한 검증 제너레이터를 v2 커스텀 타입 검증 함수로 변환합니다.
 
@@ -34,19 +50,10 @@ def get_pydantic_core_schema(
     """
 
     if not hasattr(t, "__get_validators__"):
-        raise AttributeError(f"{t.__class__.__name__} does not have `__get_validators__` method")
+        type_name = t.__name__ if inspect.isclass(t) else t.__class__.__name__
+        raise AttributeError(f"`{type_name}` does not have `__get_validators__` method")
 
     return core_schema.no_info_after_validator_function(chain(*t.__get_validators__()), schema)
-
-
-def chain(*validators: Callable[[Any], Any]) -> Callable[[Any], Any]:
-    def apply_chain(v: Any) -> Any:
-        result = copy.deepcopy(v)
-        for validator in validators:
-            result = validator(result)
-        return result
-
-    return apply_chain
 
 
 class CoreSchemaGettable(Generic[T]):
@@ -63,7 +70,10 @@ class CoreSchemaGettable(Generic[T]):
 
     @classmethod
     def __get_pydantic_core_schema__(
-        cls: SupportsGetValidators, source_type: Any, handler: GetCoreSchemaHandler
+        cls, source_type: Any, handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
+        if not compat.IS_PYDANTIC_V2:
+            pass
+
         validatable_type = get_args(source_type.__orig_bases__[1])[0]
         return get_pydantic_core_schema(cls, handler(validatable_type))
