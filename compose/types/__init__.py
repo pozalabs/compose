@@ -18,3 +18,5 @@ if compat.IS_PYDANTIC_V2:
     __all__.extend(
         ["SupportsGetValidators", "get_pydantic_core_schema", "chain", "CoreSchemaGettable"]
     )
+else:
+    __all__.append("CoreSchemaGettable")

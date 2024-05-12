@@ -1,9 +1,11 @@
 import copy
 from collections.abc import Callable, Generator
-from typing import Any, Protocol
+from typing import Any, Generic, Protocol, TypeVar, get_args
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
+
+T = TypeVar("T")
 
 
 class SupportsGetValidators(Protocol):
@@ -47,9 +49,16 @@ def chain(*validators: Callable[[Any], Any]) -> Callable[[Any], Any]:
     return apply_chain
 
 
-class CoreSchemaGettable:
+class CoreSchemaGettable(Generic[T]):
     @classmethod
     def __get_pydantic_core_schema__(
-        cls, source_type: Any, handler: GetCoreSchemaHandler
+        cls: SupportsGetValidators, source_type: Any, handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
-        return get_pydantic_core_schema(cls, handler(str))
+        validatable_type = get_args(source_type.__orig_bases__[0])[0]
+        return get_pydantic_core_schema(cls, handler(validatable_type))
+
+
+class _CoreSchemaGettableV1(Generic[T]):
+    @classmethod
+    def __get_pydantic_core_schema__(cls, source_type: Any, handler) -> None:
+        ...
