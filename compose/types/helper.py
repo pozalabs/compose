@@ -69,7 +69,7 @@ class CoreSchemaGettable(Generic[T]):
         return get_pydantic_core_schema(cls, handler(validatable_type))
 
 
-class _CoreSchemaGettableV1(Generic[T]):
+class _DummyCoreSchemaGettable(Generic[T]):
     @classmethod
     def __get_pydantic_core_schema__(cls, source_type: Any, handler) -> None:
         ...

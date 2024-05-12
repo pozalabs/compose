@@ -19,4 +19,6 @@ if compat.IS_PYDANTIC_V2:
         ["SupportsGetValidators", "get_pydantic_core_schema", "chain", "CoreSchemaGettable"]
     )
 else:
+    from .helper import _DummyCoreSchemaGettable as CoreSchemaGettable  # noqa: F401
+
     __all__.append("CoreSchemaGettable")
