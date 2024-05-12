@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Generic, Protocol, TypeVar, get_args
 
 from compose import compat
 
-if compat.IS_PYDANTIC_V2 and TYPE_CHECKING:
+if compat.IS_PYDANTIC_V2 or TYPE_CHECKING:
     from pydantic import GetCoreSchemaHandler
     from pydantic_core import core_schema
 
