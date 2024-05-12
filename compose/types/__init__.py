@@ -8,6 +8,17 @@ __all__ = [
 ]
 
 if compat.IS_PYDANTIC_V2:
-    from .helper import SupportsGetValidators, chain, get_pydantic_core_schema  # noqa: F401
+    from .helper import (  # noqa: F401
+        CoreSchemaGettable,
+        SupportsGetValidators,
+        chain,
+        get_pydantic_core_schema,
+    )
 
-    __all__.extend(["SupportsGetValidators", "get_pydantic_core_schema", "chain"])
+    __all__.extend(
+        ["SupportsGetValidators", "get_pydantic_core_schema", "chain", "CoreSchemaGettable"]
+    )
+else:
+    from .helper_compat import _DummyCoreSchemaGettable as CoreSchemaGettable  # noqa: F401
+
+    __all__.append("CoreSchemaGettable")

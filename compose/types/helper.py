@@ -1,8 +1,11 @@
 import copy
 from collections.abc import Callable, Generator
-from typing import Any, Protocol
+from typing import Any, Generic, Protocol, TypeVar, get_args
 
+from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
+
+T = TypeVar("T")
 
 
 class SupportsGetValidators(Protocol):
@@ -44,3 +47,23 @@ def chain(*validators: Callable[[Any], Any]) -> Callable[[Any], Any]:
         return result
 
     return apply_chain
+
+
+class CoreSchemaGettable(Generic[T]):
+    """Pydantic v1 커스텀 타입을 v2 커스텁 타입으로 변환하는 믹스인
+
+    ```python
+    class CustomType(str, compose.types.CoreSchemaGettable[str]):
+        @classmethod
+        def __get_validators__(cls):
+            yield str_validator
+    ```
+
+    """
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls: SupportsGetValidators, source_type: Any, handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        validatable_type = get_args(source_type.__orig_bases__[1])[0]
+        return get_pydantic_core_schema(cls, handler(validatable_type))
