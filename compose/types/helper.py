@@ -2,11 +2,8 @@ import copy
 from collections.abc import Callable, Generator
 from typing import Any, Generic, Protocol, TypeVar, get_args
 
-from compose import compat
-
-if compat.IS_PYDANTIC_V2:
-    from pydantic import GetCoreSchemaHandler
-    from pydantic_core import core_schema
+from pydantic import GetCoreSchemaHandler
+from pydantic_core import core_schema
 
 T = TypeVar("T")
 
@@ -70,9 +67,3 @@ class CoreSchemaGettable(Generic[T]):
     ) -> core_schema.CoreSchema:
         validatable_type = get_args(source_type.__orig_bases__[1])[0]
         return get_pydantic_core_schema(cls, handler(validatable_type))
-
-
-class _DummyCoreSchemaGettable(Generic[T]):
-    @classmethod
-    def __get_pydantic_core_schema__(cls, source_type: Any, handler) -> None:
-        ...
