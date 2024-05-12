@@ -1,24 +1,17 @@
 from .. import compat
 from .datetime import DateTime
+from .helper import CoreSchemaGettable, SupportsGetValidators, chain
 from .object_id import PyObjectId
 
 __all__ = [
     "PyObjectId",
     "DateTime",
+    "SupportsGetValidators",
+    "chain",
+    "CoreSchemaGettable",
 ]
 
 if compat.IS_PYDANTIC_V2:
-    from .helper import (  # noqa: F401
-        CoreSchemaGettable,
-        SupportsGetValidators,
-        chain,
-        get_pydantic_core_schema,
-    )
+    from .helper import get_pydantic_core_schema  # noqa: F401
 
-    __all__.extend(
-        ["SupportsGetValidators", "get_pydantic_core_schema", "chain", "CoreSchemaGettable"]
-    )
-else:
-    from .helper_compat import _DummyCoreSchemaGettable as CoreSchemaGettable  # noqa: F401
-
-    __all__.append("CoreSchemaGettable")
+    __all__.extend(["get_pydantic_core_schema"])
