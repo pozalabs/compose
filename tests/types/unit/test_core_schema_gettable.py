@@ -9,7 +9,7 @@ else:
     from pydantic.v1.validators import str_validator
 
 
-class StrippedStr(str, compose.types.CoreSchemaGettable):
+class LowerStr(str, compose.types.CoreSchemaGettable[str]):
     @classmethod
     def __get_validators__(cls):
         yield str_validator
@@ -17,10 +17,15 @@ class StrippedStr(str, compose.types.CoreSchemaGettable):
 
     @classmethod
     def validate(cls, v: str) -> str:
-        return v.strip()
+        return v.lower()
 
 
-def test_get_pydantic_core_schema():
-    validated_type = TypeAdapter(StrippedStr).validate_python(" test ")
-
-    assert validated_type == StrippedStr("test")
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        ("TEST", LowerStr("test")),
+        ("Test", LowerStr("test")),
+    ],
+)
+def test_get_pydantic_core_schema(value: str, expected: LowerStr):
+    assert TypeAdapter(LowerStr).validate_python(value) == expected
