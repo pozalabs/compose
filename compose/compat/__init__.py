@@ -6,8 +6,10 @@ from .model import (
     model_validate_json,
     validate_obj,
 )
+from .utils import IS_PYDANTIC_V2
 
 __all__ = [
+    "IS_PYDANTIC_V2",
     "validate_obj",
     "model_schema",
     "model_validate",
