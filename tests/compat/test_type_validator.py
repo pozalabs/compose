@@ -2,9 +2,13 @@ from collections.abc import Callable, Generator
 from typing import Any, Self
 
 import pytest
-from pydantic import TypeAdapter, parse_obj_as
 
 import compose
+
+if compose.compat.IS_PYDANTIC_V2:
+    from pydantic import TypeAdapter
+else:
+    from pydantic import parse_obj_as
 
 
 class SomeStr(str, compose.types.CoreSchemaGettable[str]):
