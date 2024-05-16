@@ -8,6 +8,12 @@ from .model import (
 )
 from .utils import IS_PYDANTIC_V2
 
+if IS_PYDANTIC_V2:
+    from pydantic.v1.validators import *  # noqa: F401, F403
+else:
+    from pydantic.validators import *  # noqa: F401, F403
+
+
 __all__ = [
     "IS_PYDANTIC_V2",
     "validate_obj",
