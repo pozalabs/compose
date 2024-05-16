@@ -7,7 +7,7 @@ import compose
 
 
 class CustomType(compose.types.Str):
-    pass
+    ...
 
 
 @pytest.mark.skipif(not compose.compat.IS_PYDANTIC_V2, reason="pydantic v2 only")
