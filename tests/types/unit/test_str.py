@@ -24,7 +24,7 @@ def test_str_invalid():
 @pytest.mark.skipif(compose.compat.IS_PYDANTIC_V2, reason="pydantic v1 only")
 @pytest.mark.parametrize(
     "value",
-    [("test"), (123)],
+    ["test", 123],
     ids=(
         "값이 상속하는 타입과 동일한 타입인 경우 유효한 값이다.",
         "v1에서는 값이 상속하는 타입과 다른 타입이더라도 타입 캐스팅이 가능한 타입이면 유효한 값이다.",
