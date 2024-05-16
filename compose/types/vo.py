@@ -1,8 +1,9 @@
 from collections.abc import Callable, Generator
 from typing import Any, Self, TypeVar
 
-from . import CoreSchemaGettable
 from compose import compat
+
+from . import CoreSchemaGettable
 
 T = TypeVar("T")
 
