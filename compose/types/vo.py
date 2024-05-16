@@ -20,3 +20,10 @@ class Str(str, CoreSchemaGettable[str]):
     def __get_validators__(cls) -> Generator[[Callable[[Any], Self]], None, None]:
         yield compat.str_validator
         yield caster(cls)
+
+
+class Int(int, CoreSchemaGettable[int]):
+    @classmethod
+    def __get_validators__(cls) -> Generator[[Callable[[Any], Self]], None, None]:
+        yield compat.int_validator
+        yield caster(cls)
