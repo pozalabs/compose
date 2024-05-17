@@ -36,6 +36,13 @@ class Float(float, CoreSchemaGettable[float]):
         yield caster(cls)
 
 
+class StrList(list[str], CoreSchemaGettable[list[str]]):
+    @classmethod
+    def __get_validators__(cls) -> Generator[[Callable[[Any], Self]], None, None]:
+        yield compat.list_validator
+        yield caster(cls)
+
+
 class IntList(list[int], CoreSchemaGettable[list[int]]):
     @classmethod
     def __get_validators__(cls) -> Generator[[Callable[[Any], Self]], None, None]:

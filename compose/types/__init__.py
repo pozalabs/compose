@@ -2,7 +2,7 @@ from .. import compat
 from .datetime import DateTime
 from .helper import CoreSchemaGettable, SupportsGetValidators, chain
 from .object_id import PyObjectId
-from .vo import Float, Int, IntList, Str
+from .vo import Float, Int, IntList, Str, StrList
 
 __all__ = [
     "PyObjectId",
@@ -14,6 +14,7 @@ __all__ = [
     "Int",
     "Str",
     "IntList",
+    "StrList",
 ]
 
 if compat.IS_PYDANTIC_V2:
