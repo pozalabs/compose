@@ -37,7 +37,7 @@ class Float(float, CoreSchemaGettable[float]):
         yield caster(cls)
 
 
-def _create_list_type(t: T, /) -> type[list[T]]:
+def _create_list_type(t: type[T], /) -> type[list[T]]:
     def __get_validators__(c) -> typing.ValidatorGenerator:
         yield compat.list_validator
         yield caster(c)
@@ -56,10 +56,10 @@ def _create_list_type(t: T, /) -> type[list[T]]:
     )
 
 
-def create_list_type() -> Callable[[[T]], type[list[T]]]:
+def create_list_type() -> Callable[[type[T]], type[list[T]]]:
     cache = {}
 
-    def factory(t: T) -> type[list[T]]:
+    def factory(t: type[T]) -> type[list[T]]:
         type_name = t.__name__
 
         if (cached := cache.get(type_name)) is not None:
