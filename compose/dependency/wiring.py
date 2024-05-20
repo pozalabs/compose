@@ -200,7 +200,11 @@ def create_lazy_resolver(container_path: str) -> Callable[[str], Any]:
         if (container_cls := getattr(container, container_name, None)) is None:
             raise ValueError(f"Cannot find container {container_name} in {module_path}")
 
-        return resolve_by_object_name(name=object_name, container=container_cls)
+        return resolve_by_object_name(
+            name=object_name,
+            container=container_cls,
+            provider_types=DEFAULT_RESOLVABLE_PROVIDER_TYPES,
+        )
 
     return resolver
 
