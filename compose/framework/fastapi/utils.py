@@ -7,7 +7,9 @@ import sentry_sdk
 from fastapi import Request, Response
 from sentry_sdk.integrations import Integration
 
-from compose import BaseModel, fastapi
+from compose import BaseModel
+
+from .exception_handler import ExceptionHandler
 
 
 class Level(enum.StrEnum):
@@ -74,7 +76,7 @@ def init_sentry(
         scope.set_tag(key, value)
 
 
-def capture_error(handler: fastapi.ExceptionHandler) -> fastapi.ExceptionHandler:
+def capture_error(handler: ExceptionHandler) -> ExceptionHandler:
     @functools.wraps(handler)
     async def wrapper(request: Request, exc: Exception) -> Response | Awaitable[Response]:
         sentry_sdk.capture_exception(exc)
