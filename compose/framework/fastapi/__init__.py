@@ -13,6 +13,12 @@ from .openapi import openapi_tags
 from .param import to_query
 from .response import NoContentResponse, ZipStreamingResponse
 from .security import APIKeyAuth, HTTPBasicAuth
+from .utils import (
+    ErrorEvent,
+    Level,
+    create_before_send_hook,
+    init_sentry,
+)
 
 __all__ = [
     "ExceptionHandler",
@@ -25,4 +31,8 @@ __all__ = [
     "openapi_tags",
     "NoContentResponse",
     "ZipStreamingResponse",
+    "ErrorEvent",
+    "Level",
+    "create_before_send_hook",
+    "init_sentry",
 ]
