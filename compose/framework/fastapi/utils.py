@@ -7,7 +7,7 @@ import sentry_sdk
 from fastapi import Request, Response
 from sentry_sdk.integrations import Integration
 
-from compose import BaseModel
+from compose import container
 
 from .exception_handler import ExceptionHandler
 
@@ -18,7 +18,7 @@ class Level(enum.StrEnum):
     ERROR = enum.auto()
 
 
-class ErrorEvent(BaseModel):
+class ErrorEvent(container.BaseModel):
     level: Level
 
     @classmethod
