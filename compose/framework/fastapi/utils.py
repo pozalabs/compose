@@ -1,7 +1,7 @@
 import enum
 import functools
-from collections.abc import Awaitable
-from typing import Any, Callable, Self, TypeAlias
+from collections.abc import Awaitable, Callable
+from typing import Any, Self, TypeAlias
 
 import sentry_sdk
 from fastapi import Request, Response
