@@ -87,10 +87,21 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
                 raise ValueError(error_message.format(name))
 
     @classmethod
-    def create(cls, database: Database, **kwargs) -> MongoRepository:
-        collection = database.get_collection(cls.__collection_name__, **kwargs)
+    def setup_indexes(cls, collection: Collection) -> None:
+        previous_index_names = {index["name"] for index in collection.list_indexes()}
+        current_indexes = cls.__indexes__ or []
+        current_index_names = {index.document["name"] for index in current_indexes + ["_id_"]}
+
+        for index_name in previous_index_names - current_index_names:
+            collection.drop_index(index_name)
+
         if cls.__indexes__ is not None:
             collection.create_indexes(cls.__indexes__)
+
+    @classmethod
+    def create(cls, database: Database, **kwargs) -> MongoRepository:
+        collection = database.get_collection(cls.__collection_name__, **kwargs)
+        cls.setup_indexes(collection)
 
         return cls(collection=collection)
 
