@@ -88,11 +88,11 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
 
     @classmethod
     def setup_indexes(cls, collection: Collection) -> None:
-        previous_index_names = [index["name"] for index in collection.list_indexes()]
+        previous_index_names = {index["name"] for index in collection.list_indexes()}
         current_indexes = cls.__indexes__ or []
-        current_index_names = [index.document["name"] for index in current_indexes] + ["_id_"]
+        current_index_names = {index.document["name"] for index in current_indexes + ["_id_"]}
 
-        for index_name in set(previous_index_names) - set(current_index_names):
+        for index_name in previous_index_names - current_index_names:
             collection.drop_index(index_name)
 
         if cls.__indexes__ is not None:
