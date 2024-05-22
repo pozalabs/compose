@@ -3,13 +3,17 @@ import functools
 from collections.abc import Awaitable, Callable
 from typing import Any, Self, TypeAlias
 
-import sentry_sdk
 from fastapi import Request, Response
-from sentry_sdk.integrations import Integration
 
 from compose import container
 
 from .exception_handler import ExceptionHandler
+
+try:
+    import sentry_sdk
+    from sentry_sdk.integrations import Integration
+except ImportError:
+    raise ImportError("Install `sentry-sdk` to use sentry helpers")
 
 
 class Level(enum.StrEnum):
