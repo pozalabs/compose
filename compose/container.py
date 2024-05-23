@@ -72,6 +72,10 @@ class BaseModel(PydanticBaseModel):
 
     else:
 
+        @classmethod
+        def model_validate(cls, obj: Any, **kwargs: Any) -> Self:
+            return cls.parse_obj(obj)
+
         def copy(
             self,
             *,
