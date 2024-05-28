@@ -18,6 +18,7 @@ from ..query.mongo import MongoFilterQuery, MongoQuery
 from . import base
 
 EntityType = TypeVar("EntityType", bound=Entity)
+registry: dict[str, list[pymongo.IndexModel] | None] = {}
 
 
 class SessionRequirement(str, enum.Enum):
@@ -60,6 +61,7 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         cls._validate_session_requirement(
             kwargs.get("session_requirement", SessionRequirement.OPTIONAL)
         )
+        registry[cls.__collection_name__] = cls.__indexes__
 
     @classmethod
     def _validate_session_requirement(cls, requirement: SessionRequirement) -> None:
@@ -87,21 +89,8 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
                 raise ValueError(error_message.format(name))
 
     @classmethod
-    def setup_indexes(cls, collection: Collection) -> None:
-        previous_index_names = {index["name"] for index in collection.list_indexes()}
-        current_indexes = cls.__indexes__ or []
-        current_index_names = {*(index.document["name"] for index in current_indexes), "_id_"}
-
-        for index_name in previous_index_names - current_index_names:
-            collection.drop_index(index_name)
-
-        if cls.__indexes__ is not None:
-            collection.create_indexes(cls.__indexes__)
-
-    @classmethod
     def create(cls, database: Database, **kwargs) -> MongoRepository:
         collection = database.get_collection(cls.__collection_name__, **kwargs)
-        cls.setup_indexes(collection)
 
         return cls(collection=collection)
 
@@ -214,3 +203,22 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
             page=qry.page,
             per_page=qry.per_page,
         )
+
+
+def setup_indexes(mongo_uri: str, db_name: str) -> None:
+    with pymongo.MongoClient(mongo_uri) as client:
+        for collection_name, indexes in registry.items():
+            if not collection_name:
+                continue
+            database = client.get_database(db_name)
+            collection = database.get_collection(collection_name)
+
+            previous_index_names = {index["name"] for index in collection.list_indexes()}
+            current_indexes = indexes or []
+            current_index_names = {*(index.document["name"] for index in current_indexes), "_id_"}
+
+            for index_name in previous_index_names - current_index_names:
+                collection.drop_index(index_name)
+
+            if indexes is not None:
+                collection.create_indexes(indexes)
