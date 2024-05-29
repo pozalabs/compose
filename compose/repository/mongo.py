@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import enum
 import inspect
+from collections.abc import Iterable
 from typing import Any, ClassVar, Generic, TypeVar, get_args, get_type_hints
 
 import pendulum
@@ -205,20 +206,26 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         )
 
 
-def setup_indexes(mongo_uri: str, db_name: str) -> None:
+def setup_indexes(mongo_uri: str, db_names: Iterable[str]) -> None:
+    # 동일한 이름의 컬렉션이 여러 DB에 존재할 경우, 컬렉션별로 인덱스를 생성할 수 없음
     with pymongo.MongoClient(mongo_uri) as client:
-        for collection_name, indexes in registry.items():
-            if not collection_name:
-                continue
+        for db_name in db_names:
             database = client.get_database(db_name)
-            collection = database.get_collection(collection_name)
+            collection_names = database.list_collection_names()
+            for collection_name, indexes in registry.items():
+                if not collection_name or collection_name not in collection_names:
+                    continue
+                collection = database.get_collection(collection_name)
 
-            previous_index_names = {index["name"] for index in collection.list_indexes()}
-            current_indexes = indexes or []
-            current_index_names = {*(index.document["name"] for index in current_indexes), "_id_"}
+                previous_index_names = {index["name"] for index in collection.list_indexes()}
+                current_indexes = indexes or []
+                current_index_names = {
+                    *(index.document["name"] for index in current_indexes),
+                    "_id_",
+                }
 
-            for index_name in previous_index_names - current_index_names:
-                collection.drop_index(index_name)
+                for index_name in previous_index_names - current_index_names:
+                    collection.drop_index(index_name)
 
-            if indexes is not None:
-                collection.create_indexes(indexes)
+                if indexes is not None:
+                    collection.create_indexes(indexes)
