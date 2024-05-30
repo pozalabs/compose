@@ -94,6 +94,11 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
     @classmethod
     def create(cls, database: Database, **kwargs) -> MongoRepository:
         collection = database.get_collection(cls.__collection_name__, **kwargs)
+        if (
+            cls.__collection_name__ not in database.list_collection_names()
+            and cls.__indexes__ is not None
+        ):
+            collection.create_indexes(cls.__indexes__)
 
         return cls(collection=collection)
 
