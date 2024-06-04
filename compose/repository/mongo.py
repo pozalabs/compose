@@ -19,7 +19,7 @@ from ..query.mongo import MongoFilterQuery, MongoQuery
 from . import base
 
 EntityType = TypeVar("EntityType", bound=Entity)
-registry: dict[str, list[pymongo.IndexModel] | None] = {}
+registry: dict[str, list[pymongo.IndexModel]] = {}
 
 
 class SessionRequirement(str, enum.Enum):
