@@ -62,14 +62,12 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         cls._validate_session_requirement(
             kwargs.get("session_requirement", SessionRequirement.OPTIONAL)
         )
+        indexes = cls.__indexes__ or []
         if cls.__collection_name__ not in registry:
-            registry[cls.__collection_name__] = (
-                cls.__indexes__ if cls.__indexes__ is not None else []
-            )
+            registry[cls.__collection_name__] = indexes
             return
 
         index_documents = [idx.document for idx in registry[cls.__collection_name__]]
-        indexes = cls.__indexes__ or []
         registry[cls.__collection_name__].extend(
             [idx for idx in indexes if idx.document not in index_documents]
         )
