@@ -19,7 +19,7 @@ from ..query.mongo import MongoFilterQuery, MongoQuery
 from . import base
 
 EntityType = TypeVar("EntityType", bound=Entity)
-registry: dict[str, list[pymongo.IndexModel] | None] = {}
+registry: dict[str, list[pymongo.IndexModel]] = {}
 
 
 class SessionRequirement(str, enum.Enum):
@@ -62,9 +62,15 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         cls._validate_session_requirement(
             kwargs.get("session_requirement", SessionRequirement.OPTIONAL)
         )
-        if cls.__collection_name__ in registry:
-            raise ValueError(f"Collection name {cls.__collection_name__} is already in use")
-        registry[cls.__collection_name__] = cls.__indexes__
+        indexes = cls.__indexes__ or []
+        if cls.__collection_name__ not in registry:
+            registry[cls.__collection_name__] = indexes
+            return
+
+        index_documents = [idx.document for idx in registry[cls.__collection_name__]]
+        registry[cls.__collection_name__].extend(
+            [idx for idx in indexes if idx.document not in index_documents]
+        )
 
     @classmethod
     def _validate_session_requirement(cls, requirement: SessionRequirement) -> None:
@@ -225,14 +231,13 @@ def setup_indexes(mongo_uri: str, db_names: Iterable[str]) -> None:
                 collection = database.get_collection(collection_name)
 
                 previous_index_names = {index["name"] for index in collection.list_indexes()}
-                current_indexes = indexes or []
                 current_index_names = {
-                    *(index.document["name"] for index in current_indexes),
+                    *(index.document["name"] for index in indexes),
                     "_id_",
                 }
 
                 for index_name in previous_index_names - current_index_names:
                     collection.drop_index(index_name)
 
-                if indexes is not None:
+                if indexes:
                     collection.create_indexes(indexes)
