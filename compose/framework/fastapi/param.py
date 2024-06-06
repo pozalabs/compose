@@ -1,6 +1,6 @@
-import json
 from typing import Any, TypeVar, get_args
 
+import pydantic_core
 from fastapi import Query
 from pydantic import BaseModel, Field, Json, create_model
 
@@ -16,10 +16,7 @@ def dict_to_json(v: dict[str, Any] | None) -> str | None:
     if v is None:
         return v
 
-    try:
-        return json.dumps(v)
-    except Exception as exc:
-        raise ValueError(f"Invalid json: {exc}")
+    return pydantic_core.to_json(v).decode()
 
 
 if compat.IS_PYDANTIC_V2:

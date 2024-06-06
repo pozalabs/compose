@@ -1,5 +1,4 @@
 import http
-import json
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
@@ -33,7 +32,7 @@ def test_to_query():
         url="/items",
         params={
             "type": ["foo", "bar"],
-            "filter": json.dumps({"foo": "bar"}),
+            "filter": '{"foo": "bar"}',
             "page": 2,
             "per_page": 20,
         },
