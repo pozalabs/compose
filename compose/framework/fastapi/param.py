@@ -1,12 +1,12 @@
 from typing import Any, TypeVar, get_args
 
-import pydantic_core
 from fastapi import Query
 from pydantic import BaseModel, Field, Json, create_model
 
 from compose import compat
 
 if compat.IS_PYDANTIC_V2:
+    import pydantic_core
     from pydantic import field_validator
 
 Q = TypeVar("Q", bound=BaseModel)
