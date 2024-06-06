@@ -12,7 +12,7 @@ if compat.IS_PYDANTIC_V2:
 Q = TypeVar("Q", bound=BaseModel)
 
 
-def dict_to_json(cls_: type[Q], v: dict[str, Any] | None) -> str | None:
+def dict_to_json(v: dict[str, Any] | None) -> str | None:
     if v is None:
         return v
 
@@ -61,7 +61,6 @@ def to_query(q: type[Q], /) -> type[Q]:
                 )
                 for validator in TYPE_VALIDATORS.get(arg, [])
             }
-            print(validators)
 
         return create_model(
             f"{q.__name__}Query",
