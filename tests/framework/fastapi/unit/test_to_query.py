@@ -1,6 +1,7 @@
 import http
-from typing import Annotated
+from typing import Annotated, Any
 
+import pytest
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 from pydantic import Field, Json
@@ -27,23 +28,50 @@ def get(q: Annotated[ListItems, Depends(to_query(ListItems))]):
 client = TestClient(app)
 
 
-def test_to_query():
+@pytest.mark.parametrize(
+    "params, expected_status_code, expected_response",
+    [
+        pytest.param(
+            {
+                "type": ["foo", "bar"],
+                "page": 1,
+                "per_page": 10,
+            },
+            http.HTTPStatus.OK,
+            {
+                "types": ["foo", "bar"],
+                "filter": None,
+                "page": 1,
+                "per_page": 10,
+            },
+        ),
+        pytest.param(
+            {
+                "type": ["foo", "bar"],
+                "filter": '{"foo": "bar"}',
+                "page": 1,
+                "per_page": 10,
+            },
+            http.HTTPStatus.OK,
+            {
+                "types": ["foo", "bar"],
+                "filter": {"foo": "bar"},
+                "page": 1,
+                "per_page": 10,
+            },
+            marks=pytest.mark.skipif(not compat.IS_PYDANTIC_V2, reason="pydantic v2 only"),
+        ),
+    ],
+)
+def test_to_query(
+    params: dict[str, Any],
+    expected_status_code: int,
+    expected_response: dict[str, Any],
+):
     response = client.get(
         url="/items",
-        params={
-            "type": ["foo", "bar"],
-            "filter": '{"foo": "bar"}',
-            "page": 2,
-            "per_page": 20,
-        },
+        params=params,
     )
-
-    expected_response = {
-        "types": ["foo", "bar"],
-        "filter": {"foo": "bar"},
-        "page": 2,
-        "per_page": 20,
-    }
 
     assert response.status_code == http.HTTPStatus.OK
     assert response.json() == expected_response
