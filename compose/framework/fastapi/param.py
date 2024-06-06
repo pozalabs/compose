@@ -2,7 +2,6 @@ import json
 from typing import Any, TypeVar, get_args
 
 from fastapi import Query
-from fastapi._compat import field_annotation_is_scalar
 from pydantic import BaseModel, Field, Json, create_model
 
 from compose import compat
@@ -75,11 +74,7 @@ def to_query(q: type[Q], /) -> type[Q]:
         field_definitions = {
             field_name: (
                 field.outer_type_,
-                (
-                    field.field_info
-                    if field_annotation_is_scalar(field.outer_type_)
-                    else Field(Query(**{arg: getattr(field, arg, None) for arg in field_args}))
-                ),
+                Field(Query(**{arg: getattr(field, arg, None) for arg in field_args})),
             )
             for field_name, field in q.__fields__.items()
         }
