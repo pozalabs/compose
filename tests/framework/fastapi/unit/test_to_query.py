@@ -1,9 +1,10 @@
 import http
+import json
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
-from pydantic import Field
+from pydantic import Field, Json
 
 import compose
 from compose import compat
@@ -14,6 +15,7 @@ app = FastAPI()
 
 class ListItems(compose.query.Query):
     types: list[str] | None = Field(None, alias="type")
+    filter: Json | None = None
     page: int = 1
     per_page: int = 10
 
@@ -27,10 +29,19 @@ client = TestClient(app)
 
 
 def test_to_query():
-    response = client.get("/items?type=foo&type=bar&page=2&per_page=20")
+    response = client.get(
+        url="/items",
+        params={
+            "type": ["foo", "bar"],
+            "filter": json.dumps({"foo": "bar"}),
+            "page": 2,
+            "per_page": 20,
+        },
+    )
 
     expected_response = {
         "types": ["foo", "bar"],
+        "filter": {"foo": "bar"},
         "page": 2,
         "per_page": 20,
     }
