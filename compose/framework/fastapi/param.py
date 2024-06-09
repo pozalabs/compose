@@ -1,6 +1,6 @@
-from typing import Any, TypeVar, get_args
+from typing import Annotated, Any, TypeVar, get_args
 
-from fastapi import Query
+from fastapi import Depends, Query
 from pydantic import BaseModel, Field, Json, create_model
 
 from compose import compat
@@ -84,3 +84,7 @@ def to_query(q: type[Q], /) -> type[Q]:
             **field_definitions,
             __base__=Child,
         )
+
+
+def as_query(q: type[Q], /) -> type[Q]:
+    return Annotated[q, Depends(to_query(q))]
