@@ -10,7 +10,7 @@ from .exception_handler import (
     create_exception_handler,
 )
 from .openapi import openapi_tags
-from .param import to_query
+from .param import as_query, to_query
 from .response import NoContentResponse, ZipStreamingResponse
 from .security import APIKeyAuth, HTTPBasicAuth
 
@@ -19,6 +19,7 @@ __all__ = [
     "ExceptionHandlerInfo",
     "create_exception_handler",
     "to_query",
+    "as_query",
     "health_check",
     "HTTPBasicAuth",
     "APIKeyAuth",
