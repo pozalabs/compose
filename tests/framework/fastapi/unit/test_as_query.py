@@ -1,14 +1,12 @@
 import http
-from typing import Annotated, Any
+from typing import Any
 
 import pytest
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import Field, Json
 
 import compose
-from compose import compat
-from compose.framework.fastapi import to_query
 
 app = FastAPI()
 
@@ -21,8 +19,8 @@ class ListItems(compose.query.Query):
 
 
 @app.get("/items")
-def get(q: Annotated[ListItems, Depends(to_query(ListItems))]):
-    return compat.model_dump(q)
+def get(q: compose.fastapi.as_query(ListItems)):
+    return compose.compat.model_dump(q)
 
 
 client = TestClient(app)
@@ -59,11 +57,11 @@ client = TestClient(app)
                 "page": 1,
                 "per_page": 10,
             },
-            marks=pytest.mark.skipif(not compat.IS_PYDANTIC_V2, reason="pydantic v2 only"),
+            marks=pytest.mark.skipif(not compose.compat.IS_PYDANTIC_V2, reason="pydantic v2 only"),
         ),
     ],
 )
-def test_to_query(
+def test_as_query(
     params: dict[str, Any],
     expected_status_code: int,
     expected_response: dict[str, Any],
