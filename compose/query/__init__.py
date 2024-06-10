@@ -1,4 +1,4 @@
-from .base import Query
+from .base import OffsetPaginationQuery, Query
 from .mongo.query import MongoFilterQuery, MongoQuery
 
-__all__ = ["Query", "MongoQuery", "MongoFilterQuery"]
+__all__ = ["Query", "OffsetPaginationQuery", "MongoQuery", "MongoFilterQuery"]
