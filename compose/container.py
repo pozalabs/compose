@@ -37,7 +37,6 @@ class BaseModel(PydanticBaseModel):
             round_trip: bool = False,
             warnings: bool = True,
         ) -> str:
-            self.model_dump()
             return self.model_dump_json(
                 indent=indent,
                 include=include,
