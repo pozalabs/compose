@@ -25,6 +25,32 @@ Model = TypeVar("Model", bound=PydanticBaseModel)
 class BaseModel(PydanticBaseModel):
     if compat.IS_PYDANTIC_V2:
 
+        def json(
+            self,
+            indent: int | None = None,
+            include: IncEx = None,
+            exclude: IncEx = None,
+            by_alias: bool = False,
+            exclude_unset: bool = False,
+            exclude_defaults: bool = False,
+            exclude_none: bool = False,
+            round_trip: bool = False,
+            warnings: bool = True,
+        ) -> str:
+            self.model_dump()
+            return self.model_dump_json(
+                indent=indent,
+                include=include,
+                exclude=exclude,
+                by_alias=by_alias,
+                exclude_unset=exclude_unset,
+                exclude_defaults=exclude_defaults,
+                exclude_none=exclude_none,
+                round_trip=round_trip,
+                warnings=warnings,
+                serialize_as_any=True,
+            )
+
         def copy(
             self,
             *,
