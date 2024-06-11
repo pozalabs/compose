@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           setup-command: |
-            poetry install --all-extras --without pydantic-settings --no-interaction
+            poetry install --extras "fastapi" --no-interaction
 
       - name: Install pydantic ${{ matrix.pydantic-version }}
         run: poetry add pydantic@${{ matrix.pydantic-version }}
