@@ -1410,7 +1410,7 @@ typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 name = "pydantic-settings"
 version = "2.3.1"
 description = "Settings management using Pydantic"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "pydantic_settings-2.3.1-py3-none-any.whl", hash = "sha256:acb2c213140dfff9669f4fe9f8180d43914f51626db28ab2db7308a576cce51a"},
@@ -2121,9 +2121,10 @@ aws = ["boto3"]
 fastapi = ["fastapi"]
 logging = ["loguru"]
 orjson = ["orjson"]
+pydantic-settings = ["pydantic-settings"]
 sentry = ["sentry-sdk"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<4.0"
-content-hash = "ea51c1a9381c52f5f6c33a1c73eede04523e902f33ec8fa431fc6d8492682fcc"
+content-hash = "0845f45d5a1be679ecf3deb23a756bdcf67188002238adf35741a66e66f0beb0"
