@@ -1407,25 +1407,6 @@ files = [
 typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
 [[package]]
-name = "pydantic-settings"
-version = "2.3.1"
-description = "Settings management using Pydantic"
-optional = true
-python-versions = ">=3.8"
-files = [
-    {file = "pydantic_settings-2.3.1-py3-none-any.whl", hash = "sha256:acb2c213140dfff9669f4fe9f8180d43914f51626db28ab2db7308a576cce51a"},
-    {file = "pydantic_settings-2.3.1.tar.gz", hash = "sha256:e34bbd649803a6bb3e2f0f58fb0edff1f0c7f556849fda106cc21bcce12c30ab"},
-]
-
-[package.dependencies]
-pydantic = ">=2.7.0"
-python-dotenv = ">=0.21.0"
-
-[package.extras]
-toml = ["tomli (>=2.0.1)"]
-yaml = ["pyyaml (>=6.0.1)"]
-
-[[package]]
 name = "pymongo"
 version = "4.7.2"
 description = "Python driver for MongoDB <http://www.mongodb.org>"
@@ -2127,4 +2108,4 @@ sentry = ["sentry-sdk"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<4.0"
-content-hash = "0845f45d5a1be679ecf3deb23a756bdcf67188002238adf35741a66e66f0beb0"
+content-hash = "7db20c45b13dfb3deaef0f64352548560dda0754cd116992883adbd227d62976"
