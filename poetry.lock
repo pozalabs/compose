@@ -2102,10 +2102,9 @@ aws = ["boto3"]
 fastapi = ["fastapi"]
 logging = ["loguru"]
 orjson = ["orjson"]
-pydantic-settings = ["pydantic-settings"]
 sentry = ["sentry-sdk"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<4.0"
-content-hash = "7db20c45b13dfb3deaef0f64352548560dda0754cd116992883adbd227d62976"
+content-hash = "6cc61d623b98a416ff4dea49c15d9920b13c6da87f4a66e042a05ad05c71648a"
