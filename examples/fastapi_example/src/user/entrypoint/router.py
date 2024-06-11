@@ -1,3 +1,3 @@
-from fastapi import APIRouter
+import compose
 
-router = APIRouter()
+router = compose.fastapi.APIRouter()

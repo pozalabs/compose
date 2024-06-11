@@ -20,7 +20,7 @@ http_basic_auth = compose.fastapi.HTTPBasicAuth(
 
 def create_app() -> FastAPI:
     _app = FastAPI(
-        openapi_tags=compose.fastapi.openapi_tags(constants.OpenAPITag),
+        openapi_tags=compose.fastapi.openapi_tags(constants.OpenApiTag),
     )
     inject_dependencies(_app)
     add_middlewares(_app)
