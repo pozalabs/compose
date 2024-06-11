@@ -1,12 +1,11 @@
-from pydantic.v1 import BaseSettings, Extra
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 import compose
 from src import APP_ENV
 
 
 class Settings(BaseSettings):
-    class Config:
-        extra = Extra.ignore
+    model_config = SettingsConfigDict(extra="ignore")
 
     @property
     def serialize_log(self) -> bool:
