@@ -10,6 +10,13 @@ F = TypeVar("F", bound=Callable[..., Any])
 
 
 def auto_wired(provider: Provider) -> Callable[[F], F]:
+    """
+    FastAPI 엔드포인트에 의존성을 자동으로 주입하는 데코레이터. 해당 데코레이터는 `@inject` 데코레이터보다
+    먼저 적용되어야 합니다.
+
+    주의: `__signature__` 속성은 일반 함수에만 존재하므로 해당 데코레이터는 메서드에 사용할 수 없습니다.
+    """
+
     def wrapper(f: F) -> F:
         signature = inspect.signature(f)
 
