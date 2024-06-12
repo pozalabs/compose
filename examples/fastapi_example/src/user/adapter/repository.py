@@ -12,3 +12,6 @@ class UserRepository:
 
     def find_by_name(self, name: str) -> User | None:
         return next((user for user in self._data if user.name == name), None)
+
+    def all(self) -> list[User]:
+        return self._data
