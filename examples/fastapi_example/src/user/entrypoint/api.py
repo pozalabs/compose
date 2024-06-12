@@ -28,6 +28,20 @@ def retrieve_user(
     return schema.User.model_validate(user.encode())
 
 
+@router.get(
+    "/v1/users",
+    response_model=list[schema.User],
+    tags=[constants.OpenApiTag.USER],
+    summary="유저 목록 조회",
+)
+@inject
+@compose.fastapi.auto_wired(provide)
+def list_users(user_repository: UserRepository):
+    """`auto_wired` 데코레이터를 사용해 의존성 자동 주입"""
+
+    return [schema.User.model_validate(user.encode()) for user in user_repository.all()]
+
+
 @router.post(
     "/v1/users",
     response_model=schema.User,
