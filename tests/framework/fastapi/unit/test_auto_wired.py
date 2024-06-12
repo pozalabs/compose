@@ -55,6 +55,7 @@ def container():
     container.unwire()
 
 
+# NOTE: 라우터를 사용지 않고 `app.get`으로 엔드포인트를 바로 등록하면 의존성 주입이 되지 않음
 @pytest.fixture
 def app(container: ApplicationContainer) -> FastAPI:
     app = FastAPI()
