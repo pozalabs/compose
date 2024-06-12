@@ -1,5 +1,3 @@
-import functools
-
 from dependency_injector import containers, providers
 
 import compose
@@ -20,11 +18,12 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
 
 def test_with_container():
-    result = compose.result.to_result(
-        functools.partial(
-            MessageBus.with_container,
-            "tests.messaging.unit.test_messagebus_with_container:ApplicationContainer",
-        )
-    )
+    def init_messagebus() -> MessageBus | None:
+        try:
+            return MessageBus.with_container(
+                "tests.messaging.unit.test_messagebus_with_container:ApplicationContainer"
+            )
+        except ValueError:
+            return None
 
-    assert result.unwrap_or(None) is not None
+    assert init_messagebus() is not None
