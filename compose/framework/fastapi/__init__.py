@@ -14,6 +14,7 @@ from .param import as_query, to_query
 from .response import NoContentResponse, ZipStreamingResponse
 from .routing import APIRouter
 from .security import APIKeyAuth, HTTPBasicAuth
+from .wiring import auto_wired
 
 __all__ = [
     "ExceptionHandler",
@@ -28,6 +29,7 @@ __all__ = [
     "NoContentResponse",
     "ZipStreamingResponse",
     "APIRouter",
+    "auto_wired",
 ]
 
 
