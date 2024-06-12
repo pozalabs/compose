@@ -12,6 +12,7 @@ from .exception_handler import (
 from .openapi import openapi_tags
 from .param import as_query, to_query
 from .response import NoContentResponse, ZipStreamingResponse
+from .routing import APIRouter
 from .security import APIKeyAuth, HTTPBasicAuth
 
 __all__ = [
@@ -26,6 +27,7 @@ __all__ = [
     "openapi_tags",
     "NoContentResponse",
     "ZipStreamingResponse",
+    "APIRouter",
 ]
 
 
