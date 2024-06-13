@@ -6,6 +6,16 @@ import pytest
 from . import param
 
 
+class TestTypeMarker(enum.Enum):
+    UNIT = ("unit", "단위 테스트")
+    INTEGRATION = ("integration", "통합 테스트")
+    E2E = ("e2e", "E2E 테스트")
+
+    @classmethod
+    def names(cls) -> list[str]:
+        return [member.value[0] for member in cls]
+
+
 def create_enum_flag_property_test(
     e: type[enum.Enum],
     f: Callable[[enum.Enum], bool],
