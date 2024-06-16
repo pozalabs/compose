@@ -85,7 +85,12 @@ def default_record_patcher(_: dict[str, Any]) -> None:
 
 
 class LoguruInstrumentor(BaseInstrumentor):
-    """https://github.com/DataDog/dd-trace-py/blob/main/ddtrace/contrib/loguru/patch.py"""
+    """
+
+    Reference:
+        https://github.com/DataDog/dd-trace-py/tree/main/ddtrace/contrib/loguru
+        https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-logging
+    """
 
     def instrumentation_dependencies(self) -> Collection[str]:
         return _instruments
