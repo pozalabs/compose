@@ -1,14 +1,19 @@
+from __future__ import annotations
+
 from collections.abc import Callable, Collection
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import wrapt
-from loguru import Logger, logger
+from loguru import logger
 from opentelemetry import trace
 from opentelemetry.instrumentation.instrumentor import BaseInstrumentor
 from opentelemetry.instrumentation.utils import unwrap
 
 ORIGINAL_PATCHER_ATTR = "_otel_original_patcher"
 _instruments = tuple()
+
+if TYPE_CHECKING:
+    from loguru import Logger
 
 
 def trace_injector(
