@@ -1,5 +1,5 @@
 import logging
-from collections.abc import Iterator
+from collections.abc import Generator
 
 import pytest
 from _pytest.logging import LogCaptureFixture
@@ -11,7 +11,7 @@ import compose
 
 
 @pytest.fixture
-def caplog(caplog: LogCaptureFixture) -> Iterator[LogCaptureFixture]:
+def caplog(caplog: LogCaptureFixture) -> Generator[LogCaptureFixture, None, None]:
     """
 
     Reference:
