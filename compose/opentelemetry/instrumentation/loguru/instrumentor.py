@@ -26,7 +26,9 @@ def trace_injector(
 
         resource = getattr(tracer_provider, "resource", None)
         trace_record = {
-            "otel_service_name": resource and resource.attributes.get("service.name", ""),
+            "otel_service_name": (
+                resource.attributes.get("service.name", "") if resource is not None else ""
+            ),
             "otel_trace_id": (
                 trace.format_trace_id(ctx.trace_id)
                 if is_valid_span
