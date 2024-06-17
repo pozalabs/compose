@@ -1,5 +1,6 @@
 from . import _signal as signal
 from . import (
+    auth,
     command,
     compat,
     concurrent,
@@ -23,6 +24,7 @@ from . import (
 from .container import BaseModel, TimeStampedModel
 
 __all__ = [
+    "auth",
     "BaseModel",
     "TimeStampedModel",
     "entity",
