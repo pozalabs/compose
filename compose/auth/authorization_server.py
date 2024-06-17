@@ -25,7 +25,7 @@ class AuthorizationServer:
                 redirect_uri=redirect_uri,
                 code=code,
             )
-            return vo.AuthorizationGrant.model_validate(response)
+        return vo.AuthorizationGrant.model_validate(response)
 
     def renew_token(self, token: str) -> vo.AuthorizationGrant:
         with self.auth_client_factory() as client:
@@ -37,7 +37,7 @@ class AuthorizationServer:
                 client_secret=client.client_secret,
                 refresh_token=token,
             )
-            return vo.AuthorizationGrant.model_validate(response)
+        return vo.AuthorizationGrant.model_validate(response)
 
     def create_authorization_url(self, redirect_uri: str) -> str:
         raise NotImplementedError
