@@ -16,7 +16,7 @@ class AuthorizationServer:
 
     def grant_authorization(self, redirect_uri: str, code: str) -> vo.AuthorizationGrant:
         with self.auth_client_factory() as client:
-            res = client.fetch_token(
+            response = client.fetch_token(
                 url=f"{self.base_url}{self.token_path}",
                 headers=self.headers,
                 grant_type="authorization_code",
@@ -25,11 +25,11 @@ class AuthorizationServer:
                 redirect_uri=redirect_uri,
                 code=code,
             )
-            return vo.AuthorizationGrant.model_validate(res)
+            return vo.AuthorizationGrant.model_validate(response)
 
     def renew_token(self, token: str) -> vo.AuthorizationGrant:
         with self.auth_client_factory() as client:
-            res = client.fetch_token(
+            response = client.fetch_token(
                 url=self.token_path,
                 headers=self.headers,
                 grant_type="refresh_token",
@@ -37,7 +37,7 @@ class AuthorizationServer:
                 client_secret=client.client_secret,
                 refresh_token=token,
             )
-            return vo.AuthorizationGrant.model_validate(res)
+            return vo.AuthorizationGrant.model_validate(response)
 
     def create_authorization_url(self, redirect_uri: str) -> str:
         raise NotImplementedError
