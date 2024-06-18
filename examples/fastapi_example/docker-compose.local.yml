@@ -1,0 +1,16 @@
+services:
+  api:
+    container_name: compose-fastapi-example-api
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    platform: linux/amd64
+    image: compose-fastapi-example-api:latest
+    command: uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload --proxy-headers
+    environment:
+      - APP_ENV=local
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
