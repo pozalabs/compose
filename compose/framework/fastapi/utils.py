@@ -26,7 +26,7 @@ class ErrorEvent(container.BaseModel):
     level: Level
 
     @classmethod
-    def for_info(cls, level: Level) -> Self:
+    def for_info(cls) -> Self:
         return cls(level=Level.INFO)
 
     @classmethod
