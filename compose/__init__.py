@@ -70,3 +70,10 @@ try:
     __all__.append("fastapi")
 except ImportError:
     pass
+
+try:
+    from . import opentelemetry  # noqa: F401
+
+    __all__.append("opentelemetry")
+except ImportError:
+    pass
