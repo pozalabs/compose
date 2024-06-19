@@ -12,7 +12,7 @@ pendulum = "^3.0.0"
 pymongo = {extras = ["aws"], version = "^4.6.3"}
 inflection = "^0.5.1"
 dependency-injector = "^4.41.0"
-pydantic = ">=1.10.0,>=2.7.0"
+pydantic = ">=1.10.16,<3.0.0"
 boto3 = {version = "^1.28.73", optional = true}
 loguru = {version = "^0.7.2", optional = true}
 orjson = {version = "^3.9.10", optional = true}
