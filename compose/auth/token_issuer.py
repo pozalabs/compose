@@ -1,9 +1,10 @@
-import uuid
 from collections.abc import Callable
 from typing import Self
 
 import pendulum
 from authlib.jose import jwt
+
+from .. import utils
 
 
 class JWTIssuer:
@@ -27,7 +28,7 @@ class JWTIssuer:
             secret_key=secret_key,
             algorithm="HS256",
             issuer=issuer,
-            token_id_generator=default_jti_generator,
+            token_id_generator=utils.uuid4_hex,
             clock=pendulum.DateTime,
         )
 
@@ -45,7 +46,3 @@ class JWTIssuer:
             },
             key=self.secret_key,
         ).decode()
-
-
-def default_jti_generator() -> str:
-    return uuid.uuid4().hex
