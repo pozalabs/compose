@@ -11,7 +11,7 @@ class JWTIssuer:
         algorithm: str,
         issuer: str,
         token_id_generator: Callable[[], str],
-        clock: Callable[..., pendulum.DateTime],
+        clock: type[pendulum.DateTime],
     ):
         self.secret_key = secret_key
         self.algorithm = algorithm

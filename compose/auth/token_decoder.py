@@ -1,5 +1,3 @@
-from collections.abc import Callable
-
 import pendulum
 from authlib.jose import JWTClaims, errors, jwt
 
@@ -7,7 +5,7 @@ from .. import exceptions
 
 
 class JWTDecoder:
-    def __init__(self, secret_key: str, clock: Callable[..., pendulum.DateTime]):
+    def __init__(self, secret_key: str, clock: type[pendulum.DateTime]):
         self.secret_key = secret_key
         self.clock = clock
 
