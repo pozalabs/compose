@@ -20,6 +20,7 @@ from . import (
     types,
     typing,
     uow,
+    utils,
 )
 from .container import BaseModel, TimeStampedModel
 
@@ -48,6 +49,7 @@ __all__ = [
     "enums",
     "stream",
     "typing",
+    "utils",
 ]
 
 try:
