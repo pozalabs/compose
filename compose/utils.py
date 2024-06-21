@@ -1,4 +1,5 @@
 import functools
+import uuid
 from collections.abc import Callable, Generator
 from typing import Any, TypeVar, get_type_hints
 
@@ -37,3 +38,7 @@ def unordered_partial(p: functools.partial[RT], t: T) -> Callable[..., RT]:
 
 def ident(x: T) -> T:
     return x
+
+
+def uuid4_hex() -> str:
+    return uuid.uuid4().hex
