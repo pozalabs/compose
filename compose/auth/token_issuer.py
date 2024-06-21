@@ -27,7 +27,7 @@ class JWTIssuer:
             secret_key=secret_key,
             algorithm="HS256",
             issuer=issuer,
-            token_id_generator=lambda: uuid.uuid4().hex,
+            token_id_generator=default_jti_generator,
             clock=pendulum.DateTime,
         )
 
@@ -45,3 +45,7 @@ class JWTIssuer:
             },
             key=self.secret_key,
         ).decode()
+
+
+def default_jti_generator() -> str:
+    return uuid.uuid4().hex
