@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import signal
-import sys
 import threading
 import time
 import types
@@ -9,8 +8,6 @@ from collections.abc import Callable
 
 from .consumer import MessageConsumer
 from .signal_handler import SignalHandler, ThreadSignalHandler
-
-CAN_USE_ASYNCIO_RUNNER = sys.version_info >= (3, 11)
 
 logger = logging.getLogger("compose")
 
@@ -48,13 +45,8 @@ class ThreadMessageConsumerRunner:
             t.join()
 
     def _run_in_thread(self) -> None:
-        if CAN_USE_ASYNCIO_RUNNER:
-            with asyncio.Runner() as runner:
-                runner.run(self._run_consumer())
-        else:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(self._run_consumer())
+        with asyncio.Runner() as runner:
+            runner.run(self._run_consumer())
 
     async def _run_consumer(self) -> None:
         message_consumer = self.message_consumer_factory()
