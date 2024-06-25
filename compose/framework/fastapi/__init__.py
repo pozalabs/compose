@@ -9,7 +9,7 @@ from .exception_handler import (
     ExceptionHandlerInfo,
     create_exception_handler,
 )
-from .openapi import openapi_tags
+from .openapi import additional_responses, openapi_tags
 from .param import as_query, to_query
 from .response import NoContentResponse, ZipStreamingResponse
 from .routing import APIRouter
@@ -30,6 +30,7 @@ __all__ = [
     "ZipStreamingResponse",
     "APIRouter",
     "auto_wired",
+    "additional_responses",
 ]
 
 
