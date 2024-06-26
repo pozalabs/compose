@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import enum
 from typing import Any, ClassVar, Self, cast
 
@@ -28,7 +26,7 @@ class BaseError(Exception):
         return self.message
 
     @classmethod
-    def with_default_message(cls, name: str, message: str) -> type[BaseError]:
+    def with_default_message(cls, name: str, message: str) -> type[Self]:
         return cast(
             type[Self],
             type(name, (cls,), {"default_message": message}),
