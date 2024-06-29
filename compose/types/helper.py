@@ -18,8 +18,7 @@ class SupportsGetValidators(Protocol):
     """Naming Convention: https://github.com/python/typeshed/issues/4174"""
 
     @classmethod
-    def __get_validators__(cls) -> Generator[[Callable[[Any], Any]], None, None]:
-        ...
+    def __get_validators__(cls) -> Generator[[Callable[[Any], Any]], None, None]: ...
 
 
 def chain(*validators: Callable[[Any], Any]) -> Callable[[Any], Any]:
@@ -75,5 +74,12 @@ class CoreSchemaGettable(Generic[T]):
         if not compat.IS_PYDANTIC_V2:
             pass
 
-        validatable_type = get_args(source_type.__orig_bases__[1])[0]
+        core_schema_gettable_cls = next(
+            (base for base in source_type.__orig_bases__ if base.__name__ == "CoreSchemaGettable"),
+            None,
+        )
+        if core_schema_gettable_cls is None:
+            raise AttributeError(f"`{source_type.__name__}` does not inherit `CoreSchemaGettable`")
+
+        validatable_type = get_args(core_schema_gettable_cls)[0]
         return get_pydantic_core_schema(cls, handler(validatable_type))
