@@ -16,7 +16,7 @@ class AuthorizationServer:
 
     async def grant_authorization(self, redirect_uri: str, code: str) -> vo.AuthorizationGrant:
         async with self.auth_client_factory() as client:
-            response = client.fetch_token(
+            response = await client.fetch_token(
                 url=f"{self.base_url}{self.token_path}",
                 headers=self.headers,
                 grant_type="authorization_code",
@@ -29,7 +29,7 @@ class AuthorizationServer:
 
     async def renew_token(self, token: str) -> vo.AuthorizationGrant:
         async with self.auth_client_factory() as client:
-            response = client.fetch_token(
+            response = await client.fetch_token(
                 url=self.token_path,
                 headers=self.headers,
                 grant_type="refresh_token",
