@@ -7,11 +7,11 @@ from typing import Any
 import pendulum
 
 from .. import compat
-from .helper import chain
+from .helper import get_pydantic_core_schema
 
 if compat.IS_PYDANTIC_V2:
     from pydantic import GetCoreSchemaHandler
-    from pydantic_core import CoreSchema, core_schema
+    from pydantic_core import CoreSchema
 else:
     from pydantic.datetime_parse import parse_datetime
 
@@ -35,7 +35,4 @@ class DateTime(pendulum.DateTime):
         def __get_pydantic_core_schema__(
             cls, source_type: Any, handler: GetCoreSchemaHandler
         ) -> CoreSchema:
-            return core_schema.no_info_after_validator_function(
-                chain(*cls.__get_validators__()),
-                handler(datetime.datetime),
-            )
+            return get_pydantic_core_schema(cls, handler(datetime.datetime))
