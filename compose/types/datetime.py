@@ -7,6 +7,7 @@ from typing import Any
 import pendulum
 
 from .. import compat
+from .helper import chain
 
 if compat.IS_PYDANTIC_V2:
     from pydantic import GetCoreSchemaHandler
@@ -18,6 +19,16 @@ else:
 class DateTime(pendulum.DateTime):
     """https://stackoverflow.com/a/76719893"""
 
+    @classmethod
+    def __get_validators__(cls) -> Generator[Callable[[Any], pendulum.DateTime], None, None]:
+        if not compat.IS_PYDANTIC_V2:
+            yield parse_datetime
+        yield cls._instance
+
+    @classmethod
+    def _instance(cls, v: datetime.datetime | pendulum.DateTime) -> pendulum.DateTime:
+        return pendulum.instance(obj=v, tz=pendulum.UTC)
+
     if compat.IS_PYDANTIC_V2:
 
         @classmethod
@@ -25,17 +36,6 @@ class DateTime(pendulum.DateTime):
             cls, source_type: Any, handler: GetCoreSchemaHandler
         ) -> CoreSchema:
             return core_schema.no_info_after_validator_function(
-                cls._instance,
+                chain(*cls.__get_validators__()),
                 handler(datetime.datetime),
             )
-
-    else:
-
-        @classmethod
-        def __get_validators__(cls) -> Generator[Callable[[Any], pendulum.DateTime], None, None]:
-            yield parse_datetime
-            yield cls._instance
-
-    @classmethod
-    def _instance(cls, v: datetime.datetime | pendulum.DateTime) -> pendulum.DateTime:
-        return pendulum.instance(obj=v, tz=pendulum.UTC)
