@@ -21,7 +21,7 @@ class OpenAPIDoc:
     def add_to_app(self, app: FastAPI) -> None:
         raise NotImplementedError
 
-    def endpoint(self, app: FastAPI, **kwargs: Any) -> Response | dict[str, Any]:
+    def get_endpoint(self, app: FastAPI, **kwargs: Any) -> Callable[[], Response]:
         raise NotImplementedError
 
 
@@ -42,20 +42,23 @@ class SwaggerUIHTML(OpenAPIDoc):
             response_class=HTMLResponse,
             dependencies=self.dependencies,
             include_in_schema=False,
-        )(self.endpoint)
+        )(self.get_endpoint(app))
 
-    def endpoint(self, app: FastAPI, **kwargs: Any) -> HTMLResponse:
-        default_kwargs = {
-            "openapi_url": app.root_path + self.openapi_url,
-            "title": f"{app.title} - Swagger UI",
-            "oauth2_redirect_url": (
-                app.swagger_ui_oauth2_redirect_url
-                and app.root_path + app.swagger_ui_oauth2_redirect_url
-            ),
-            "init_oauth": app.swagger_ui_init_oauth,
-            "swagger_ui_parameters": app.swagger_ui_parameters,
-        }
-        return get_swagger_ui_html(**(default_kwargs | kwargs))
+    def get_endpoint(self, app: FastAPI, **kwargs) -> Callable[[], HTMLResponse]:
+        def endpoint():
+            default_kwargs = {
+                "openapi_url": app.root_path + self.openapi_url,
+                "title": f"{app.title} - Swagger UI",
+                "oauth2_redirect_url": (
+                    app.swagger_ui_oauth2_redirect_url
+                    and app.root_path + app.swagger_ui_oauth2_redirect_url
+                ),
+                "init_oauth": app.swagger_ui_init_oauth,
+                "swagger_ui_parameters": app.swagger_ui_parameters,
+            }
+            return get_swagger_ui_html(**(default_kwargs | kwargs))
+
+        return endpoint
 
 
 class RedocHTML(OpenAPIDoc):
@@ -75,29 +78,34 @@ class RedocHTML(OpenAPIDoc):
             response_class=HTMLResponse,
             dependencies=self.dependencies,
             include_in_schema=False,
-        )(self.endpoint)
+        )(self.get_endpoint(app))
 
-    def endpoint(self, app: FastAPI, **kwargs: Any) -> HTMLResponse:
-        default_kwargs = {
-            "openapi_url": app.root_path + self.openapi_url,
-            "title": f"{app.title} - ReDoc",
-        }
-        return get_redoc_html(**(default_kwargs | kwargs))
+    def get_endpoint(self, app: FastAPI, **kwargs: Any) -> Callable[[], Response]:
+        def endpoint():
+            default_kwargs = {
+                "openapi_url": app.root_path + self.openapi_url,
+                "title": f"{app.title} - ReDoc",
+            }
+            return get_redoc_html(**(default_kwargs | kwargs))
+
+        return endpoint
 
 
-class OenAPIJson(OpenAPIDoc):
+class OpenAPIJson(OpenAPIDoc):
     def __init__(self, path: str = "/openapi.json"):
         self.path = path
 
     def add_to_app(self, app: FastAPI) -> None:
         app.get(
             self.path,
-            response_model=schema.Schema,
             include_in_schema=False,
-        )(self.endpoint)
+        )(self.get_endpoint(app))
 
-    def endpoint(self, app: FastAPI, **kwargs: Any) -> dict[str, Any]:
-        return app.openapi()
+    def get_endpoint(self, app: FastAPI, **kwargs: Any) -> Callable[[], dict[str, Any]]:
+        def endpoint() -> dict[str, Any]:
+            return app.openapi()
+
+        return endpoint
 
 
 def docs_routes_exposer(
