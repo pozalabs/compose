@@ -6,7 +6,7 @@ from typing import Literal, TypeAlias
 
 from .. import model
 from ..messagebus import MessageBus
-from ..queue import MessageQueue
+from ..queue.base import MessageQueue
 from ..signal_handler import DefaultSignalHandler, SignalHandler
 
 HookEventType = Literal[

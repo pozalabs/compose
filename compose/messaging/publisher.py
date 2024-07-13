@@ -2,7 +2,7 @@ import logging
 
 from ..event import Event
 from .model import EventMessage
-from .queue import MessageQueue
+from .queue.base import MessageQueue
 
 logger = logging.getLogger("compose")
 
