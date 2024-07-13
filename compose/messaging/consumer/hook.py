@@ -1,3 +1,4 @@
+import json
 import logging
 from collections.abc import Callable
 from typing import Literal, TypeAlias
@@ -23,7 +24,7 @@ def default_hook(_) -> None: ...
 
 def log_event_message(log_message: str, message: EventMessage) -> None:
     logger.info(
-        f"{log_message}: {message.json()}",
+        f"{log_message}: {json.dumps(message.encode())}",
         extra={"event_message": message.encode()},
     )
 
