@@ -17,15 +17,6 @@ HookEventType = Literal[
 HookArgType: TypeAlias = str | EventMessage | Exception
 Hook: TypeAlias = Callable[[HookArgType], None]
 
-DEFAULT_HOOKS = {
-    "on_start": [logger.info],
-    "on_receive": [lambda message: log_event_message("Received message", message)],
-    "on_receive_error": [lambda exc: log_exception("Failed to receive message", exc)],
-    "on_consume": [lambda message: log_event_message("Consumed message", message)],
-    "on_consume_error": [lambda exc: log_exception(f"Failed to consume message due to {exc}", exc)],
-    "on_shutdown": [logger.info],
-}
-
 
 def default_hook(_) -> None: ...
 
@@ -39,3 +30,13 @@ def log_event_message(log_message: str, message: EventMessage) -> None:
 
 def log_exception(log_message: str, exc: Exception) -> None:
     logger.exception(log_message, exc_info=exc, stack_info=True)
+
+
+DEFAULT_HOOKS = {
+    "on_start": [logger.info],
+    "on_receive": [lambda message: log_event_message("Received message", message)],
+    "on_receive_error": [lambda exc: log_exception("Failed to receive message", exc)],
+    "on_consume": [lambda message: log_event_message("Consumed message", message)],
+    "on_consume_error": [lambda exc: log_exception(f"Failed to consume message due to {exc}", exc)],
+    "on_shutdown": [logger.info],
+}
