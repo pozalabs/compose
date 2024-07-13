@@ -3,13 +3,15 @@ from .consumer_runner import ThreadMessageConsumerRunner
 from .messagebus import MessageBus
 from .model import EventMessage, SqsEventMessage
 from .publisher import EventPublisher
-from .queue import MessageQueue
+from .queue import LocalMessageQueue, MessageQueue, event_store
 from .signal_handler import DefaultSignalHandler, SignalHandler, ThreadSignalHandler
 
 __all__ = [
     "EventMessage",
     "SqsEventMessage",
     "MessageQueue",
+    "LocalMessageQueue",
+    "event_store",
     "MessageConsumer",
     "ThreadMessageConsumerRunner",
     "MessageBus",
