@@ -28,3 +28,11 @@ try:
     __all__.append("SqsMessageQueue")
 except ImportError:
     pass
+
+
+try:
+    from .consumer.fastapi import MessageConsumerASGIMiddleware  # noqa: F401
+
+    __all__.append("MessageConsumerASGIMiddleware")
+except ImportError:
+    pass
