@@ -6,15 +6,17 @@ from fastapi import Depends, FastAPI, Response
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.responses import HTMLResponse
 
-from compose import schema
+from compose import container
 
 
 def openapi_tags(tag: type[enum.StrEnum]) -> list[dict[str, Any]]:
     return [{"name": member.value} for member in tag.__members__.values()]
 
 
-def additional_responses(*status_codes: int) -> dict[int, dict[str, Any]]:
-    return {int(status_code): {"model": schema.Schema} for status_code in sorted(status_codes)}
+def additional_responses(
+    schema_type: type[container.BaseModel], *status_codes: int
+) -> dict[int, dict[str, Any]]:
+    return {int(status_code): {"model": schema_type} for status_code in sorted(status_codes)}
 
 
 class OpenAPIDoc:
