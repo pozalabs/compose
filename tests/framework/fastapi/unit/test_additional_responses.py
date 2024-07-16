@@ -6,6 +6,23 @@ import compose
 
 
 @pytest.mark.parametrize(
+    "status_codes, expected",
+    [
+        (
+            (http.HTTPStatus.NOT_FOUND, http.HTTPStatus.UNPROCESSABLE_ENTITY),
+            {404: {"model": compose.schema.Error}, 422: {"model": compose.schema.Error}},
+        ),
+    ],
+)
+def test_additional_responses_with_default_schema(
+    status_codes: tuple[int],
+    expected: dict[int, dict[str, dict[str, str]]],
+):
+    responses = compose.fastapi.additional_responses(*status_codes)
+    assert responses == expected
+
+
+@pytest.mark.parametrize(
     "schema_type, status_codes, expected",
     [
         (
@@ -20,10 +37,10 @@ import compose
         ),
     ],
 )
-def test_additional_responses(
-    schema_type: type[compose.BaseModel] | None,
+def test_additional_responses_with_response_schema(
+    schema_type: type[compose.BaseModel],
     status_codes: tuple[int],
     expected: dict[int, dict[str, dict[str, str]]],
 ):
-    responses = compose.fastapi.additional_responses(schema_type, *status_codes)
+    responses = compose.fastapi.additional_responses(*status_codes, schema_type=schema_type)
     assert responses == expected

@@ -6,7 +6,7 @@ from fastapi import Depends, FastAPI, Response
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.responses import HTMLResponse
 
-from compose import container
+from compose import container, schema
 
 
 def openapi_tags(tag: type[enum.StrEnum]) -> list[dict[str, Any]]:
@@ -14,7 +14,7 @@ def openapi_tags(tag: type[enum.StrEnum]) -> list[dict[str, Any]]:
 
 
 def additional_responses(
-    schema_type: type[container.BaseModel], *status_codes: int
+    *status_codes: int, schema_type: type[container.BaseModel] = schema.Error
 ) -> dict[int, dict[str, Any]]:
     return {int(status_code): {"model": schema_type} for status_code in sorted(status_codes)}
 
