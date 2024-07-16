@@ -36,7 +36,7 @@ def client(app: FastAPI) -> TestClient:
         ),
     ],
 )
-def test_docs_routes_exposer(
+def test_add_doc_routes(
     docs: list[compose.fastapi.OpenAPIDoc],
     cond: bool,
     expected_status_codes: list[http.HTTPStatus],
@@ -50,7 +50,7 @@ def test_docs_routes_exposer(
         assert response.status_code == expected_status_code
 
 
-def test_not_exposed_docs_not_added(app: FastAPI, client: TestClient):
+def test_docs_not_exposed(app: FastAPI, client: TestClient):
     compose.fastapi.add_doc_routes(app=app, docs=[compose.fastapi.SwaggerUIHTML()], cond=True)
 
     assert client.get("/redoc").status_code == http.HTTPStatus.NOT_FOUND
