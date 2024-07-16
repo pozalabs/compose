@@ -14,8 +14,8 @@ from .openapi import (
     OpenAPIJson,
     RedocHTML,
     SwaggerUIHTML,
+    add_doc_routes,
     additional_responses,
-    docs_routes_exposer,
     openapi_tags,
 )
 from .param import as_query, to_query
@@ -43,7 +43,7 @@ __all__ = [
     "SwaggerUIHTML",
     "RedocHTML",
     "OpenAPIJson",
-    "docs_routes_exposer",
+    "add_doc_routes",
 ]
 
 

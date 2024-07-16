@@ -108,15 +108,13 @@ class OpenAPIJson(OpenAPIDoc):
         return endpoint
 
 
-def docs_routes_exposer(
+def add_doc_routes(
+    app: FastAPI,
     docs: list[OpenAPIDoc],
     cond: bool,
-) -> Callable[[FastAPI], None]:
-    def add_docs_routes(app: FastAPI) -> None:
-        if not cond:
-            return
+) -> None:
+    if not cond:
+        return
 
-        for doc in docs:
-            doc.add_to_app(app)
-
-    return add_docs_routes
+    for doc in docs:
+        doc.add_to_app(app)
