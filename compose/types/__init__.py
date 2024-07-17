@@ -2,6 +2,7 @@ from .. import compat
 from .datetime import DateTime
 from .helper import CoreSchemaGettable, SupportsGetValidators, chain
 from .object_id import PyObjectId
+from .url import S3ContentUrl
 from .vo import Float, Int, IntList, Str, StrList, TypedList
 
 __all__ = [
@@ -16,6 +17,7 @@ __all__ = [
     "IntList",
     "StrList",
     "TypedList",
+    "S3ContentUrl",
 ]
 
 if compat.IS_PYDANTIC_V2:
