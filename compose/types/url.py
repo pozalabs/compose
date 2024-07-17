@@ -13,7 +13,7 @@ class S3ContentUrl(Str):
         if getattr(cls, "base_url", None) is None:
             raise ValueError("`base_url` must be set")
 
-        v = urllib.parse.unquote(str(v))
+        v = urllib.parse.unquote(str(v).strip("/"))
         if v.startswith(cls.base_url):
             v = v[len(cls.base_url) :].lstrip("/")
 
