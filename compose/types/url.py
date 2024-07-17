@@ -10,7 +10,7 @@ class S3ContentUrl(Str):
     base_url: ClassVar[str]
 
     def __new__(cls, v: Any):
-        if cls.base_url is None:
+        if getattr(cls, "base_url", None) is None:
             raise ValueError("`base_url` must be set")
 
         v = urllib.parse.unquote(str(v))
@@ -18,7 +18,6 @@ class S3ContentUrl(Str):
             v = v[len(cls.base_url) :].lstrip("/")
 
         quoted_parts = [urllib.parse.quote(part, safe="~()*!.'") for part in v.split("/")]
-        print(quoted_parts)
         url = f"{cls.base_url}/{'/'.join(quoted_parts)}"
         return super().__new__(cls, url)
 
