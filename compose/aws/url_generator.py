@@ -22,6 +22,7 @@ class S3UrlGenerator:
     def generate_download_url(
         self,
         key: str,
+        filename: str | None = None,
         bucket: str | None = None,
         expires_in: Seconds | None = None,
         params: dict[str, str] | None = None,
