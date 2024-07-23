@@ -1,6 +1,7 @@
 from . import _signal as signal
 from . import (
     auth,
+    aws,
     command,
     compat,
     concurrent,
@@ -50,6 +51,7 @@ __all__ = [
     "stream",
     "typing",
     "utils",
+    "aws",
 ]
 
 try:
