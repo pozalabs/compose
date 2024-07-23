@@ -3,6 +3,7 @@ try:
 except ImportError:
     raise ImportError("Install `fastapi` to use fastapi helpers")
 
+from .depends import CommandUpdater, UserInjector, create_with_user
 from .endpoint import health_check
 from .exception_handler import (
     ExceptionHandler,
@@ -44,6 +45,9 @@ __all__ = [
     "RedocHTML",
     "OpenAPIJson",
     "add_doc_routes",
+    "CommandUpdater",
+    "UserInjector",
+    "create_with_user",
 ]
 
 
