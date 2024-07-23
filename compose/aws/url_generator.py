@@ -3,6 +3,8 @@ from __future__ import annotations
 import urllib.parse
 from typing import TYPE_CHECKING, TypeAlias
 
+from compose.types import ContentDisposition
+
 if TYPE_CHECKING:
     import mypy_boto3_s3
 
@@ -35,7 +37,7 @@ class S3UrlGenerator:
         default_params = {
             "Bucket": bucket,
             "Key": key,
-            "ResponseContentDisposition": f"attachment; filename*=UTF-8''{filename}",
+            "ResponseContentDisposition": ContentDisposition.attachment(filename),
         }
         return self.s3_client.generate_presigned_url(
             "get_object",

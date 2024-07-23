@@ -1,5 +1,4 @@
 import http
-import urllib.parse
 from collections.abc import Mapping
 from typing import Any, Self
 
@@ -7,6 +6,8 @@ from fastapi import Response
 from fastapi.responses import StreamingResponse
 from starlette.background import BackgroundTask
 from starlette.responses import ContentStream
+
+from compose.types import ContentDisposition
 
 
 class NoContentResponse(Response):
@@ -39,6 +40,6 @@ class ZipStreamingResponse(StreamingResponse):
         return cls(
             content=content,
             media_type=cls.default_media_type,
-            headers={"Content-Disposition": f"attachment; filename={urllib.parse.quote(filename)}"},
+            headers={"Content-Disposition": ContentDisposition.attachment(filename)},
             background=background,
         )

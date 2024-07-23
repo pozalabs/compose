@@ -4,6 +4,7 @@ from .helper import CoreSchemaGettable, SupportsGetValidators, chain
 from .object_id import PyObjectId
 from .url import S3ContentUrl
 from .vo import Float, Int, IntList, Str, StrList, TypedList
+from .web import ContentDisposition
 
 __all__ = [
     "PyObjectId",
@@ -18,6 +19,7 @@ __all__ = [
     "StrList",
     "TypedList",
     "S3ContentUrl",
+    "ContentDisposition",
 ]
 
 if compat.IS_PYDANTIC_V2:
