@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import urllib.parse
 from typing import TYPE_CHECKING, TypeAlias
 
 if TYPE_CHECKING:
@@ -30,9 +31,15 @@ class S3UrlGenerator:
         if (bucket := bucket or self.bucket) is None:
             raise ValueError("`bucket` must be provided if default bucket is not set")
 
+        filename = urllib.parse.quote(filename or key.split("/")[-1])
+        default_params = {
+            "Bucket": bucket,
+            "Key": key,
+            "ResponseContentDisposition": f"attachment; filename*=UTF-8''{filename}",
+        }
         return self.s3_client.generate_presigned_url(
             "get_object",
-            Params={"Bucket": bucket, "Key": key} | (params or {}),
+            Params=default_params | (params or {}),
             ExpiresIn=expires_in or self.expires_in,
         )
 
