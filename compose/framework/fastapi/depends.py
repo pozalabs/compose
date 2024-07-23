@@ -2,7 +2,8 @@ from collections.abc import Callable
 from typing import Annotated, Any, TypeVar
 
 from fastapi import Depends
-from pydantic import BaseModel
+
+from compose.container import BaseModel
 
 U = TypeVar("U")
 T = TypeVar("T", bound=BaseModel)
@@ -14,7 +15,7 @@ class CommandUpdater:
         self.to_field = to_field
 
     def __call__(self, cmd: T, user: U) -> T:
-        return cmd.model_copy(update={self.to_field: getattr(user, self.from_field)}, deep=True)
+        return cmd.copy(update={self.to_field: getattr(user, self.from_field)}, deep=True)
 
 
 class UserInjector:
