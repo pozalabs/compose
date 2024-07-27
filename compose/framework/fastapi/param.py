@@ -1,15 +1,17 @@
+from collections.abc import Callable
 from typing import Annotated, Any, TypeVar, get_args
 
 from fastapi import Depends, Query
 from pydantic import BaseModel, Field, Json, create_model
 
-from compose import compat
+from compose import compat, container
 
 if compat.IS_PYDANTIC_V2:
     import pydantic_core
     from pydantic import field_validator
 
 Q = TypeVar("Q", bound=BaseModel)
+T = TypeVar("T", bound=container.BaseModel)
 
 
 def dict_to_json(v: dict[str, Any] | None) -> str | None:
@@ -88,3 +90,31 @@ def to_query(q: type[Q], /) -> type[Q]:
 
 def as_query(q: type[Q], /) -> type[Q]:
     return Annotated[q, Depends(to_query(q))]
+
+
+def create_model_dependency_resolver(
+    model_type: type[T],
+    dependencies: dict[str, tuple[type, Any]],
+) -> Callable[..., Any]:
+    dependencies_model = create_model(
+        f"{model_type.__name__}fields",
+        **{
+            name: (field_type, Field(field_value))
+            for name, (field_type, field_value) in dependencies.items()
+        },
+    )
+
+    def wrapper(
+        t: model_type,
+        resolved_dependencies: Annotated[dependencies_model, Depends(dependencies_model)],
+    ) -> T:
+        return t.copy(update=resolved_dependencies.model_dump(), deep=True)
+
+    return wrapper
+
+
+def with_depends(model_type: type[T], **params: Any) -> type[T]:
+    return Annotated[
+        model_type,
+        Depends(create_model_dependency_resolver(model_type, params)),
+    ]
