@@ -12,3 +12,10 @@ __all__ = [
     "JWTDecoder",
     "JWTIssuer",
 ]
+
+try:
+    from .password import HashedPassword  # noqa: F401
+
+    __all__.append("HashedPassword")
+except ImportError:
+    pass
