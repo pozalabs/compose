@@ -19,7 +19,7 @@ from .openapi import (
     additional_responses,
     openapi_tags,
 )
-from .param import as_query, to_query
+from .param import as_query, to_query, with_depends
 from .response import NoContentResponse, ZipStreamingResponse
 from .routing import APIRouter
 from .security import APIKeyAuth, HTTPBasicAuth
@@ -48,6 +48,7 @@ __all__ = [
     "CommandUpdater",
     "UserInjector",
     "create_with_user",
+    "with_depends",
 ]
 
 
