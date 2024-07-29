@@ -25,6 +25,8 @@ from . import (
 )
 from .container import BaseModel, TimeStampedModel
 
+tp = typing
+
 __all__ = [
     "auth",
     "BaseModel",
@@ -50,6 +52,7 @@ __all__ = [
     "enums",
     "stream",
     "typing",
+    "tp",
     "utils",
     "aws",
 ]
