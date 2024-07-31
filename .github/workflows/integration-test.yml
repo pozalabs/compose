@@ -32,4 +32,4 @@ jobs:
 
       - name: Run tests
         run: |
-          poetry run pytest -vv -s tests -m unit
+          poetry run pytest -vv -s tests -m integration
