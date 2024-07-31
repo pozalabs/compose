@@ -14,7 +14,7 @@ from .exceptions import LockAcquisitionFailedError
 Seconds = NewType("Seconds", float)
 
 
-class AcquireMongoLock(Protocol):
+class MongoLockAcquirer(Protocol):
     def __call__(
         self,
         key: str,
@@ -52,7 +52,7 @@ class MongoLock:
             )
 
     @classmethod
-    def acquirer(cls, db: Database, collection_name: str | None = None) -> AcquireMongoLock:
+    def acquirer(cls, db: Database, collection_name: str | None = None) -> MongoLockAcquirer:
         collection_name = collection_name or cls.default_collection_name
         return functools.partial(cls, collection=db[collection_name])
 

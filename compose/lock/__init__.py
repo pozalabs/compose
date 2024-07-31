@@ -1,3 +1,3 @@
-from .mongo import MongoLock
+from .mongo import MongoLock, MongoLockAcquirer
 
-__all__ = ["MongoLock"]
+__all__ = ["MongoLock", "MongoLockAcquirer"]
