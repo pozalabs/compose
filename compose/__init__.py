@@ -11,6 +11,7 @@ from . import (
     event,
     exceptions,
     field,
+    lock,
     messaging,
     pagination,
     query,
@@ -55,6 +56,7 @@ __all__ = [
     "tp",
     "utils",
     "aws",
+    "lock",
 ]
 
 try:
