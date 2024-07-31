@@ -89,7 +89,7 @@ class MongoLock:
                 if lock is None:
                     continue
 
-                # MongoDB에 Date 저장시 나노초는 버리기 때문에 <=로 비교
+                # MongoDB는 Date 타입에서 나노초를 버리기 때문에 <=로 비교
                 if pendulum.instance(lock["expires_at"], tz=pendulum.UTC) <= expires_at:
                     return True
 
