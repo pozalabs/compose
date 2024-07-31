@@ -30,6 +30,6 @@ jobs:
       - name: Install pydantic ${{ matrix.pydantic-version }}
         run: poetry add pydantic@${{ matrix.pydantic-version }}
 
-      - name: Run unit tests
+      - name: Run tests
         run: |
           poetry run pytest -vv -s tests -m unit
