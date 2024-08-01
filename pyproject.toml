@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pozalabs-compose"
-version = "0.51.0"
+version = "1.0.0"
 description = "Backend components for Pozalabs"
 license = "MIT"
 authors = [
