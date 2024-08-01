@@ -3,13 +3,10 @@ from __future__ import annotations
 import copy
 import inspect
 from collections.abc import Callable, Generator
-from typing import TYPE_CHECKING, Any, Generic, Protocol, TypeVar, get_args
+from typing import Any, Generic, Protocol, TypeVar, get_args
 
-from compose import compat
-
-if compat.IS_PYDANTIC_V2 or TYPE_CHECKING:
-    from pydantic import GetCoreSchemaHandler
-    from pydantic_core import core_schema
+from pydantic import GetCoreSchemaHandler
+from pydantic_core import core_schema
 
 T = TypeVar("T")
 
@@ -71,9 +68,6 @@ class CoreSchemaGettable(Generic[T]):
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
-        if not compat.IS_PYDANTIC_V2:
-            pass
-
         core_schema_gettable_cls = next(
             (base for base in source_type.__orig_bases__ if base.__name__ == "CoreSchemaGettable"),
             None,

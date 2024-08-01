@@ -57,7 +57,6 @@ client = TestClient(app)
                 "page": 1,
                 "per_page": 10,
             },
-            marks=pytest.mark.skipif(not compose.compat.IS_PYDANTIC_V2, reason="pydantic v2 only"),
         ),
     ],
 )
