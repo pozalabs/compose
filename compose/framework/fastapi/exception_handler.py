@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 
-from compose import compat, schema
+from compose import schema
 
 E: TypeAlias = TypeVar("E", bound=Exception)
 ExceptionHandler: TypeAlias = Callable[[Request, E], Response | Awaitable[Response]]
@@ -117,7 +117,7 @@ def create_exception_handler(
             invalid_params=(
                 (invalid_params := getattr(exc, "invalid_params", None))
                 and [
-                    compat.model_validate(t=schema.InvalidParam, obj=invalid_param)
+                    schema.InvalidParam.model_validate(obj=invalid_param)
                     for invalid_param in invalid_params
                 ]
             ),

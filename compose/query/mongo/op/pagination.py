@@ -3,7 +3,6 @@ from typing import Any, Self
 
 import pymongo
 
-from compose import compat
 from compose.container import BaseModel
 
 from .aggregation import Push
@@ -16,14 +15,14 @@ from .types import DictExpression, ListExpression
 
 class Cursor(BaseModel):
     def to_str(self) -> str:
-        return base64.b64encode(compat.model_dump_json(self, by_alias=True).encode()).decode()
+        return base64.b64encode(self.model_dump_json(by_alias=True).encode()).decode()
 
     def to_dict(self) -> dict[str, Any]:
-        return compat.model_dump(self, by_alias=True)
+        return self.model_dump(by_alias=True)
 
     @classmethod
     def from_str(cls, cursor: str) -> Self:
-        return compat.model_validate_json(t=cls, obj=base64.b64decode(cursor).decode())
+        return cls.model_validate_json(json_data=base64.b64decode(cursor).decode())
 
 
 class CursorPaginationClause(And):

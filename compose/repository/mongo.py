@@ -12,7 +12,7 @@ from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.results import UpdateResult
 
-from .. import compat, types
+from .. import types
 from ..entity import Entity
 from ..pagination import Pagination
 from ..query.mongo import MongoFilterQuery, MongoQuery
@@ -29,7 +29,7 @@ class SessionRequirement(str, enum.Enum):
 
 def entity_to_mongo_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
     default_kwargs = {"by_alias": True}
-    return compat.model_dump(entity, **(default_kwargs | kwargs))
+    return entity.model_dump(**(default_kwargs | kwargs))
 
 
 class MongoRepository(base.BaseRepository, Generic[EntityType]):
@@ -122,7 +122,7 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         """https://stackoverflow.com/a/73746554/9331155"""
         entity_type: EntityType = get_args(self.__class__.__orig_bases__[0])[0]  # type: ignore
         result = self.collection.find_one(filter=filter_, session=session, **kwargs)
-        return result and compat.model_validate(entity_type, result)
+        return result and entity_type.model_validate(result)
 
     def find_by_query(
         self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
