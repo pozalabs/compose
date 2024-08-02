@@ -1,5 +1,6 @@
 import bson
 import pytest
+from pydantic import TypeAdapter
 
 import compose
 
@@ -16,7 +17,7 @@ import compose
     ),
 )
 def test_validate(object_id: bson.ObjectId | bytes, expected: compose.types.PyObjectId):
-    actual = compose.compat.validate_obj(compose.types.PyObjectId, object_id)
+    actual = TypeAdapter(compose.types.PyObjectId).validate_python(object_id)
 
     assert actual == expected
 
@@ -31,4 +32,4 @@ def test_validate(object_id: bson.ObjectId | bytes, expected: compose.types.PyOb
 )
 def test_validate_invalid_id(object_id: bytes | str):
     with pytest.raises(ValueError):
-        compose.compat.validate_obj(compose.types.PyObjectId, object_id)
+        TypeAdapter(compose.types.PyObjectId).validate_python(object_id)

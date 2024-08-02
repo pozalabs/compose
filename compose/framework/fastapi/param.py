@@ -1,14 +1,11 @@
 from collections.abc import Callable
 from typing import Annotated, Any, TypeVar, get_args
 
+import pydantic_core
 from fastapi import Depends, Query
-from pydantic import BaseModel, Field, Json, create_model
+from pydantic import BaseModel, Field, Json, create_model, field_validator
 
-from compose import compat, container
-
-if compat.IS_PYDANTIC_V2:
-    import pydantic_core
-    from pydantic import field_validator
+from compose import container
 
 Q = TypeVar("Q", bound=BaseModel)
 T = TypeVar("T", bound=container.BaseModel)
@@ -21,12 +18,11 @@ def dict_to_json(v: dict[str, Any] | None) -> str | None:
     return pydantic_core.to_json(v).decode()
 
 
-if compat.IS_PYDANTIC_V2:
-    TYPE_VALIDATORS = {
-        Json: [
-            dict_to_json,
-        ]
-    }
+TYPE_VALIDATORS = {
+    Json: [
+        dict_to_json,
+    ]
+}
 
 
 def to_query(q: type[Q], /) -> type[Q]:
@@ -38,54 +34,34 @@ def to_query(q: type[Q], /) -> type[Q]:
         "description",
     )
 
-    if compat.IS_PYDANTIC_V2:
-        validators = {}
-        field_args = (*field_args, "annotation")
-        field_definitions = {}
-        for field_name, field_info in q.model_fields.items():
-            annotation = field_info.annotation
-            field_definitions[field_name] = (
-                annotation,
-                Field(Query(**{arg: getattr(field_info, arg, None) for arg in field_args})),
-            )
-            if not (args := get_args(annotation)):
-                continue
-
-            if (arg := next((arg for arg in args if arg is not None), None)) is None:
-                continue
-
-            validators |= {
-                f"{field_name}_{validator.__name__}": field_validator(field_name, mode="before")(
-                    validator
-                )
-                for validator in TYPE_VALIDATORS.get(arg, [])
-            }
-
-        return create_model(
-            f"{q.__name__}Query",
-            **field_definitions,
-            __validators__=validators,
-            __base__=q,
+    validators = {}
+    field_args = (*field_args, "annotation")
+    field_definitions = {}
+    for field_name, field_info in q.model_fields.items():
+        annotation = field_info.annotation
+        field_definitions[field_name] = (
+            annotation,
+            Field(Query(**{arg: getattr(field_info, arg, None) for arg in field_args})),
         )
+        if not (args := get_args(annotation)):
+            continue
 
-    else:
-        field_definitions = {
-            field_name: (
-                field.outer_type_,
-                Field(Query(**{arg: getattr(field, arg, None) for arg in field_args})),
+        if (arg := next((arg for arg in args if arg is not None), None)) is None:
+            continue
+
+        validators |= {
+            f"{field_name}_{validator.__name__}": field_validator(field_name, mode="before")(
+                validator
             )
-            for field_name, field in q.__fields__.items()
+            for validator in TYPE_VALIDATORS.get(arg, [])
         }
 
-        class Child(q):
-            class Config:
-                arbitrary_types_allowed = True
-
-        return create_model(
-            f"{q.__name__}Query",
-            **field_definitions,
-            __base__=Child,
-        )
+    return create_model(
+        f"{q.__name__}Query",
+        **field_definitions,
+        __validators__=validators,
+        __base__=q,
+    )
 
 
 def as_query(q: type[Q], /) -> type[Q]:

@@ -1,4 +1,6 @@
 import pytest
+from pydantic import TypeAdapter
+from pydantic.v1.validators import str_validator
 
 import compose
 
@@ -6,7 +8,7 @@ import compose
 class LowerStr(str, compose.types.CoreSchemaGettable[str]):
     @classmethod
     def __get_validators__(cls):
-        yield compose.compat.str_validator
+        yield str_validator
         yield cls.validate
 
     @classmethod
@@ -22,4 +24,4 @@ class LowerStr(str, compose.types.CoreSchemaGettable[str]):
     ],
 )
 def test_get_pydantic_core_schema(value: str, expected: LowerStr):
-    assert compose.compat.validate_obj(LowerStr, value) == expected
+    assert TypeAdapter(LowerStr).validate_python(value) == expected

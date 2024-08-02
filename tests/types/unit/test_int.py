@@ -1,13 +1,12 @@
 from typing import Any
 
 import pytest
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 
 import compose
 
 
-class CustomType(compose.types.Int):
-    ...
+class CustomType(compose.types.Int): ...
 
 
 @pytest.mark.parametrize(
@@ -19,9 +18,9 @@ class CustomType(compose.types.Int):
     ),
 )
 def test_int(value: Any):
-    assert compose.compat.validate_obj(CustomType, value) == CustomType(value)
+    assert TypeAdapter(CustomType).validate_python(value) == CustomType(value)
 
 
 def test_int_invalid():
     with pytest.raises(ValidationError):
-        compose.compat.validate_obj(CustomType, [1, 2, 3])
+        TypeAdapter(CustomType).validate_python([1, 2, 3])

@@ -1,11 +1,9 @@
 from typing import Any
 
 import pytest
+from pydantic import ConfigDict
 
 import compose
-
-if compose.compat.IS_PYDANTIC_V2:
-    from pydantic import ConfigDict
 
 
 @pytest.fixture
@@ -15,12 +13,7 @@ def model_type() -> type[compose.BaseModel]:
         name: str
         age: int | None = None
 
-        if compose.compat.IS_PYDANTIC_V2:
-            model_config = ConfigDict(json_schema_extra=compose.schema.schema_excludes("age"))
-        else:
-
-            class Config:
-                schema_extra = compose.schema.schema_excludes("age")
+        model_config = ConfigDict(json_schema_extra=compose.schema.schema_excludes("age"))
 
     return Model
 
@@ -39,4 +32,4 @@ def expected() -> dict[str, Any]:
 
 
 def test_schema_excludes(model_type: type[compose.BaseModel], expected: dict[str, Any]):
-    assert compose.compat.model_schema(model_type) == expected
+    assert model_type.model_json_schema() == expected

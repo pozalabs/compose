@@ -2,7 +2,7 @@ import types
 from collections.abc import Callable
 from typing import Any, TypeVar, cast
 
-from compose import compat, typing
+from compose import typing
 
 from .helper import CoreSchemaGettable
 
@@ -19,31 +19,23 @@ def caster(factory: Callable[[Any], T], /) -> Callable[[Any], T]:
 class Str(str, CoreSchemaGettable[str]):
     @classmethod
     def __get_validators__(cls) -> typing.ValidatorGenerator:
-        if not compat.IS_PYDANTIC_V2:
-            yield compat.str_validator
         yield caster(cls)
 
 
 class Int(int, CoreSchemaGettable[int]):
     @classmethod
     def __get_validators__(cls) -> typing.ValidatorGenerator:
-        if not compat.IS_PYDANTIC_V2:
-            yield compat.int_validator
         yield caster(cls)
 
 
 class Float(float, CoreSchemaGettable[float]):
     @classmethod
     def __get_validators__(cls) -> typing.ValidatorGenerator:
-        if not compat.IS_PYDANTIC_V2:
-            yield compat.float_validator
         yield caster(cls)
 
 
 def _create_list_type(t: type[T], /) -> type[list[T]]:
     def __get_validators__(c) -> typing.ValidatorGenerator:
-        if not compat.IS_PYDANTIC_V2:
-            yield compat.list_validator
         yield caster(c)
 
     return cast(

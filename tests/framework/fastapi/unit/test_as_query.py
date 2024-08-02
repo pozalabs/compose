@@ -20,7 +20,7 @@ class ListItems(compose.query.Query):
 
 @app.get("/items")
 def get(q: compose.fastapi.as_query(ListItems)):
-    return compose.compat.model_dump(q)
+    return q.model_dump()
 
 
 client = TestClient(app)
@@ -57,7 +57,6 @@ client = TestClient(app)
                 "page": 1,
                 "per_page": 10,
             },
-            marks=pytest.mark.skipif(not compose.compat.IS_PYDANTIC_V2, reason="pydantic v2 only"),
         ),
     ],
 )

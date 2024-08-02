@@ -1,6 +1,5 @@
-from .. import compat
 from .datetime import DateTime
-from .helper import CoreSchemaGettable, SupportsGetValidators, chain
+from .helper import CoreSchemaGettable, SupportsGetValidators, chain, get_pydantic_core_schema
 from .object_id import PyObjectId
 from .url import S3ContentUrl
 from .vo import Float, Int, IntList, Str, StrList, TypedList
@@ -20,9 +19,5 @@ __all__ = [
     "TypedList",
     "S3ContentUrl",
     "ContentDisposition",
+    "get_pydantic_core_schema",
 ]
-
-if compat.IS_PYDANTIC_V2:
-    from .helper import get_pydantic_core_schema  # noqa: F401
-
-    __all__.extend(["get_pydantic_core_schema"])
