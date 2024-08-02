@@ -3,7 +3,6 @@ from . import (
     auth,
     aws,
     command,
-    compat,
     concurrent,
     dependency,
     entity,

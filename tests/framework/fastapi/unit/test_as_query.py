@@ -20,7 +20,7 @@ class ListItems(compose.query.Query):
 
 @app.get("/items")
 def get(q: compose.fastapi.as_query(ListItems)):
-    return compose.compat.model_dump(q)
+    return q.model_dump()
 
 
 client = TestClient(app)

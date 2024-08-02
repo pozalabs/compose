@@ -6,7 +6,7 @@ class Model(compose.BaseModel):
 
 
 def test_py_object_id_schema_type_is_string():
-    actual = compose.compat.model_schema(Model)
+    actual = Model.model_json_schema()
 
     expected = {
         "properties": {"id": {"title": "Id", "type": "string"}},

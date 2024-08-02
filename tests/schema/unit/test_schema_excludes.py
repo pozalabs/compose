@@ -32,4 +32,4 @@ def expected() -> dict[str, Any]:
 
 
 def test_schema_excludes(model_type: type[compose.BaseModel], expected: dict[str, Any]):
-    assert compose.compat.model_schema(model_type) == expected
+    assert model_type.model_json_schema() == expected

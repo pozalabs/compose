@@ -1,7 +1,7 @@
 from typing import Any
 
 import pytest
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 
 import compose
 
@@ -10,7 +10,7 @@ class CustomType(compose.types.StrList): ...
 
 
 def test_str_list():
-    assert compose.compat.validate_obj(CustomType, ["1", "2", "3"]) == CustomType(["1", "2", "3"])
+    assert TypeAdapter(CustomType).validate_python(["1", "2", "3"]) == CustomType(["1", "2", "3"])
 
 
 @pytest.mark.parametrize(
@@ -19,4 +19,4 @@ def test_str_list():
 )
 def test_str_list_invalid(value: Any):
     with pytest.raises(ValidationError):
-        compose.compat.validate_obj(CustomType, value)
+        TypeAdapter(CustomType).validate_python(value)
