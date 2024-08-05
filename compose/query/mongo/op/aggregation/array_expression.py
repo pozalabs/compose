@@ -1,6 +1,7 @@
-from typing import Any, Self
+from typing import Any, Self, Unpack
 
-from ..base import Evaluable, Operator
+from ..base import Evaluable, Merge, Operator
+from ..sort import SortBy
 from ..types import DictExpression, MongoKeyword, _String
 
 
@@ -65,3 +66,17 @@ class Reduce(Operator):
     @classmethod
     def int(cls, input_: Any, in_: Any) -> Self:
         return cls(input_=input_, initial_value=0, in_=in_)
+
+
+class SortArray(Operator):
+    def __init__(self, input_: Any, *sort_by: Unpack[tuple[SortBy, ...]]):
+        self.input = input_
+        self.sort_by = sort_by
+
+    def expression(self) -> DictExpression:
+        return {
+            "$sortArray": {
+                "input": Evaluable(self.input).expression(),
+                "sortBy": Merge.dict(*self.sort_by).expression(),
+            }
+        }
