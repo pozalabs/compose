@@ -11,11 +11,9 @@ jobs:
         python-version:
           - "3.11"
           - "3.12"
-        pydantic-version:
-          - "^2.7"
       fail-fast: false
 
-    name: Python ${{ matrix.python-version }} / pydantic ${{ matrix.pydantic-version }}
+    name: Python ${{ matrix.python-version }}
 
     steps:
       - uses: actions/checkout@v4
@@ -25,9 +23,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
           setup-command: |
             poetry install --all-extras --no-interaction
-
-      - name: Install pydantic ${{ matrix.pydantic-version }}
-        run: poetry add pydantic@${{ matrix.pydantic-version }}
 
       - name: Run tests
         run: |
