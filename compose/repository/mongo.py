@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import enum
 import inspect
+import warnings
 from collections.abc import Iterable
 from typing import Any, ClassVar, Generic, TypeVar, get_args, get_type_hints
 
@@ -230,6 +231,14 @@ def setup_indexes(
         raise ValueError("Either `mongo_client` or `mongo_uri` must be provided")
 
     if mongo_uri is not None:
+        warnings.warn(
+            (
+                "`mongo_uri` is deprecated and will be removed in the future. "
+                "Use `mongo_client` instead."
+            ),
+            DeprecationWarning,
+        )
+
         with pymongo.MongoClient(mongo_uri) as mongo_client:
             for db_name in db_names:
                 setup_database_indexes(mongo_client.get_database(db_name))
