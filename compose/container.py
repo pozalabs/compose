@@ -71,8 +71,13 @@ class BaseModel(PydanticBaseModel):
         exclude: AbstractSetIntStr | MappingIntStrAny | None = None,
         update: dict[str, Any] | None = None,
         deep: bool = False,
+        validate: bool = False,
     ) -> Model:
-        return super().model_copy(update=update, deep=deep)
+        result = super().model_copy(update=update, deep=deep)
+        if not validate:
+            return result
+
+        return self.__class__.model_validate(result.model_dump_json(warnings=False))
 
     def encode(
         self,
