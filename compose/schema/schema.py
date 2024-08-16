@@ -46,6 +46,10 @@ class ListSchema(Schema, Generic[ListItem]):
             items=[parser(item, **parser_kwargs) for item in pagination.items],
         )
 
+    @classmethod
+    def from_items(cls, items: list[ListItem]) -> Self:
+        return cls(total=len(items), items=items)
+
 
 class InvalidParam(container.BaseModel):
     loc: str
