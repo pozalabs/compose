@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import enum
 import inspect
+import warnings
 from collections.abc import Iterable
-from typing import Any, ClassVar, Generic, TypeVar, get_args, get_type_hints
+from typing import Any, ClassVar, Generic, TypeVar, Unpack, get_args, get_type_hints
 
 import pendulum
 import pymongo
@@ -219,25 +220,49 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         )
 
 
-def setup_indexes(mongo_uri: str, db_names: Iterable[str]) -> None:
-    # 동일한 이름의 컬렉션이 여러 DB에 존재할 경우, 컬렉션별로 인덱스를 생성할 수 없음
-    with pymongo.MongoClient(mongo_uri) as client:
-        for db_name in db_names:
-            database = client.get_database(db_name)
-            collection_names = database.list_collection_names()
-            for collection_name, indexes in registry.items():
-                if not collection_name or collection_name not in collection_names:
-                    continue
-                collection = database.get_collection(collection_name)
+def setup_indexes(
+    db_names: Iterable[str],
+    mongo_client: pymongo.MongoClient | None = None,
+    mongo_uri: str | None = None,
+) -> None:
+    # NOTE: 동일한 이름의 컬렉션이 여러 DB에 존재할 경우, 컬렉션별로 인덱스를 생성할 수 없음
 
-                previous_index_names = {index["name"] for index in collection.list_indexes()}
-                current_index_names = {
-                    *(index.document["name"] for index in indexes),
-                    "_id_",
-                }
+    if mongo_client is None and mongo_uri is None:
+        raise ValueError("Either `mongo_client` or `mongo_uri` must be provided")
 
-                for index_name in previous_index_names - current_index_names:
-                    collection.drop_index(index_name)
+    if mongo_uri is not None:
+        warnings.warn(
+            (
+                "`mongo_uri` is deprecated and will be removed in the future. "
+                "Use `mongo_client` instead."
+            ),
+            DeprecationWarning,
+        )
 
-                if indexes:
-                    collection.create_indexes(indexes)
+        with pymongo.MongoClient(mongo_uri) as mongo_client:
+            setup_database_indexes(*(mongo_client.get_database(db_name) for db_name in db_names))
+
+        return
+
+    setup_database_indexes(*(mongo_client.get_database(db_name) for db_name in db_names))
+
+
+def setup_database_indexes(*databases: Unpack[tuple[Database, ...]]) -> None:
+    for database in databases:
+        collection_names = database.list_collection_names()
+        for collection_name, indexes in registry.items():
+            if not collection_name or collection_name not in collection_names:
+                continue
+            collection = database.get_collection(collection_name)
+
+            previous_index_names = {index["name"] for index in collection.list_indexes()}
+            current_index_names = {
+                *(index.document["name"] for index in indexes),
+                "_id_",
+            }
+
+            for index_name in previous_index_names - current_index_names:
+                collection.drop_index(index_name)
+
+            if indexes:
+                collection.create_indexes(indexes)
