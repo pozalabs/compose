@@ -10,6 +10,7 @@ from . import (
     event,
     exceptions,
     field,
+    handler,
     lock,
     messaging,
     pagination,
@@ -56,6 +57,7 @@ __all__ = [
     "utils",
     "aws",
     "lock",
+    "handler",
 ]
 
 try:
