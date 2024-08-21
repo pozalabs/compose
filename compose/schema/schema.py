@@ -47,7 +47,7 @@ class ListSchema(Schema, Generic[ListItem]):
         )
 
     @classmethod
-    def from_items(cls, items: list[ListItem]) -> Self:
+    def from_items(cls, items: list[Any]) -> Self:
         return cls(total=len(items), items=items)
 
 
