@@ -1,6 +1,6 @@
 from typing import Any, Generic, Self, TypeVar, get_args
 
-from pydantic import ConfigDict, Field, ValidationError, model_validator
+from pydantic import ConfigDict, ValidationError
 
 from .. import container
 from ..pagination import Pagination
@@ -17,15 +17,8 @@ class TimeStampedSchema(container.TimeStampedModel, Schema): ...
 
 
 class ListSchema(Schema, Generic[ListItem]):
-    total: int = 0
-    items: list[ListItem] = Field(default_factory=list)
-
-    @model_validator(mode="before")
-    @classmethod
-    def _update_total(cls, data: dict[str, Any]) -> dict[str, Any]:
-        return (
-            data if data.get("total") is not None else data | {"total": len(data.get("items", []))}
-        )
+    total: int
+    items: list[ListItem]
 
     @classmethod
     def from_pagination(
@@ -54,8 +47,8 @@ class ListSchema(Schema, Generic[ListItem]):
         )
 
     @classmethod
-    def from_items(cls, items: list[ListItem]) -> Self:
-        return cls(items=items)
+    def from_items(cls, items: list[Any]) -> Self:
+        return cls(total=len(items), items=items)
 
 
 class InvalidParam(container.BaseModel):
