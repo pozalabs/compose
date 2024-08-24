@@ -81,7 +81,7 @@ class Project(Stage[DictExpression]):
         return {"$project": Merge.dict(*self.specs).expression()}
 
     @classmethod
-    def from_attrs(cls, **kwargs: Any) -> Self:
+    def create(cls, **kwargs: Any) -> Self:
         return cls(*(Spec(field, spec) for field, spec in kwargs.items()))
 
 
