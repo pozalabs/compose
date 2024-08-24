@@ -81,8 +81,8 @@ class Project(Stage[DictExpression]):
         return {"$project": Merge.dict(*self.specs).expression()}
 
     @classmethod
-    def create(cls, **kwargs: Any) -> Self:
-        return cls(*(Spec(field, spec) for field, spec in kwargs.items()))
+    def from_attrs(cls, **attrs: Any) -> Self:
+        return cls(*(Spec(field, spec) for field, spec in attrs.items()))
 
 
 class Lookup(Stage[DictExpression]):

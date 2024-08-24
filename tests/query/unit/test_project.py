@@ -24,7 +24,7 @@ from compose.query.mongo.op import Project
             },
         ),
         (
-            Project.create(
+            Project.from_attrs(
                 field1=1,
                 field2=0,
                 field3="$field3",
