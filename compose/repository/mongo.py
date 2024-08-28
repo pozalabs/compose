@@ -118,9 +118,31 @@ class MongoRepository(BaseRepository, Generic[EntityType]):
     ) -> EntityType | None:
         return self.find_by({"_id": entity_id}, session=session, **kwargs)
 
+    def find(
+        self,
+        filter_: dict[str, Any],
+        *,
+        projection: dict[str, Any] | None = None,
+        session: ClientSession | None = None,
+        **kwargs,
+    ) -> EntityType | dict[str, Any] | None:
+        validate_to_entity = projection is not None
+        query_result = self.collection.find_one(
+            filter=filter_,
+            session=session,
+            **kwargs,
+        )
+        if query_result is None:
+            return None
+
+        return (
+            self._entity_type.model_validate(query_result) if validate_to_entity else query_result
+        )
+
     def list(
         self,
         filter_: dict[str, Any] | None = None,
+        *,
         projection: dict[str, Any] | None = None,
         sort: list[tuple[str, int]] | None = None,
         session: ClientSession | None = None,
@@ -138,26 +160,6 @@ class MongoRepository(BaseRepository, Generic[EntityType]):
             [self._entity_type.model_validate(item) for item in query_result]
             if validate_to_entity
             else list(query_result)
-        )
-
-    def find(
-        self,
-        filter_: dict[str, Any],
-        projection: dict[str, Any] | None = None,
-        session: ClientSession | None = None,
-        **kwargs,
-    ) -> EntityType | dict[str, Any] | None:
-        validate_to_entity = projection is not None
-        query_result = self.collection.find_one(
-            filter=filter_,
-            session=session,
-            **kwargs,
-        )
-        if query_result is None:
-            return None
-
-        return (
-            self._entity_type.model_validate(query_result) if validate_to_entity else query_result
         )
 
     def find_by(
