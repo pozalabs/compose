@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import enum
+import functools
 import inspect
 import warnings
 from collections.abc import Iterable
-from typing import Any, ClassVar, Generic, TypeVar, Unpack, get_args, get_type_hints
+from typing import Any, ClassVar, Generic, TypeVar, Unpack, get_args, get_origin, get_type_hints
 
 import pendulum
 import pymongo
@@ -17,7 +18,7 @@ from .. import types
 from ..entity import Entity
 from ..pagination import Pagination
 from ..query.mongo import MongoFilterQuery, MongoQuery
-from . import base
+from .base import BaseRepository
 
 EntityType = TypeVar("EntityType", bound=Entity)
 registry: dict[str, list[pymongo.IndexModel]] = {}
@@ -33,7 +34,7 @@ def entity_to_mongo_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
     return entity.model_dump(**(default_kwargs | kwargs))
 
 
-class MongoRepository(base.BaseRepository, Generic[EntityType]):
+class MongoRepository(BaseRepository, Generic[EntityType]):
     """
     `MongoRepository` 추상 클래스
 
@@ -116,6 +117,48 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
         **kwargs,
     ) -> EntityType | None:
         return self.find_by({"_id": entity_id}, session=session, **kwargs)
+
+    def list(
+        self,
+        filter_: dict[str, Any] | None = None,
+        projection: dict[str, Any] | None = None,
+        sort: list[tuple[str, int]] | None = None,
+        session: ClientSession | None = None,
+        **kwargs,
+    ) -> list[EntityType] | list[dict[str, Any]]:
+        validate_to_entity = projection is not None
+        query_result = self.collection.find(
+            filter=filter_,
+            projection=projection,
+            sort=sort,
+            session=session,
+            **kwargs,
+        )
+        return (
+            [self._entity_type.model_validate(item) for item in query_result]
+            if validate_to_entity
+            else list(query_result)
+        )
+
+    def find(
+        self,
+        filter_: dict[str, Any],
+        projection: dict[str, Any] | None = None,
+        session: ClientSession | None = None,
+        **kwargs,
+    ) -> EntityType | dict[str, Any] | None:
+        validate_to_entity = projection is not None
+        query_result = self.collection.find_one(
+            filter=filter_,
+            session=session,
+            **kwargs,
+        )
+        if query_result is None:
+            return None
+
+        return (
+            self._entity_type.model_validate(query_result) if validate_to_entity else query_result
+        )
 
     def find_by(
         self, filter_: dict[str, Any], session: ClientSession | None = None, **kwargs
@@ -218,6 +261,17 @@ class MongoRepository(base.BaseRepository, Generic[EntityType]):
             page=qry.page,
             per_page=qry.per_page,
         )
+
+    @functools.cached_property
+    def _entity_type(self) -> EntityType:
+        orig_base = next(
+            (base for base in self.__class__.__orig_bases__ if get_origin(base) is MongoRepository),
+            None,
+        )
+        if orig_base is None:
+            raise ValueError("No origin base found")
+
+        return get_args(orig_base)[0]
 
 
 def setup_indexes(
