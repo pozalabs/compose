@@ -20,7 +20,7 @@ from ..pagination import Pagination
 from ..query.mongo import MongoFilterQuery, MongoQuery
 from .base import BaseRepository
 
-EntityType = TypeVar("EntityType", bound=Entity)
+T = TypeVar("T", bound=Entity)
 registry: dict[str, list[pymongo.IndexModel]] = {}
 
 
@@ -29,12 +29,12 @@ class SessionRequirement(str, enum.Enum):
     OPTIONAL = "optional"
 
 
-def entity_to_mongo_schema(entity: EntityType, **kwargs) -> dict[str, Any]:
+def entity_to_mongo_schema(entity: T, **kwargs) -> dict[str, Any]:
     default_kwargs = {"by_alias": True}
     return entity.model_dump(**(default_kwargs | kwargs))
 
 
-class MongoRepository(BaseRepository, Generic[EntityType]):
+class MongoRepository(BaseRepository, Generic[T]):
     """
     `MongoRepository` 추상 클래스
 
@@ -115,8 +115,8 @@ class MongoRepository(BaseRepository, Generic[EntityType]):
         entity_id: types.PyObjectId,
         session: ClientSession | None = None,
         **kwargs,
-    ) -> EntityType | None:
-        return self.find_by({"_id": entity_id}, session=session, **kwargs)
+    ) -> T | None:
+        return self.find({"_id": entity_id}, session=session, **kwargs)
 
     def find(
         self,
@@ -125,7 +125,7 @@ class MongoRepository(BaseRepository, Generic[EntityType]):
         projection: dict[str, Any] | None = None,
         session: ClientSession | None = None,
         **kwargs,
-    ) -> EntityType | dict[str, Any] | None:
+    ) -> T | dict[str, Any] | None:
         validate_to_entity = projection is not None
         query_result = self.collection.find_one(
             filter=filter_,
@@ -147,7 +147,7 @@ class MongoRepository(BaseRepository, Generic[EntityType]):
         sort: list[tuple[str, int]] | None = None,
         session: ClientSession | None = None,
         **kwargs,
-    ) -> list[EntityType] | list[dict[str, Any]]:
+    ) -> list[T] | list[dict[str, Any]]:
         validate_to_entity = projection is not None
         query_result = self.collection.find(
             filter=filter_,
@@ -164,11 +164,9 @@ class MongoRepository(BaseRepository, Generic[EntityType]):
 
     def find_by(
         self, filter_: dict[str, Any], session: ClientSession | None = None, **kwargs
-    ) -> EntityType | None:
-        """https://stackoverflow.com/a/73746554/9331155"""
-        entity_type: EntityType = get_args(self.__class__.__orig_bases__[0])[0]  # type: ignore
+    ) -> T | None:
         result = self.collection.find_one(filter=filter_, session=session, **kwargs)
-        return result and entity_type.model_validate(result)
+        return result and self._entity_type.model_validate(result)
 
     def find_by_query(
         self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
@@ -182,17 +180,15 @@ class MongoRepository(BaseRepository, Generic[EntityType]):
         query_result = self.collection.aggregate(qry.to_query(), session=session, **kwargs)
         return list(query_result)
 
-    def add(self, entity: EntityType, session: ClientSession | None = None, **kwargs) -> None:
+    def add(self, entity: T, session: ClientSession | None = None, **kwargs) -> None:
         self.collection.insert_one(entity_to_mongo_schema(entity), session=session, **kwargs)
 
-    def add_many(
-        self, entities: list[EntityType], session: ClientSession | None = None, **kwargs
-    ) -> None:
+    def add_many(self, entities: list[T], session: ClientSession | None = None, **kwargs) -> None:
         self.collection.insert_many(
             [entity_to_mongo_schema(entity) for entity in entities], session=session, **kwargs
         )
 
-    def update(self, entity: EntityType, session: ClientSession | None = None, **kwargs) -> None:
+    def update(self, entity: T, session: ClientSession | None = None, **kwargs) -> None:
         schema = entity_to_mongo_schema(entity)
         update_result = self.collection.update_one(
             {"_id": entity.id},
@@ -211,7 +207,7 @@ class MongoRepository(BaseRepository, Generic[EntityType]):
     def on_update(
         self,
         update_result: UpdateResult,
-        entity: EntityType,
+        entity: T,
         session: ClientSession | None = None,
         **kwargs,
     ) -> None:
@@ -229,7 +225,7 @@ class MongoRepository(BaseRepository, Generic[EntityType]):
         )
 
     def update_many(
-        self, entities: list[EntityType], session: ClientSession | None = None, **kwargs
+        self, entities: list[T], session: ClientSession | None = None, **kwargs
     ) -> None:
         for entity in entities:
             self.update(entity=entity, session=session, **kwargs)
@@ -265,7 +261,7 @@ class MongoRepository(BaseRepository, Generic[EntityType]):
         )
 
     @functools.cached_property
-    def _entity_type(self) -> EntityType:
+    def _entity_type(self) -> T:
         orig_base = next(
             (base for base in self.__class__.__orig_bases__ if get_origin(base) is MongoRepository),
             None,
