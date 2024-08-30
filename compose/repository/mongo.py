@@ -116,7 +116,7 @@ class MongoRepository(BaseRepository, Generic[EntityType]):
         session: ClientSession | None = None,
         **kwargs,
     ) -> EntityType | None:
-        return self.find_by({"_id": entity_id}, session=session, **kwargs)
+        return self.find({"_id": entity_id}, session=session, **kwargs)
 
     def find(
         self,
