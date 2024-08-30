@@ -165,10 +165,8 @@ class MongoRepository(BaseRepository, Generic[T]):
     def find_by(
         self, filter_: dict[str, Any], session: ClientSession | None = None, **kwargs
     ) -> T | None:
-        """https://stackoverflow.com/a/73746554/9331155"""
-        entity_type: T = get_args(self.__class__.__orig_bases__[0])[0]  # type: ignore
         result = self.collection.find_one(filter=filter_, session=session, **kwargs)
-        return result and entity_type.model_validate(result)
+        return result and self._entity_type.model_validate(result)
 
     def find_by_query(
         self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
