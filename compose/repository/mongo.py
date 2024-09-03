@@ -116,9 +116,9 @@ class MongoRepository(BaseRepository, Generic[T]):
         session: ClientSession | None = None,
         **kwargs,
     ) -> T | None:
-        return self.find({"_id": entity_id}, session=session, **kwargs)
+        return self.find_by({"_id": entity_id}, session=session, **kwargs)
 
-    def find(
+    def find_by(
         self,
         filter_: dict[str, Any],
         *,
@@ -161,12 +161,6 @@ class MongoRepository(BaseRepository, Generic[T]):
             if validate_to_entity
             else list(query_result)
         )
-
-    def find_by(
-        self, filter_: dict[str, Any], session: ClientSession | None = None, **kwargs
-    ) -> T | None:
-        result = self.collection.find_one(filter=filter_, session=session, **kwargs)
-        return result and self._entity_type.model_validate(result)
 
     def find_by_query(
         self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
