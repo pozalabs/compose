@@ -116,9 +116,9 @@ class MongoRepository(BaseRepository, Generic[T]):
         session: ClientSession | None = None,
         **kwargs,
     ) -> T | None:
-        return self.find({"_id": entity_id}, session=session, **kwargs)
+        return self.find_by({"_id": entity_id}, session=session, **kwargs)
 
-    def find(
+    def find_by(
         self,
         filter_: dict[str, Any],
         *,
@@ -126,7 +126,7 @@ class MongoRepository(BaseRepository, Generic[T]):
         session: ClientSession | None = None,
         **kwargs,
     ) -> T | dict[str, Any] | None:
-        validate_to_entity = projection is not None
+        validate_to_entity = projection is None
         query_result = self.collection.find_one(
             filter=filter_,
             session=session,
@@ -139,16 +139,22 @@ class MongoRepository(BaseRepository, Generic[T]):
             self._entity_type.model_validate(query_result) if validate_to_entity else query_result
         )
 
-    def list(
+    def find_by_query(
+        self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
+    ) -> dict[str, Any] | None:
+        query_result = self.collection.aggregate(qry.to_query(), session=session, **kwargs)
+        return next(query_result, None)
+
+    def list_by(
         self,
-        filter_: dict[str, Any] | None = None,
+        filter_: dict[str, Any],
         *,
         projection: dict[str, Any] | None = None,
         sort: list[tuple[str, int]] | None = None,
         session: ClientSession | None = None,
         **kwargs,
     ) -> list[T] | list[dict[str, Any]]:
-        validate_to_entity = projection is not None
+        validate_to_entity = projection is None
         query_result = self.collection.find(
             filter=filter_,
             projection=projection,
@@ -161,18 +167,6 @@ class MongoRepository(BaseRepository, Generic[T]):
             if validate_to_entity
             else list(query_result)
         )
-
-    def find_by(
-        self, filter_: dict[str, Any], session: ClientSession | None = None, **kwargs
-    ) -> T | None:
-        result = self.collection.find_one(filter=filter_, session=session, **kwargs)
-        return result and self._entity_type.model_validate(result)
-
-    def find_by_query(
-        self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
-    ) -> dict[str, Any] | None:
-        query_result = self.collection.aggregate(qry.to_query(), session=session, **kwargs)
-        return next(query_result, None)
 
     def list_by_query(
         self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
