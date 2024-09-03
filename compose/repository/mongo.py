@@ -126,7 +126,7 @@ class MongoRepository(BaseRepository, Generic[T]):
         session: ClientSession | None = None,
         **kwargs,
     ) -> T | dict[str, Any] | None:
-        validate_to_entity = projection is not None
+        validate_to_entity = projection is None
         query_result = self.collection.find_one(
             filter=filter_,
             session=session,
@@ -154,7 +154,7 @@ class MongoRepository(BaseRepository, Generic[T]):
         session: ClientSession | None = None,
         **kwargs,
     ) -> list[T] | list[dict[str, Any]]:
-        validate_to_entity = projection is not None
+        validate_to_entity = projection is None
         query_result = self.collection.find(
             filter=filter_,
             projection=projection,
