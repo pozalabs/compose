@@ -147,7 +147,7 @@ class MongoRepository(BaseRepository, Generic[T]):
 
     def list_by(
         self,
-        filter_: dict[str, Any] | None = None,
+        filter_: dict[str, Any],
         *,
         projection: dict[str, Any] | None = None,
         sort: list[tuple[str, int]] | None = None,
