@@ -139,7 +139,13 @@ class MongoRepository(BaseRepository, Generic[T]):
             self._entity_type.model_validate(query_result) if validate_to_entity else query_result
         )
 
-    def list(
+    def find_by_query(
+        self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
+    ) -> dict[str, Any] | None:
+        query_result = self.collection.aggregate(qry.to_query(), session=session, **kwargs)
+        return next(query_result, None)
+
+    def list_by(
         self,
         filter_: dict[str, Any] | None = None,
         *,
@@ -161,12 +167,6 @@ class MongoRepository(BaseRepository, Generic[T]):
             if validate_to_entity
             else list(query_result)
         )
-
-    def find_by_query(
-        self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
-    ) -> dict[str, Any] | None:
-        query_result = self.collection.aggregate(qry.to_query(), session=session, **kwargs)
-        return next(query_result, None)
 
     def list_by_query(
         self, qry: MongoQuery, session: ClientSession | None = None, **kwargs
