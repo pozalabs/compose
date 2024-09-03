@@ -4,7 +4,7 @@ import enum
 import functools
 import inspect
 import warnings
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from typing import Any, ClassVar, Generic, TypeVar, Unpack, get_args, get_origin, get_type_hints
 
 import pendulum
@@ -29,9 +29,8 @@ class SessionRequirement(str, enum.Enum):
     OPTIONAL = "optional"
 
 
-def entity_to_mongo_schema(entity: T, **kwargs) -> dict[str, Any]:
-    default_kwargs = {"by_alias": True}
-    return entity.model_dump(**(default_kwargs | kwargs))
+def entity_to_document(entity: T) -> dict[str, Any]:
+    return entity.model_dump(by_alias=True)
 
 
 class MongoRepository(BaseRepository, Generic[T]):
@@ -55,6 +54,7 @@ class MongoRepository(BaseRepository, Generic[T]):
 
     __collection_name__: ClassVar[str] = ""
     __indexes__: ClassVar[list[pymongo.IndexModel] | None] = None
+    entity_to_document: ClassVar[Callable[[T], dict[str, Any]]] = entity_to_document
 
     def __init__(self, collection: Collection):
         self.collection = collection
@@ -181,15 +181,15 @@ class MongoRepository(BaseRepository, Generic[T]):
         return list(query_result)
 
     def add(self, entity: T, session: ClientSession | None = None, **kwargs) -> None:
-        self.collection.insert_one(entity_to_mongo_schema(entity), session=session, **kwargs)
+        self.collection.insert_one(self.entity_to_document(entity), session=session, **kwargs)
 
     def add_many(self, entities: list[T], session: ClientSession | None = None, **kwargs) -> None:
         self.collection.insert_many(
-            [entity_to_mongo_schema(entity) for entity in entities], session=session, **kwargs
+            [self.entity_to_document(entity) for entity in entities], session=session, **kwargs
         )
 
     def update(self, entity: T, session: ClientSession | None = None, **kwargs) -> None:
-        schema = entity_to_mongo_schema(entity)
+        schema = self.entity_to_document(entity)
         update_result = self.collection.update_one(
             {"_id": entity.id},
             {"$set": schema},
