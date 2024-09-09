@@ -4,7 +4,7 @@ import enum
 import functools
 import inspect
 import warnings
-from collections.abc import Callable, Iterable
+from collections.abc import Iterable
 from typing import Any, ClassVar, Generic, TypeVar, Unpack, get_args, get_origin, get_type_hints
 
 import pendulum
@@ -29,10 +29,6 @@ class SessionRequirement(str, enum.Enum):
     OPTIONAL = "optional"
 
 
-def entity_to_document(entity: T) -> dict[str, Any]:
-    return entity.model_dump(by_alias=True)
-
-
 class MongoRepository(BaseRepository, Generic[T]):
     """
     `MongoRepository` 추상 클래스
@@ -54,7 +50,6 @@ class MongoRepository(BaseRepository, Generic[T]):
 
     __collection_name__: ClassVar[str] = ""
     __indexes__: ClassVar[list[pymongo.IndexModel] | None] = None
-    entity_to_document: ClassVar[Callable[[T], dict[str, Any]]] = entity_to_document
 
     def __init__(self, collection: Collection):
         self.collection = collection
@@ -264,6 +259,10 @@ class MongoRepository(BaseRepository, Generic[T]):
             raise ValueError("No origin base found")
 
         return get_args(orig_base)[0]
+
+    @staticmethod
+    def entity_to_document(entity: T) -> dict[str, Any]:
+        return entity.model_dump(by_alias=True)
 
 
 def setup_indexes(
