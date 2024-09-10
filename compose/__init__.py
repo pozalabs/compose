@@ -86,3 +86,10 @@ try:
     __all__.append("opentelemetry")
 except ImportError:
     pass
+
+try:
+    from . import httpx  # noqa: F401
+
+    __all__.append("httpx")
+except ImportError:
+    pass
