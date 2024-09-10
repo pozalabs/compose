@@ -34,11 +34,11 @@ def client(app: FastAPI) -> TestClient:
     "auth, expected_status_code",
     [
         (
-            compose.httpx.HeaderApiKeyAuth(api_key="api-key"),
+            compose.httpx.HeaderAPIKeyAuth(api_key="api-key"),
             http.HTTPStatus.OK,
         ),
         (
-            compose.httpx.HeaderApiKeyAuth(api_key="invali-api-key"),
+            compose.httpx.HeaderAPIKeyAuth(api_key="invali-api-key"),
             http.HTTPStatus.UNAUTHORIZED,
         ),
     ],
@@ -50,7 +50,7 @@ def client(app: FastAPI) -> TestClient:
 def test_header_api_key_auth(
     app: FastAPI,
     client: TestClient,
-    auth: compose.httpx.HeaderApiKeyAuth,
+    auth: compose.httpx.HeaderAPIKeyAuth,
     expected_status_code: int,
 ):
     response = client.get("/items", auth=auth)

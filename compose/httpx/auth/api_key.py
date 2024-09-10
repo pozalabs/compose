@@ -3,7 +3,7 @@ from collections.abc import Generator
 import httpx
 
 
-class HeaderApiKeyAuth(httpx.Auth):
+class HeaderAPIKeyAuth(httpx.Auth):
     def __init__(self, api_key: str, header_name: str = "X-API-Key"):
         self.api_key = api_key
         self.header_name = header_name

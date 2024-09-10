@@ -3,6 +3,6 @@ try:
 except ImportError:
     raise ImportError("Install `httpx` extra to use httpx features")
 
-from .auth.api_key import HeaderApiKeyAuth
+from .auth.api_key import HeaderAPIKeyAuth
 
-__all__ = ["HeaderApiKeyAuth"]
+__all__ = ["HeaderAPIKeyAuth"]
