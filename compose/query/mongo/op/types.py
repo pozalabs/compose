@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import copy
-from typing import Any, ClassVar, Self, TypeVar
+from typing import Any, Self, TypeVar
 
 import inflection
 
@@ -26,44 +25,6 @@ class MongoKeyword(str):
 
 def _camelize(v: str) -> str:
     return inflection.camelize(v.strip("_"), uppercase_first_letter=False)
-
-
-class AggVar(str):
-    """https://www.mongodb.com/docs/manual/reference/aggregation-variables/"""
-
-    prefix: ClassVar[str] = "$"
-
-    def __new__(cls, v: str | AggVar):
-        copied = copy.deepcopy(v)
-        num_prefixes = 0
-        prefix_removed = not v.startswith(cls.prefix)
-        while not prefix_removed:
-            copied = copied[1:]
-            num_prefixes += 1
-            prefix_removed = not copied.startswith(cls.prefix)
-
-        if num_prefixes not in (1, 2):
-            raise ValueError(f"Cannot interpret {v} as valid aggregation variable")
-
-        return super().__new__(cls, v)
-
-    @classmethod
-    def from_(cls, v: str) -> Self:
-        if v.startswith(cls.prefix):
-            raise ValueError(f"`v` must not start with `{cls.prefix}`")
-
-        return cls(f"{cls.prefix * 2}{v}")
-
-    @classmethod
-    def current(cls, v: str) -> Self:
-        if v.startswith(cls.prefix):
-            raise ValueError(f"`v` must not start with `{cls.prefix}`")
-
-        return cls(f"{cls.prefix}{v}")
-
-    @classmethod
-    def root(cls) -> Self:
-        return cls.current("ROOT")
 
 
 class _FieldPath(str):

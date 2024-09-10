@@ -70,9 +70,6 @@ class Spec(Operator):
         return cls(field=field, spec=_FieldPath(spec))
 
 
-Specification = Spec
-
-
 class Project(Stage[DictExpression]):
     def __init__(self, *specs: Spec):
         self.specs = list(specs)

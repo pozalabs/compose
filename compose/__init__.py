@@ -1,4 +1,3 @@
-from . import _signal as signal
 from . import (
     auth,
     aws,
