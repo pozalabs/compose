@@ -1,12 +1,10 @@
-from typing import Any, Generic, Self, TypeVar, get_args
+from typing import Any, Self, get_args
 
 from pydantic import ConfigDict, ValidationError
 
 from .. import container
 from ..pagination import Pagination
 from .extra import schema_by_field_name
-
-ListItem = TypeVar("ListItem")
 
 
 class Schema(container.BaseModel):
@@ -16,9 +14,9 @@ class Schema(container.BaseModel):
 class TimeStampedSchema(container.TimeStampedModel, Schema): ...
 
 
-class ListSchema(Schema, Generic[ListItem]):
+class ListSchema[T](Schema):
     total: int
-    items: list[ListItem]
+    items: list[T]
 
     @classmethod
     def from_pagination(
