@@ -1,16 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, TypeAlias, Union, cast
+from typing import Any, Union, cast
 
 from pydantic import BaseModel as PydanticBaseModel
 
 # `|` 사용시 TypeError: unsupported operand type(s) for |: 'types.UnionType' and 'str' 발생
-JsonValue: TypeAlias = Union[int, float, str, bool, None, list["JsonValue"], "JsonDict"]
-JsonDict: TypeAlias = dict[str, JsonValue]
-JsonSchemaExtraCallable: TypeAlias = (
-    Callable[[JsonDict], None] | Callable[[JsonDict, type[Any]], None]
-)
+type JsonValue = Union[int, float, str, bool, None, list["JsonValue"], "JsonDict"]
+type JsonDict = dict[str, JsonValue]
+type JsonSchemaExtraCallable = Callable[[JsonDict], None] | Callable[[JsonDict, type[Any]], None]
 
 
 def schema_excludes(*excludes: str) -> JsonSchemaExtraCallable:

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import urllib.parse
-from typing import TYPE_CHECKING, TypeAlias
+from typing import TYPE_CHECKING
 
 from compose.types import ContentDisposition
 
 if TYPE_CHECKING:
     import mypy_boto3_s3
 
-Seconds: TypeAlias = int
+type Seconds = int
 
 
 class S3UrlGenerator:

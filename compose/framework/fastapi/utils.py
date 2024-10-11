@@ -1,7 +1,7 @@
 import enum
 import functools
 from collections.abc import Awaitable, Callable
-from typing import Any, Self, TypeAlias
+from typing import Any, Self
 
 from fastapi import Request, Response
 
@@ -38,7 +38,7 @@ class ErrorEvent(container.BaseModel):
         return cls(level=Level.ERROR)
 
 
-SentryHook: TypeAlias = Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]]
+type SentryHook = Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]]
 
 
 def create_before_send_hook(

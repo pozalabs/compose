@@ -1,7 +1,7 @@
 import json
 import logging
 from collections.abc import Callable
-from typing import Literal, TypeAlias
+from typing import Literal
 
 from ..model import EventMessage
 
@@ -15,8 +15,8 @@ HookEventType = Literal[
     "on_consume_error",
     "on_shutdown",
 ]
-HookArgType: TypeAlias = str | EventMessage | Exception
-Hook: TypeAlias = Callable[[HookArgType], None]
+type HookArgType = str | EventMessage | Exception
+type Hook = Callable[[HookArgType], None]
 
 
 def default_hook(_) -> None: ...
