@@ -1,14 +1,10 @@
 import abc
 import functools
-from typing import Generic, TypeVar
 
 from ..uow import MongoUnitOfWork
 
-T = TypeVar("T")
-R = TypeVar("R")
 
-
-class MongoTransactionHandler(abc.ABC, Generic[T, R]):
+class MongoTransactionHandler[T, R](abc.ABC):
     def __init__(self, uow: MongoUnitOfWork):
         self.uow = uow
 

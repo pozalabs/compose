@@ -1,15 +1,13 @@
 import types
 from collections.abc import Callable
-from typing import Any, TypeVar, cast
+from typing import Any, cast
 
 from compose import typing
 
 from .helper import CoreSchemaGettable
 
-T = TypeVar("T")
 
-
-def caster(factory: Callable[[Any], T], /) -> Callable[[Any], T]:
+def caster[T](factory: Callable[[Any], T], /) -> Callable[[Any], T]:
     def _cast(v: Any) -> T:
         return factory(v)
 
@@ -34,7 +32,7 @@ class Float(float, CoreSchemaGettable[float]):
         yield caster(cls)
 
 
-def _create_list_type(t: type[T], /) -> type[list[T]]:
+def _create_list_type[T](t: type[T], /) -> type[list[T]]:
     def __get_validators__(c) -> typing.ValidatorGenerator:
         yield caster(c)
 
@@ -52,7 +50,7 @@ def _create_list_type(t: type[T], /) -> type[list[T]]:
     )
 
 
-def create_list_type() -> Callable[[type[T]], type[list[T]]]:
+def create_list_type[T]() -> Callable[[type[T]], type[list[T]]]:
     cache = {}
 
     def factory(t: type[T]) -> type[list[T]]:

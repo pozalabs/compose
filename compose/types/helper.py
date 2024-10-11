@@ -3,12 +3,10 @@ from __future__ import annotations
 import copy
 import inspect
 from collections.abc import Callable, Generator
-from typing import Any, Generic, Protocol, TypeVar, get_args
+from typing import Any, Protocol, get_args
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
-
-T = TypeVar("T")
 
 
 class SupportsGetValidators(Protocol):
@@ -52,7 +50,7 @@ def get_pydantic_core_schema(
     return core_schema.no_info_after_validator_function(chain(*t.__get_validators__()), schema)
 
 
-class CoreSchemaGettable(Generic[T]):
+class CoreSchemaGettable[T]:
     """Pydantic v1 커스텀 타입을 v2 커스텁 타입으로 변환하는 믹스인
 
     ```python

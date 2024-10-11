@@ -4,11 +4,9 @@ import abc
 import functools
 import operator
 from collections.abc import Callable
-from typing import Any, ClassVar, Generic, Self, TypeVar
+from typing import Any, ClassVar, Self
 
 from .types import DictExpression, ListExpression
-
-T = TypeVar("T")
 
 
 class Operator:
@@ -49,7 +47,7 @@ class GeneralAggregationOperator(Operator):
         return Evaluable({self.mongo_operator: self.expressions}).expression()
 
 
-class Stage(Operator, Generic[T]):
+class Stage[T](Operator):
     @abc.abstractmethod
     def expression(self) -> T:
         raise NotImplementedError

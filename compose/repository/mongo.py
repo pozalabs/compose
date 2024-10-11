@@ -5,7 +5,7 @@ import functools
 import inspect
 import warnings
 from collections.abc import Iterable
-from typing import Any, ClassVar, Generic, TypeVar, Unpack, get_args, get_origin, get_type_hints
+from typing import Any, ClassVar, Unpack, get_args, get_origin, get_type_hints
 
 import pendulum
 import pymongo
@@ -20,7 +20,6 @@ from ..pagination import Pagination
 from ..query.mongo import MongoFilterQuery, MongoQuery
 from .base import BaseRepository
 
-T = TypeVar("T", bound=Entity)
 registry: dict[str, list[pymongo.IndexModel]] = {}
 
 
@@ -29,7 +28,7 @@ class SessionRequirement(str, enum.Enum):
     OPTIONAL = "optional"
 
 
-class MongoRepository(BaseRepository, Generic[T]):
+class MongoRepository[T: Entity](BaseRepository):
     """
     `MongoRepository` 추상 클래스
 
