@@ -140,7 +140,6 @@ mypy-boto3-s3 = {version = ">=1.34.0,<1.35.0", optional = true, markers = "extra
 mypy-boto3-sqs = {version = ">=1.34.0,<1.35.0", optional = true, markers = "extra == \"essential\""}
 mypy-boto3-ssm = {version = ">=1.34.0,<1.35.0", optional = true, markers = "extra == \"ssm\""}
 types-s3transfer = "*"
-typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
 
 [package.extras]
 accessanalyzer = ["mypy-boto3-accessanalyzer (>=1.34.0,<1.35.0)"]
@@ -1238,9 +1237,6 @@ files = [
     {file = "mypy_boto3_cloudformation-1.34.111.tar.gz", hash = "sha256:a02e201d1a9d9a8fb4db5b942d5c537a4e8861c611f0d986126674ac557cb9e8"},
 ]
 
-[package.dependencies]
-typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
-
 [[package]]
 name = "mypy-boto3-dynamodb"
 version = "1.34.148"
@@ -1251,9 +1247,6 @@ files = [
     {file = "mypy_boto3_dynamodb-1.34.148-py3-none-any.whl", hash = "sha256:f1a7aabff5c6e926b9b272df87251c9d6dfceb4c1fb159fb5a2df52062cd7e87"},
     {file = "mypy_boto3_dynamodb-1.34.148.tar.gz", hash = "sha256:c85489b92cbbbe4f6997070372022df914d4cb8eb707fdc73aa18ce6ba25c578"},
 ]
-
-[package.dependencies]
-typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
 
 [[package]]
 name = "mypy-boto3-ec2"
@@ -1266,9 +1259,6 @@ files = [
     {file = "mypy_boto3_ec2-1.34.149.tar.gz", hash = "sha256:034f8d160535f5cf77fe35c95588454790cd2709f656274604bc36f76406211f"},
 ]
 
-[package.dependencies]
-typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
-
 [[package]]
 name = "mypy-boto3-lambda"
 version = "1.34.77"
@@ -1279,9 +1269,6 @@ files = [
     {file = "mypy-boto3-lambda-1.34.77.tar.gz", hash = "sha256:7b81d2a5604fb592e92fe0b284ecd259de071703360a33b71c9b54df46d81c9c"},
     {file = "mypy_boto3_lambda-1.34.77-py3-none-any.whl", hash = "sha256:e21022d2eef12aa731af80790410afdba9412b056339823252813bae2adbf553"},
 ]
-
-[package.dependencies]
-typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
 
 [[package]]
 name = "mypy-boto3-rds"
@@ -1294,9 +1281,6 @@ files = [
     {file = "mypy_boto3_rds-1.34.145.tar.gz", hash = "sha256:091a3605d4c2b010be2e61b306f7c877019344b3949b0bfceaee2db2a57bcc8c"},
 ]
 
-[package.dependencies]
-typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
-
 [[package]]
 name = "mypy-boto3-s3"
 version = "1.34.138"
@@ -1307,9 +1291,6 @@ files = [
     {file = "mypy_boto3_s3-1.34.138-py3-none-any.whl", hash = "sha256:47ded5f06accc10ff9db9d55c85cca88e4f028ec360d7cfcea90377e525cba56"},
     {file = "mypy_boto3_s3-1.34.138.tar.gz", hash = "sha256:7f9770d1f0e9f6fc2ced96daf5c0792b2dbbb4a4f874f28200ff3c940d0815c3"},
 ]
-
-[package.dependencies]
-typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
 
 [[package]]
 name = "mypy-boto3-sqs"
@@ -1322,9 +1303,6 @@ files = [
     {file = "mypy_boto3_sqs-1.34.121.tar.gz", hash = "sha256:bdbc623235ffc8127cb8753f49323f74a919df552247b0b2caaf85cf9bb495b8"},
 ]
 
-[package.dependencies]
-typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
-
 [[package]]
 name = "mypy-boto3-ssm"
 version = "1.34.132"
@@ -1335,9 +1313,6 @@ files = [
     {file = "mypy_boto3_ssm-1.34.132-py3-none-any.whl", hash = "sha256:c740e22b7e1c6d988e22a4d72ac36c4372a2e583ea81c3d9546c94e00b056394"},
     {file = "mypy_boto3_ssm-1.34.132.tar.gz", hash = "sha256:6ef95781d9fe6d1d6ee51d7d9395b342adfa7ca7fdd43d7b2b5de96763f01239"},
 ]
-
-[package.dependencies]
-typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
 
 [[package]]
 name = "nodeenv"
@@ -2768,5 +2743,5 @@ sentry = ["sentry-sdk"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.11,<3.13"
-content-hash = "0a4c4efbf9646f10b83923d0b9e65a3a5049df17e4d643d3c50ffb548a4e3ef1"
+python-versions = ">=3.12,<3.13"
+content-hash = "0ed746068376962144ff9d6de5f47781c0f7a0a092271d547b1cb1ca1c09f729"
