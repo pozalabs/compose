@@ -1,6 +1,6 @@
 import http
 from collections.abc import Awaitable, Callable
-from typing import ClassVar, Self, TypeAlias, TypeVar
+from typing import ClassVar, Self
 
 from fastapi import Request, Response
 from fastapi.encoders import jsonable_encoder
@@ -11,8 +11,7 @@ from starlette.exceptions import HTTPException
 
 from compose import schema
 
-E: TypeAlias = TypeVar("E", bound=Exception)
-ExceptionHandler: TypeAlias = Callable[[Request, E], Response | Awaitable[Response]]
+type ExceptionHandler[E: Exception] = Callable[[Request, E], Response | Awaitable[Response]]
 
 
 class ExceptionHandlerInfo:

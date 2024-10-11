@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, TypeAlias, TypeVar
+from typing import Any, TypeVar
 
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import ConfigDict
@@ -9,10 +9,10 @@ from typing_extensions import Self
 
 from . import field, types
 
-AbstractSetIntStr: TypeAlias = set[int] | set[str]
-MappingIntStrAny: TypeAlias = dict[int, Any] | dict[str, Any]
+type AbstractSetIntStr = set[int] | set[str]
+type MappingIntStrAny = dict[int, Any] | dict[str, Any]
 
-IncEx: TypeAlias = set[int] | set[str] | dict[int, Any] | dict[str, Any] | None
+type IncEx = set[int] | set[str] | dict[int, Any] | dict[str, Any] | None
 Model = TypeVar("Model", bound=PydanticBaseModel)
 
 

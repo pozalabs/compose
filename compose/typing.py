@@ -1,15 +1,13 @@
 from collections.abc import Callable, Generator
-from typing import Any, Self, TypeAlias, TypeVar
+from typing import Any, Self
 
 from .types import PyObjectId
 
-T = TypeVar("T")
+type Validator = Callable[[Any], Self]
+type ValidatorGenerator = Generator[Validator, None, None]
 
-Validator: TypeAlias = Callable[[Any], Self]
-ValidatorGenerator: TypeAlias = Generator[Validator, None, None]
+type Factory[T] = Callable[..., T]
+type PyObjectIdFactory = Factory[PyObjectId]
 
-Factory: TypeAlias = Callable[..., T]
-PyObjectIdFactory: TypeAlias = Factory[PyObjectId]
-
-NoArgsFactory: TypeAlias = Callable[[], T]
-NoArgsPyObjectIdFactory: TypeAlias = NoArgsFactory[PyObjectId]
+type NoArgsFactory[T] = Callable[[], T]
+type NoArgsPyObjectIdFactory = NoArgsFactory[PyObjectId]

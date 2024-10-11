@@ -1,11 +1,10 @@
 import collections
 import contextvars
-from typing import TypeAlias
 
 from .. import model
 from .base import MessageQueue
 
-EventMessageQueue: TypeAlias = collections.deque[model.EventMessage]
+type EventMessageQueue = collections.deque[model.EventMessage]
 
 event_store: contextvars.ContextVar[EventMessageQueue] = contextvars.ContextVar("event_store")
 
