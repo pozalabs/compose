@@ -1,3 +1,3 @@
-from .command import Command
+from .command import Command, IdentifiedCommand
 
-__all__ = ["Command"]
+__all__ = ["Command", "IdentifiedCommand"]
