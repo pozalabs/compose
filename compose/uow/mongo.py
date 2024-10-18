@@ -1,15 +1,12 @@
 import functools
 from collections.abc import Callable
-from typing import TypeVar
 
 from pymongo.client_session import ClientSession, SessionOptions, TransactionOptions
 
 from ..utils import unordered_partial
 
-T = TypeVar("T")
 
-
-class MongoUnitOfWork:
+class MongoUnitOfWork[T]:
     def __init__(self, session_factory: Callable[..., ClientSession]):
         self.session_factory = session_factory
 
