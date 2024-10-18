@@ -1,15 +1,14 @@
 from collections.abc import Callable, Iterable
-from typing import TypeAlias, TypeVar
+from typing import TypeAlias
 
 from .base import Operator
 from .raw import Raw
 from .types import DictExpression, ListExpression
 
-T = TypeVar("T")
 Expressionable: TypeAlias = Operator | DictExpression | ListExpression
 
 
-class _Map:
+class _Map[T]:
     def __init__(self, collection: Iterable[T], callback: Callable[[T], Operator]):
         self.collection = collection
         self.callback = callback
@@ -18,7 +17,7 @@ class _Map:
         return [self.callback(item) for item in self.collection]
 
 
-def Map(collection: Iterable[T], callback: Callable[[T], Operator]) -> list[Operator]:  # noqa: N802
+def Map[T](collection: Iterable[T], callback: Callable[[T], Operator]) -> list[Operator]:  # noqa: N802
     return _Map(collection, callback).eval()
 
 
