@@ -3,8 +3,12 @@ import secrets
 from collections.abc import Callable
 from typing import Annotated, Self
 
-from fastapi import Depends, HTTPException
-from fastapi.security import APIKeyHeader, HTTPBasic, HTTPBasicCredentials
+from authlib.jose import JWTClaims
+from fastapi import Depends, HTTPException, Request
+from fastapi.security import APIKeyHeader, HTTPBasic, HTTPBasicCredentials, HTTPBearer
+
+from compose import exceptions
+from compose.auth import JWTDecoder
 
 
 class HTTPBasicAuth:
@@ -82,3 +86,54 @@ class APIKeyAuth:
     @classmethod
     def static(cls, api_key: str, header: APIKeyHeader) -> Self:
         return cls(api_key_factory=lambda: api_key, header=header)
+
+
+class JWTBearer(HTTPBearer):
+    def __init__(
+        self,
+        token_decoder: JWTDecoder,
+        on_token_lookup_error: Callable[[], HTTPException],
+        on_token_decoding_error: Callable[[], HTTPException],
+    ):
+        super().__init__(auto_error=True)
+        self.token_decoder = token_decoder
+        self.on_token_lookup_error = on_token_lookup_error
+        self.on_token_decoding_error = on_token_decoding_error
+
+    async def __call__(self, request: Request) -> JWTClaims:
+        try:
+            credentials = await super().__call__(request)
+        except HTTPException:
+            raise self.on_token_lookup_error()
+
+        try:
+            decoded = self.token_decoder.decode(credentials.credentials)
+        except exceptions.AuthorizationError:
+            raise self.on_token_decoding_error()
+
+        return decoded
+
+
+class JWTCookieAuth:
+    def __init__(
+        self,
+        key: str,
+        token_decoder: JWTDecoder,
+        on_token_lookup_error: Callable[[], HTTPException],
+        on_token_decoding_error: Callable[[], HTTPException],
+    ):
+        self.key = key
+        self.token_decoder = token_decoder
+        self.on_token_lookup_error = on_token_lookup_error
+        self.on_token_decoding_error = on_token_decoding_error
+
+    async def __call__(self, request: Request) -> JWTClaims:
+        if (credentials := request.cookies.get(self.key)) is None:
+            raise self.on_token_lookup_error()
+
+        try:
+            decoded = self.token_decoder.decode(credentials)
+        except exceptions.AuthorizationError:
+            raise self.on_token_decoding_error()
+
+        return decoded
