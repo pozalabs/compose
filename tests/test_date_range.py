@@ -28,4 +28,4 @@ import compose
     ),
 )
 def test_for_day(dt: pendulum.DateTime, expected: compose.DayPeriod):
-    assert compose.DayPeriod.for_day(dt) == expected
+    assert compose.DateRange.for_day(dt) == expected
