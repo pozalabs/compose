@@ -1,13 +1,10 @@
 from collections.abc import Iterable
-from typing import TypeVar
 
 import pytest
 from dependency_injector import containers, providers
 
 from compose.dependency import ConflictResolution, provide
 from compose.dependency.wiring import create_provider
-
-T = TypeVar("T")
 
 
 class RepositoryA:
@@ -39,7 +36,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         (RepositoryA, ApplicationContainer, "repository_a2", RepositoryA(name="repository_a2")),
     ],
 )
-def test_provide_from_multiple_candidates(
+def test_provide_from_multiple_candidates[T](
     type_: type[T],
     container_cls: type[containers.Container],
     name: str,
@@ -72,7 +69,7 @@ def test_provide_from_multiple_candidates(
         ),
     ],
 )
-def test_provide_with_provider_types(
+def test_provide_with_provider_types[T](
     type_: type[T],
     container_cls: type[containers.Container],
     provider_types: Iterable[type[providers.Provider]],
@@ -93,7 +90,7 @@ def test_provide_with_provider_types(
         (RepositoryA, ApplicationContainer, "repository_a1", RepositoryA(name="repository_a1")),
     ],
 )
-def test_create_provider(
+def test_create_provider[T](
     type_: type[T],
     container_cls: type[containers.Container],
     name: str,

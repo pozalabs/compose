@@ -1,10 +1,6 @@
-from typing import Any, ClassVar, TypeVar
-
-from pydantic import BaseModel
+from typing import Any, ClassVar
 
 from . import container, field, types
-
-ModelType = TypeVar("ModelType", bound=BaseModel)
 
 
 class Entity(container.TimeStampedModel):

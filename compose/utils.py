@@ -1,13 +1,10 @@
 import functools
 import uuid
 from collections.abc import Callable, Generator
-from typing import Any, TypeVar, get_type_hints
-
-T = TypeVar("T")
-RT = TypeVar("RT")
+from typing import Any, get_type_hints
 
 
-def descendants_of(cls: type[T]) -> Generator[type[T], None, None]:
+def descendants_of[T](cls: type[T]) -> Generator[type[T], None, None]:
     stack = cls.__subclasses__()
     while stack:
         current_cls = stack.pop()
@@ -15,7 +12,7 @@ def descendants_of(cls: type[T]) -> Generator[type[T], None, None]:
         stack.extend(current_cls.__subclasses__())
 
 
-def unordered_partial(p: functools.partial[RT], t: T) -> Callable[..., RT]:
+def unordered_partial[RT, T](p: functools.partial[RT], t: T) -> Callable[..., RT]:
     type_hints = get_type_hints(p.func)
 
     exclude_keys = {*p.keywords.keys(), "return"}
@@ -36,7 +33,7 @@ def unordered_partial(p: functools.partial[RT], t: T) -> Callable[..., RT]:
     return functools.partial(wrapper)
 
 
-def ident(x: T) -> T:
+def ident[T](x: T) -> T:
     return x
 
 

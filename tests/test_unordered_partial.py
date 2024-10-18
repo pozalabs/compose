@@ -1,12 +1,9 @@
 import functools
 from collections.abc import Callable
-from typing import TypeVar
 
 import pytest
 
 from compose.utils import unordered_partial
-
-T = TypeVar("T")
 
 
 class Adder:
@@ -50,7 +47,7 @@ def test_can_inject_unordered_arg():
         "입력 타입과 일치하는 인자가 없으면 에러를 일으킨다.",
     ),
 )
-def test_cannot_inject_arg(
+def test_cannot_inject_arg[T](
     unordered_partial_factory: Callable[[], functools.partial[T]],
     expected_exc_cls: type[Exception],
     expected_message: str,

@@ -1,15 +1,13 @@
 import inspect
 from collections.abc import Callable
-from typing import Any, TypeVar
+from typing import Any
 
 from fastapi import Depends
 
 from compose.dependency.wiring import Provider
 
-F = TypeVar("F", bound=Callable[..., Any])
 
-
-def auto_wired(provider: Provider) -> Callable[[F], F]:
+def auto_wired[F: Callable[..., Any]](provider: Provider) -> Callable[[F], F]:
     """
     FastAPI 엔드포인트에 의존성을 자동으로 주입하는 데코레이터. 해당 데코레이터는 `@inject` 데코레이터보다
     먼저 적용되어야 합니다.

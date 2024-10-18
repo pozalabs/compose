@@ -1,18 +1,16 @@
 from collections.abc import Callable
-from typing import Any, TypeVar, cast
+from typing import Any, cast
 
 from .base import GeneralAggregationOperator, Operator
 
-OperatorType = TypeVar("OperatorType", bound=Operator)
 
-
-def create_operator(
+def create_operator[T: Operator](
     name: str,
-    expression_factory: Callable[[OperatorType], Any],
-    base: tuple[type[OperatorType], ...],
-) -> type[OperatorType]:
+    expression_factory: Callable[[T], Any],
+    base: tuple[type[T], ...],
+) -> type[T]:
     return cast(
-        type[OperatorType],
+        type[T],
         type(name, base, {"expression": expression_factory}),
     )
 

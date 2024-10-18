@@ -1,11 +1,9 @@
 import io
-from typing import IO, TypeVar
+from typing import IO
 
 import pytest
 
 from compose.stream import chunk_reader
-
-T = TypeVar("T")
 
 
 @pytest.mark.parametrize(
@@ -16,5 +14,5 @@ T = TypeVar("T")
         (io.StringIO("abc"), 3, ["abc"]),
     ],
 )
-def test_chunk_reader(f: IO[T], chunk_size: int, expected: list[T]):
+def test_chunk_reader[T](f: IO[T], chunk_size: int, expected: list[T]):
     assert list(chunk_reader(f=f, chunk_size=chunk_size)) == expected
