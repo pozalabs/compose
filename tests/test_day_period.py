@@ -9,14 +9,14 @@ import compose
     [
         (
             pendulum.datetime(2024, 10, 10, 10, 10),
-            compose.DayPeriod(
+            compose.datetime.DayPeriod(
                 start=pendulum.datetime(2024, 10, 10),
                 end=pendulum.datetime(2024, 10, 11),
             ),
         ),
         (
             pendulum.datetime(2024, 10, 10, 8, tz="Asia/Seoul"),
-            compose.DayPeriod(
+            compose.datetime.DayPeriod(
                 start=pendulum.datetime(2024, 10, 9, 15),
                 end=pendulum.datetime(2024, 10, 10, 15),
             ),
