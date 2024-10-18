@@ -3,12 +3,11 @@ import functools
 import importlib
 import inspect
 from collections.abc import Callable, Iterable
-from typing import Any, Protocol, TypeVar
+from typing import Any, Protocol
 
 from dependency_injector import containers, providers
 from dependency_injector.wiring import Provide
 
-T = TypeVar("T")
 Container = type[containers.Container] | containers.Container
 
 DEFAULT_RESOLVABLE_PROVIDER_TYPES = (providers.Factory, providers.Singleton)
@@ -20,8 +19,7 @@ class Wirer(Protocol):
         container: containers.Container,
         modules: Iterable[str] | None = None,
         from_package: str | None = None,
-    ) -> None:
-        ...
+    ) -> None: ...
 
 
 def create_wirer(packages: Iterable[str]) -> Wirer:
@@ -162,7 +160,7 @@ def resolve(
     return resolve_by_name(name=name, container=container, provider_types=provider_types)
 
 
-def provide(
+def provide[T](
     type_: type[T],
     from_: type[containers.Container],
     /,
@@ -209,21 +207,20 @@ def create_lazy_resolver(container_path: str) -> Callable[[str], Any]:
     return resolver
 
 
-class Provider(Protocol):
+class Provider[T](Protocol):
     def __call__(
         self,
         t: type[T],
         /,
         name: str | None = None,
         conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
-    ) -> Provide[T]:
-        ...
+    ) -> Provide[T]: ...
 
 
-def create_provider(
+def create_provider[T](
     container: type[containers.Container],
     provider_types: Iterable[type[providers.Provider]] = DEFAULT_RESOLVABLE_PROVIDER_TYPES,
-) -> Provider:
+) -> Provider[T]:
     def provider(
         type_: type[T],
         /,
