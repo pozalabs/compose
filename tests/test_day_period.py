@@ -24,7 +24,7 @@ import compose
     ],
     ids=(
         "UTC 날짜를 입력하는 경우 UTC 기준 시작 시간을 시작 시간으로 사용한다.",
-        "KST 날짜를 입력하는 경우 KST 기준 시작 시간을 UTC로 변환한 시각을 시작 시간으로 사용한다.",
+        "UTC 외의 날짜를 입력하는 경우 해당 타임존 기준 시작 시간을 UTC로 변환한 시각을 시작 시간으로 사용한다.",
     ),
 )
 def test_for_day(dt: pendulum.DateTime, expected: compose.DayPeriod):
