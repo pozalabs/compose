@@ -1,15 +1,12 @@
 from collections.abc import Callable
-from typing import Annotated, Any, TypeVar
+from typing import Annotated, Any
 
 from fastapi import Depends
 
 from compose.container import BaseModel
 
-U = TypeVar("U")
-T = TypeVar("T", bound=BaseModel)
 
-
-class CommandUpdater:
+class CommandUpdater[T: BaseModel, U]:
     def __init__(self, from_field: str, to_field: str):
         self.from_field = from_field
         self.to_field = to_field
@@ -18,7 +15,7 @@ class CommandUpdater:
         return cmd.copy(update={self.to_field: getattr(user, self.from_field)}, deep=True)
 
 
-class UserInjector:
+class UserInjector[T: BaseModel, U]:
     def __init__(
         self,
         user_getter: Callable[[], U],
@@ -37,7 +34,7 @@ class UserInjector:
         return inject_user
 
 
-def create_with_user(
+def create_with_user[T: BaseModel](
     user_injector: Callable[..., Any],
 ) -> Callable[[type[T]], type[T]]:
     def with_user(cmd: type[T]) -> type[T]:
