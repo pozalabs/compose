@@ -5,7 +5,7 @@ import pendulum
 from . import container, types
 
 
-class DayPeriod(container.BaseModel):
+class DateRange(container.BaseModel):
     start: types.DateTime
     end: types.DateTime
 
