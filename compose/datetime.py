@@ -2,12 +2,12 @@ from typing import Self
 
 import pendulum
 
-from . import container
+from . import container, types
 
 
 class DayPeriod(container.BaseModel):
-    start: pendulum.DateTime
-    end: pendulum.DateTime
+    start: types.DateTime
+    end: types.DateTime
 
     @classmethod
     def for_day(cls, dt: pendulum.DateTime, tz: pendulum.tz.Timezone = pendulum.UTC) -> Self:
