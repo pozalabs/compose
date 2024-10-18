@@ -8,7 +8,7 @@ from typing import Any, Protocol
 from dependency_injector import containers, providers
 from dependency_injector.wiring import Provide
 
-Container = type[containers.Container] | containers.Container
+type Container = type[containers.Container] | containers.Container
 
 DEFAULT_RESOLVABLE_PROVIDER_TYPES = (providers.Factory, providers.Singleton)
 
