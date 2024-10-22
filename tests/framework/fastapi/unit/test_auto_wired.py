@@ -117,7 +117,10 @@ def test_auto_wired(
 
 @pytest.mark.parametrize(
     "qry, expected_status_code, expected_response",
-    [(ListUsers(names=["user1"]), http.HTTPStatus.OK, [{"name": "user1"}])],
+    [
+        (ListUsers(names=["user1"]), http.HTTPStatus.OK, [{"name": "user1"}]),
+        (ListUsers(names=["user3"]), http.HTTPStatus.OK, []),
+    ],
 )
 def test_with_query_model(
     client: TestClient,
