@@ -10,7 +10,11 @@ class DateRange(container.BaseModel):
     end: types.DateTime
 
     @classmethod
-    def for_day(cls, dt: pendulum.DateTime, tz: pendulum.tz.Timezone = pendulum.UTC) -> Self:
+    def from_day_start(
+        cls,
+        dt: pendulum.DateTime,
+        tz: pendulum.tz.Timezone = pendulum.UTC,
+    ) -> Self:
         if dt.tzinfo is None:
             raise ValueError("input datetime must be aware")
 
