@@ -1,10 +1,13 @@
 import http
-from typing import Any
+import urllib.parse
+from collections.abc import Callable
+from typing import Annotated, Any
 
 import pytest
 from dependency_injector import providers
 from dependency_injector.wiring import inject
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, Query
+from pydantic import Field
 from starlette.testclient import TestClient
 
 import compose
@@ -12,6 +15,16 @@ import compose
 
 class User(compose.BaseModel):
     name: str
+
+
+class ListUsers(compose.query.Query):
+    names: list[str] = Field(default_factory=list, alias="name")
+
+    def to_query(self) -> Callable[[User], bool]:
+        def filter_(user: User) -> bool:
+            return user.name in self.names
+
+        return filter_
 
 
 class UserRepository:
@@ -24,6 +37,10 @@ class UserRepository:
     def find_by_name(self, name: str) -> User | None:
         return next((item for item in self._items if item.name == name), None)
 
+    def filter(self, qry: ListUsers) -> list[User]:
+        filter_users = qry.to_query()
+        return [item for item in self._items if filter_users(item)]
+
 
 class UserContainer(compose.dependency.DeclarativeContainer):
     user_repository = providers.Singleton(UserRepository)
@@ -35,6 +52,16 @@ class ApplicationContainer(compose.dependency.DeclarativeContainer):
 
 provide = compose.dependency.create_provider(ApplicationContainer)
 router = APIRouter()
+
+
+@router.get("/v1/users", response_model=list[User])
+@inject
+@compose.fastapi.auto_wired(provide)
+def list_users(
+    qry: Annotated[ListUsers, Query()],
+    user_repository: UserRepository,
+):
+    return user_repository.filter(qry)
 
 
 @router.get("/v1/users/{name}", response_model=User)
@@ -83,6 +110,24 @@ def test_auto_wired(
     expected_response: dict[str, Any],
 ):
     response = client.get(f"/v1/users/{name}")
+
+    assert response.status_code == expected_status_code
+    assert response.json() == expected_response
+
+
+@pytest.mark.parametrize(
+    "qry, expected_status_code, expected_response",
+    [(ListUsers(names=["user1"]), http.HTTPStatus.OK, [{"name": "user1"}])],
+)
+def test_with_query_model(
+    client: TestClient,
+    qry: ListUsers,
+    expected_status_code: int,
+    expected_response: list[dict[str, Any]],
+):
+    response = client.get(
+        "/v1/users", params=urllib.parse.urlencode(qry.model_dump(by_alias=True), doseq=True)
+    )
 
     assert response.status_code == expected_status_code
     assert response.json() == expected_response
