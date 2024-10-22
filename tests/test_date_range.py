@@ -27,5 +27,5 @@ import compose
         "UTC 외의 날짜를 입력하는 경우 해당 타임존 기준 시작 시간을 UTC로 변환한 시각을 시작 시간으로 사용한다.",
     ),
 )
-def test_for_day(dt: pendulum.DateTime, expected: compose.datetime.DateRange):
-    assert compose.datetime.DateRange.for_day(dt) == expected
+def test_from_day_start(dt: pendulum.DateTime, expected: compose.datetime.DateRange):
+    assert compose.datetime.DateRange.from_day_start(dt) == expected
