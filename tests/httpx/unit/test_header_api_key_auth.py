@@ -3,7 +3,6 @@ import http
 import pytest
 from fastapi import FastAPI
 from fastapi.params import Depends
-from fastapi.security import APIKeyHeader
 from starlette.testclient import TestClient
 
 import compose
@@ -12,13 +11,9 @@ import compose
 @pytest.fixture
 def app() -> FastAPI:
     _app = FastAPI()
-    api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)
-    api_key_auth = compose.fastapi.APIKeyAuth(
-        api_key_factory=lambda: "api-key",
-        header=api_key_header,
-    ).authenticator()
+    api_key_header = compose.fastapi.APIKeyHeader(api_key="api-key")
 
-    @_app.get("/items", dependencies=[Depends(api_key_auth)])
+    @_app.get("/items", dependencies=[Depends(api_key_header)])
     def create_item():
         return [{"name": "item_1"}, {"name": "item_2"}]
 

@@ -1,14 +1,24 @@
 import http
 import secrets
 from collections.abc import Callable
-from typing import Annotated, Self
+from typing import Annotated
 
 from authlib.jose import JWTClaims
 from fastapi import Depends, HTTPException, Request
-from fastapi.security import APIKeyHeader, HTTPBasic, HTTPBasicCredentials, HTTPBearer
+from fastapi.security import APIKeyHeader as FastAPIAPIKeyHeader
+from fastapi.security import HTTPBasic, HTTPBasicCredentials, HTTPBearer
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from compose import exceptions
 from compose.auth import JWTDecoder
+
+
+def unauthorized_error(detail: str, headers: dict[str, str] | None = None) -> HTTPException:
+    return HTTPException(
+        status_code=http.HTTPStatus.UNAUTHORIZED,
+        detail=detail,
+        headers=headers,
+    )
 
 
 class HTTPBasicAuth:
@@ -37,55 +47,36 @@ class HTTPBasicAuth:
         return authenticate
 
 
-class APIKeyAuth:
-    """API Key Authentication for FastAPI
+class APIKeyHeader(FastAPIAPIKeyHeader):
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        name: str = "X-API-Key",
+        auto_error: bool = True,
+        scheme_name: str | None = None,
+        description: str | None = None,
+    ):
+        super().__init__(
+            name=name,
+            auto_error=auto_error,
+            scheme_name=scheme_name,
+            description=description,
+        )
+        self.api_key = api_key
 
-    Example:
-    ```python
-    import compose
-    from fastapi import Depends
-    from fastapi.security import APIKeyHeader
+    async def __call__(self, request: Request) -> str:
+        exc = unauthorized_error(detail="Not authenticated. Invalid API key")
 
-    app = FastAPI()
-    api_key_header = APIKeyHeader("x-api-key", auto_error=False)
+        try:
+            input_api_key = await super().__call__(request)
+        except (StarletteHTTPException, HTTPException):
+            raise exc
 
-    # 고정 API Key 인증
-    api_key_auth = compose.fastapi.APIKeyAuth.static(
-        api_key="api-key",
-        header=api_key_header,
-    ).authenticator()
+        if input_api_key is None or input_api_key != self.api_key:
+            raise exc
 
-    # 동적 API Key 인증
-    api_key_auth = compose.fastapi.APIKeyAuth(
-        api_key_factory=api_key_factory,
-        header=api_key_header,
-    ).authenticator()
-
-    @app.get("/auth/api-key", dependencies=[Depends(api_key_auth)])
-    def authed_by_api_key():
-        return {"message": "Authenticated"}
-    """
-
-    def __init__(self, api_key_factory: Callable[[], str], header: APIKeyHeader):
-        self.api_key_factory = api_key_factory
-        self.header = header
-
-    def authenticator(self) -> Callable[[str], None]:
-        _header = self.header
-
-        def authenticate(header: Annotated[str, Depends(_header)]) -> None:
-            api_key = self.api_key_factory()
-            if header != api_key:
-                raise HTTPException(
-                    status_code=http.HTTPStatus.UNAUTHORIZED,
-                    detail="Not authenticated. Invalid API key",
-                )
-
-        return authenticate
-
-    @classmethod
-    def static(cls, api_key: str, header: APIKeyHeader) -> Self:
-        return cls(api_key_factory=lambda: api_key, header=header)
+        return input_api_key
 
 
 class JWTBearer(HTTPBearer):
