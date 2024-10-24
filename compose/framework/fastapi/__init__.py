@@ -22,7 +22,7 @@ from .openapi import (
 from .param import as_query, to_query, with_depends
 from .response import NoContentResponse, ZipStreamingResponse
 from .routing import APIRouter
-from .security import APIKeyHeader, HTTPBasicAuth, JWTBearer, JWTCookieAuth
+from .security import APIKeyHeader, HTTPBasicAuth, JWTBearer, JWTCookieAuth, unauthorized_error
 from .wiring import auto_wired
 
 __all__ = [
@@ -51,6 +51,7 @@ __all__ = [
     "UserInjector",
     "create_with_user",
     "with_depends",
+    "unauthorized_error",
 ]
 
 

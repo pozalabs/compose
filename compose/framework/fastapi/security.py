@@ -13,6 +13,14 @@ from compose import exceptions
 from compose.auth import JWTDecoder
 
 
+def unauthorized_error(detail: str, headers: dict[str, str] | None = None) -> HTTPException:
+    return HTTPException(
+        status_code=http.HTTPStatus.UNAUTHORIZED,
+        detail=detail,
+        headers=headers,
+    )
+
+
 class HTTPBasicAuth:
     def __init__(self, username: str, password: str, security: HTTPBasic):
         self.username = username
@@ -58,10 +66,7 @@ class APIKeyHeader(FastAPIAPIKeyHeader):
         self.api_key = api_key
 
     async def __call__(self, request: Request) -> str:
-        exc = HTTPException(
-            status_code=http.HTTPStatus.UNAUTHORIZED,
-            detail="Not authenticated. Invalid API key",
-        )
+        exc = unauthorized_error(detail="Not authenticated. Invalid API key")
 
         try:
             input_api_key = await super().__call__(request)
