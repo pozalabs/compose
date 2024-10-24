@@ -65,7 +65,7 @@ class APIKeyHeader(FastAPIAPIKeyHeader):
 
         try:
             input_api_key = await super().__call__(request)
-        except StarletteHTTPException:
+        except (StarletteHTTPException, HTTPException):
             raise exc
 
         if input_api_key is None or input_api_key != self.api_key:
