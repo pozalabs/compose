@@ -1,16 +1,14 @@
 import http
 import secrets
 from collections.abc import Callable
-from typing import Annotated
+from typing import Annotated, Literal
 
-from authlib.jose import JWTClaims
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import APIKeyHeader as FastAPIAPIKeyHeader
-from fastapi.security import HTTPBasic, HTTPBasicCredentials, HTTPBearer
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import HTTPBearer as FastAPIHTTPBearer
+from fastapi.security.base import SecurityBase
 from starlette.exceptions import HTTPException as StarletteHTTPException
-
-from compose import exceptions
-from compose.auth import JWTDecoder
 
 
 def unauthorized_error(detail: str, headers: dict[str, str] | None = None) -> HTTPException:
@@ -79,52 +77,41 @@ class APIKeyHeader(FastAPIAPIKeyHeader):
         return input_api_key
 
 
-class JWTBearer(HTTPBearer):
+class HTTPBearer(FastAPIHTTPBearer):
     def __init__(
         self,
-        token_decoder: JWTDecoder,
-        on_token_lookup_error: Callable[[], HTTPException],
-        on_token_decoding_error: Callable[[], HTTPException],
+        *,
+        auto_error: bool = True,
+        error_handlers: dict[Literal["on_credentials_missing"], Callable[[], HTTPException]]
+        | None = None,
     ):
-        super().__init__(auto_error=True)
-        self.token_decoder = token_decoder
-        self.on_token_lookup_error = on_token_lookup_error
-        self.on_token_decoding_error = on_token_decoding_error
+        super().__init__(auto_error=auto_error)
+        self.error_handlers = error_handlers or {}
+        self._default_error_handler = lambda: unauthorized_error(detail="Not authenticated")
 
-    async def __call__(self, request: Request) -> JWTClaims:
+    async def __call__(self, request: Request) -> str:
         try:
             credentials = await super().__call__(request)
         except HTTPException:
-            raise self.on_token_lookup_error()
+            raise self.error_handlers.get("on_credentials_missing", self._default_error_handler)()
 
-        try:
-            decoded = self.token_decoder.decode(credentials.credentials)
-        except exceptions.AuthorizationError:
-            raise self.on_token_decoding_error()
-
-        return decoded
+        return credentials.credentials
 
 
-class JWTCookieAuth:
+class CookieAuth(SecurityBase):
     def __init__(
         self,
-        key: str,
-        token_decoder: JWTDecoder,
-        on_token_lookup_error: Callable[[], HTTPException],
-        on_token_decoding_error: Callable[[], HTTPException],
+        *,
+        name: str,
+        error_handlers: dict[Literal["on_cookie_missing"], Callable[[], HTTPException]]
+        | None = None,
     ):
-        self.key = key
-        self.token_decoder = token_decoder
-        self.on_token_lookup_error = on_token_lookup_error
-        self.on_token_decoding_error = on_token_decoding_error
+        self.name = name
+        self.error_handlers = error_handlers or {}
+        self._default_error_handler = lambda: unauthorized_error(detail="Not authenticated")
 
-    async def __call__(self, request: Request) -> JWTClaims:
-        if (credentials := request.cookies.get(self.key)) is None:
-            raise self.on_token_lookup_error()
+    async def __call__(self, request: Request) -> str:
+        if (credentials := request.cookies.get(self.name)) is None:
+            raise self.error_handlers.get("on_cookie_missing", self._default_error_handler)()
 
-        try:
-            decoded = self.token_decoder.decode(credentials)
-        except exceptions.AuthorizationError:
-            raise self.on_token_decoding_error()
-
-        return decoded
+        return credentials

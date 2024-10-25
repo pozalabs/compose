@@ -22,7 +22,7 @@ from .openapi import (
 from .param import as_query, to_query, with_depends
 from .response import NoContentResponse, ZipStreamingResponse
 from .routing import APIRouter
-from .security import APIKeyHeader, HTTPBasicAuth, JWTBearer, JWTCookieAuth, unauthorized_error
+from .security import APIKeyHeader, CookieAuth, HTTPBasicAuth, HTTPBearer, unauthorized_error
 from .wiring import auto_wired
 
 __all__ = [
@@ -34,8 +34,8 @@ __all__ = [
     "health_check",
     "HTTPBasicAuth",
     "APIKeyHeader",
-    "JWTBearer",
-    "JWTCookieAuth",
+    "HTTPBearer",
+    "CookieAuth",
     "openapi_tags",
     "NoContentResponse",
     "ZipStreamingResponse",
