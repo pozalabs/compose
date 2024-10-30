@@ -73,6 +73,6 @@ class Range(Operator):
         return cls(g=Gte(field=field, value=start), l=Lt(field=field, value=end))
 
     @classmethod
-    def day(cls, field: str, dt: pendulum.DateTime) -> Self:
+    def day_of(cls, field: str, dt: pendulum.DateTime) -> Self:
         date_range = types.DateRange.day_of(dt)
         return cls.date(field=field, start=date_range.start, end=date_range.end)

@@ -23,7 +23,7 @@ from compose.query.mongo.op import Range
             },
         ),
         (
-            Range.day(
+            Range.day_of(
                 field="created_at",
                 dt=pendulum.datetime(2024, 10, 2, tz="Asia/Seoul"),
             ),
