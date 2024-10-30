@@ -60,23 +60,23 @@ class Regex(ComparisonOperator):
 
 
 class Range(Operator):
-    def __init__(self, field: str, from_: Gt | Gte, to: Lt | Lte):
+    def __init__(self, field: str, start: Gt | Gte, end: Lt | Lte):
         self.field = field
-        self.from_ = from_
-        self.to = to
+        self.start = start
+        self.end = end
 
     def expression(self) -> dict[str, Any]:
-        return {self.field: self.from_.expression()[self.field] | self.to.expression()[self.field]}
+        return {self.field: self.start.expression()[self.field] | self.end.expression()[self.field]}
 
     @classmethod
-    def date(cls, field: str, from_: pendulum.DateTime, to: pendulum.DateTime) -> Self:
+    def date(cls, field: str, start: pendulum.DateTime, end: pendulum.DateTime) -> Self:
         return cls(
             field=field,
-            from_=Gte(field=field, value=from_),
-            to=Lt(field=field, value=to),
+            start=Gte(field=field, value=start),
+            end=Lt(field=field, value=end),
         )
 
     @classmethod
     def day(cls, field: str, dt: pendulum.DateTime) -> Self:
         date_range = types.DateRange.day_of(dt)
-        return cls.date(field=field, from_=date_range.start, to=date_range.end)
+        return cls.date(field=field, start=date_range.start, end=date_range.end)

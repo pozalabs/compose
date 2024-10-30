@@ -22,8 +22,8 @@ from compose.query.mongo.op import (
                     Eq(field="field", value="value"),
                     Range.date(
                         field="created_at",
-                        from_=pendulum.datetime(2024, 10, 1),
-                        to=pendulum.datetime(2024, 10, 2),
+                        start=pendulum.datetime(2024, 10, 1),
+                        end=pendulum.datetime(2024, 10, 2),
                     ),
                 ),
                 Pipeline(
