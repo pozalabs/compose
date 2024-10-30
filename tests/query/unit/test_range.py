@@ -21,7 +21,19 @@ from compose.query.mongo.op import Range
                     "$lt": pendulum.datetime(2024, 10, 2),
                 }
             },
-        )
+        ),
+        (
+            Range.day(
+                field="created_at",
+                dt=pendulum.datetime(2024, 10, 2, tz="Asia/Seoul"),
+            ),
+            {
+                "created_at": {
+                    "$gte": pendulum.datetime(2024, 10, 1, 15),
+                    "$lt": pendulum.datetime(2024, 10, 2, 15),
+                }
+            },
+        ),
     ],
 )
 def test_expression(op: Range, expected: dict[str, Any]):

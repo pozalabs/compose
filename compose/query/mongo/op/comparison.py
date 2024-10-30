@@ -5,6 +5,8 @@ from typing import Any, Self
 
 import pendulum
 
+from compose import types
+
 from . import utils
 from .base import ComparisonOperator, Operator
 from .types import DictExpression
@@ -73,3 +75,8 @@ class Range(Operator):
             from_=Gte(field=field, value=from_),
             to=Lt(field=field, value=to),
         )
+
+    @classmethod
+    def day(cls, field: str, dt: pendulum.DateTime) -> Self:
+        date_range = types.DateRange.day_of(dt)
+        return cls.date(field=field, from_=date_range.start, to=date_range.end)
