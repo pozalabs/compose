@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Self, TypeVar
 
-import inflection
+from pydantic.alias_generators import to_camel
 
 DictExpression = dict[str, Any]
 ListExpression = list[DictExpression]
@@ -24,7 +24,7 @@ class MongoKeyword(str):
 
 
 def _camelize(v: str) -> str:
-    return inflection.camelize(v.strip("_"), uppercase_first_letter=False)
+    return to_camel(v.strip("_"))
 
 
 class _FieldPath(str):
