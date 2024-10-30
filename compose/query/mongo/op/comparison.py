@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Self
+
+import pendulum
 
 from . import utils
 from .base import ComparisonOperator, Operator
@@ -53,3 +55,21 @@ class Regex(ComparisonOperator):
 
     def expression(self) -> dict[str, Any]:
         return {self.field: {"$regex": self.value, "$options": self.options}}
+
+
+class Range(Operator):
+    def __init__(self, field: str, from_: Gt | Gte, to: Lt | Lte):
+        self.field = field
+        self.from_ = from_
+        self.to = to
+
+    def expression(self) -> dict[str, Any]:
+        return {self.field: self.from_.expression()[self.field] | self.to.expression()[self.field]}
+
+    @classmethod
+    def date(cls, field: str, from_: pendulum.DateTime, to: pendulum.DateTime) -> Self:
+        return cls(
+            field=field,
+            from_=Gte(field=field, value=from_),
+            to=Lt(field=field, value=to),
+        )

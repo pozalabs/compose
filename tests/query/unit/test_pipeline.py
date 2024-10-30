@@ -1,3 +1,4 @@
+import pendulum
 import pytest
 
 from compose.query.mongo.op import (
@@ -6,6 +7,7 @@ from compose.query.mongo.op import (
     Match,
     MatchLookup,
     Pipeline,
+    Range,
     Set,
     Spec,
 )
@@ -18,6 +20,11 @@ from compose.query.mongo.op import (
             Pipeline(
                 Match.and_(
                     Eq(field="field", value="value"),
+                    Range.date(
+                        field="created_at",
+                        from_=pendulum.datetime(2024, 10, 1),
+                        to=pendulum.datetime(2024, 10, 2),
+                    ),
                 ),
                 Pipeline(
                     MatchLookup(
@@ -30,7 +37,19 @@ from compose.query.mongo.op import (
                 ),
             ),
             [
-                {"$match": {"$and": [{"field": {"$eq": "value"}}]}},
+                {
+                    "$match": {
+                        "$and": [
+                            {"field": {"$eq": "value"}},
+                            {
+                                "created_at": {
+                                    "$gte": pendulum.datetime(2024, 10, 1),
+                                    "$lt": pendulum.datetime(2024, 10, 2),
+                                }
+                            },
+                        ]
+                    }
+                },
                 {
                     "$lookup": {
                         "from": "from",
