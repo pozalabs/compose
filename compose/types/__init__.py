@@ -1,4 +1,4 @@
-from .datetime import DateTime
+from .datetime import DateRange, DateTime
 from .helper import CoreSchemaGettable, SupportsGetValidators, chain, get_pydantic_core_schema
 from .object_id import PyObjectId
 from .url import S3ContentUrl
@@ -8,6 +8,7 @@ from .web import ContentDisposition
 __all__ = [
     "PyObjectId",
     "DateTime",
+    "DateRange",
     "SupportsGetValidators",
     "chain",
     "CoreSchemaGettable",

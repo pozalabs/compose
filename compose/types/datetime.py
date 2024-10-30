@@ -1,8 +1,7 @@
-from __future__ import annotations
-
 import datetime
 from collections.abc import Callable, Generator
-from typing import Any
+from dataclasses import dataclass
+from typing import Any, Self
 
 import pendulum
 from pydantic import GetCoreSchemaHandler
@@ -27,3 +26,20 @@ class DateTime(pendulum.DateTime):
         cls, source_type: Any, handler: GetCoreSchemaHandler
     ) -> CoreSchema:
         return get_pydantic_core_schema(cls, handler(datetime.datetime))
+
+
+@dataclass
+class DateRange:
+    start: DateTime
+    end: DateTime
+
+    @classmethod
+    def day_of(
+        cls,
+        dt: pendulum.DateTime,
+        tz: pendulum.tz.Timezone | str = pendulum.UTC,
+    ) -> Self:
+        if dt.tzinfo is None:
+            raise ValueError("input datetime must be aware")
+
+        return cls(start=(start := dt.start_of("day").in_tz(tz)), end=start.add(days=1))
