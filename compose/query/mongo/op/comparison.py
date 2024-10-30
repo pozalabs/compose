@@ -60,21 +60,17 @@ class Regex(ComparisonOperator):
 
 
 class Range(Operator):
-    def __init__(self, field: str, start: Gt | Gte, end: Lt | Lte):
-        self.field = field
-        self.start = start
-        self.end = end
+    def __init__(self, g: Gt | Gte, l: Lt | Lte):  # noqa: E741
+        self.g = g
+        self.l = l
 
     def expression(self) -> dict[str, Any]:
-        return {self.field: self.start.expression()[self.field] | self.end.expression()[self.field]}
+        field = self.g.field
+        return {field: self.g.expression()[field] | self.l.expression()[field]}
 
     @classmethod
     def date(cls, field: str, start: pendulum.DateTime, end: pendulum.DateTime) -> Self:
-        return cls(
-            field=field,
-            start=Gte(field=field, value=start),
-            end=Lt(field=field, value=end),
-        )
+        return cls(g=Gte(field=field, value=start), l=Lt(field=field, value=end))
 
     @classmethod
     def day(cls, field: str, dt: pendulum.DateTime) -> Self:
