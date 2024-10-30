@@ -3,7 +3,6 @@ from . import (
     aws,
     command,
     concurrent,
-    datetime,
     dependency,
     entity,
     enums,
@@ -56,7 +55,6 @@ __all__ = [
     "aws",
     "lock",
     "handler",
-    "datetime",
 ]
 
 try:
