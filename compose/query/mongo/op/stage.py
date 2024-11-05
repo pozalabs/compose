@@ -262,3 +262,11 @@ class Group(Stage[DictExpression]):
     @classmethod
     def by_null(cls, *ops: Operator) -> Self:
         return cls(*ops, key=None)
+
+
+class Sample(Stage[DictExpression]):
+    def __init__(self, size: int):
+        self.size = size
+
+    def expression(self) -> DictExpression:
+        return Evaluable({"$size": {"size": self.size}}).expression()
