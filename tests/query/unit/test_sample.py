@@ -8,7 +8,7 @@ from compose.query.mongo.op import DictExpression, Sample
     [
         (
             Sample(3),
-            {"$size": {"size": 3}},
+            {"$sample": {"size": 3}},
         )
     ],
 )
