@@ -14,7 +14,7 @@ class Operator:
     def expression(self) -> Any:
         raise NotImplementedError
 
-    def fmap(self, op: Callable[..., Operator]) -> Operator:
+    def then(self, op: Callable[..., Operator]) -> Operator:
         return op(self.expression())
 
 
