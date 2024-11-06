@@ -15,8 +15,8 @@ from compose.query.mongo.op import Filter, Operator, Size, ToBool
                     as_="output",
                     cond={"$eq": ["$$field", "value"]},
                 )
-                .fmap(Size)
-                .fmap(ToBool)
+                .then(Size)
+                .then(ToBool)
             ),
             {
                 "$toBool": {
