@@ -72,7 +72,7 @@ except ImportError:
     pass
 
 try:
-    from .framework import fastapi  # noqa: F401
+    from . import fastapi  # noqa: F401
 
     __all__.append("fastapi")
 except ImportError:
