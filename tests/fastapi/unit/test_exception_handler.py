@@ -5,11 +5,10 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 
 import compose
-from compose.framework.fastapi import ExceptionHandlerInfo
 
 
 def test_error_handler_info_for_status_code():
-    error_handler = ExceptionHandlerInfo.for_status_code(
+    error_handler = compose.fastapi.ExceptionHandlerInfo.for_status_code(
         status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR,
         error_type=http.HTTPStatus.INTERNAL_SERVER_ERROR.name.lower(),
     )
@@ -32,7 +31,7 @@ def test_error_handler_info_for_exc():
     class AuthorizationError(compose.exceptions.BaseError):
         pass
 
-    error_handler = ExceptionHandlerInfo.for_exc(
+    error_handler = compose.fastapi.ExceptionHandlerInfo.for_exc(
         exc_cls=AuthorizationError,
         status_code=http.HTTPStatus.UNAUTHORIZED,
         error_type=http.HTTPStatus.UNAUTHORIZED.name.lower(),
