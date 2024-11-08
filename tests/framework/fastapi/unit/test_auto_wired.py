@@ -65,8 +65,7 @@ def list_users(
 
 
 @router.get("/v1/users/{name}", response_model=User)
-@inject
-@compose.fastapi.auto_wired(provide)
+@compose.fastapi.auto_wired(provide, with_injection=True)
 def retrieve_user(
     name: str,
     user_repository: UserRepository,
