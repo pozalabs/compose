@@ -64,7 +64,6 @@ try:
 except ImportError:
     pass
 
-
 try:
     from . import testing  # noqa: F401
 
@@ -73,7 +72,7 @@ except ImportError:
     pass
 
 try:
-    from . import fastapi  # noqa: F401
+    from . import fastapi  # noqa: F401, RUF100
 
     __all__.append("fastapi")
 except ImportError:
