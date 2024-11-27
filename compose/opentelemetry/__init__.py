@@ -1,6 +1,6 @@
-try:
-    import opentelemetry  # noqa: F401
-except ImportError:
+from .._internal import is_package_installed
+
+if not is_package_installed("opentelemetry"):
     raise ImportError("Install `opentelemetry` extra to use opentelemetry features")
 
 from .instrumentation.loguru.instrumentor import LoguruInstrumentor
