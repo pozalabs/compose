@@ -1,7 +1,7 @@
-try:
-    import fastapi  # noqa: F401
-except ImportError:
-    raise ImportError("Install `fastapi` to use fastapi helpers")
+from .._internal import is_package_installed
+
+if not is_package_installed("fastapi"):
+    raise ImportError("Install `fastapi` to use `compose.fastapi` package")
 
 from .depends import CommandUpdater, UserInjector, create_with_user
 from .endpoint import health_check
@@ -26,32 +26,32 @@ from .security import APIKeyHeader, CookieAuth, HTTPBasicAuth, HTTPBearer, unaut
 from .wiring import auto_wired
 
 __all__ = [
+    "APIKeyHeader",
+    "APIRouter",
+    "CommandUpdater",
+    "CookieAuth",
     "ExceptionHandler",
     "ExceptionHandlerInfo",
-    "create_exception_handler",
-    "to_query",
-    "as_query",
-    "health_check",
     "HTTPBasicAuth",
-    "APIKeyHeader",
     "HTTPBearer",
-    "CookieAuth",
-    "openapi_tags",
     "NoContentResponse",
-    "ZipStreamingResponse",
-    "APIRouter",
-    "auto_wired",
-    "additional_responses",
     "OpenAPIDoc",
-    "SwaggerUIHTML",
-    "RedocHTML",
     "OpenAPIJson",
-    "add_doc_routes",
-    "CommandUpdater",
+    "RedocHTML",
+    "SwaggerUIHTML",
     "UserInjector",
+    "ZipStreamingResponse",
+    "add_doc_routes",
+    "additional_responses",
+    "as_query",
+    "auto_wired",
+    "create_exception_handler",
     "create_with_user",
-    "with_depends",
+    "health_check",
+    "openapi_tags",
+    "to_query",
     "unauthorized_error",
+    "with_depends",
 ]
 
 

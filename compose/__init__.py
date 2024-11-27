@@ -72,9 +72,7 @@ except ImportError:
     pass
 
 try:
-    # TODO: `fastapi` 패키지에서 `import fastapi`를 사용하고 있어 발생하는 RUF100 규칙 위배 오류 해결
-    # TODO: `import xxx` 대신 `importlib.util.find_spec()`을 사용하여 패키지 존재 여부 확인
-    from . import fastapi  # noqa: F401, RUF100
+    from . import fastapi
 
     __all__.append("fastapi")
 except ImportError:
