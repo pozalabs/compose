@@ -102,6 +102,15 @@ class MatchLookup(Lookup):
         self.local_field = local_field
         self.foreign_field = foreign_field
 
+    @classmethod
+    def on_id(cls, from_: str, as_: str, local_field: str) -> Self:
+        return cls(
+            from_=from_,
+            local_field=local_field,
+            foreign_field="_id",
+            as_=as_,
+        )
+
 
 class SubqueryLookup(Lookup):
     def __init__(
