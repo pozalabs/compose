@@ -103,7 +103,7 @@ class MatchLookup(Lookup):
         self.foreign_field = foreign_field
 
     @classmethod
-    def on_id(cls, from_: str, as_: str, local_field: str) -> Self:
+    def on_id(cls, from_: str, local_field: str, as_: str | None = None) -> Self:
         return cls(
             from_=from_,
             local_field=local_field,
