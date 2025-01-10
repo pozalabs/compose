@@ -83,9 +83,9 @@ class Project(Stage[DictExpression]):
 
 
 class Lookup(Stage[DictExpression]):
-    def __init__(self, from_: str, as_: str):
+    def __init__(self, from_: str, as_: str | None = None):
         self.from_ = from_
-        self.as_ = as_
+        self.as_ = as_ or self.from_
 
     def expression(self) -> DictExpression:
         return {
@@ -97,7 +97,7 @@ class Lookup(Stage[DictExpression]):
 
 
 class MatchLookup(Lookup):
-    def __init__(self, from_: str, as_: str, local_field: str, foreign_field: str):
+    def __init__(self, from_: str, local_field: str, foreign_field: str, as_: str | None = None):
         super().__init__(from_=from_, as_=as_)
         self.local_field = local_field
         self.foreign_field = foreign_field
@@ -116,9 +116,9 @@ class SubqueryLookup(Lookup):
     def __init__(
         self,
         from_: str,
-        as_: str,
         let: Operator,
         pipeline: Pipeline,
+        as_: str | None = None,
     ):
         super().__init__(from_=from_, as_=as_)
         self.let = let
