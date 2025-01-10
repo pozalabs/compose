@@ -116,8 +116,8 @@ class SubqueryLookup(Lookup):
     def __init__(
         self,
         from_: str,
-        let: Operator,
         pipeline: Pipeline,
+        let: Operator | None = None,
         as_: str | None = None,
     ):
         super().__init__(from_=from_, as_=as_)
