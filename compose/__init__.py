@@ -90,3 +90,10 @@ try:
     __all__.append("httpx")
 except ImportError:
     pass
+
+try:
+    from . import testcontainers  # noqa: F401
+
+    __all__.append("testcontainers")
+except ImportError:
+    pass
