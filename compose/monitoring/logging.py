@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from loguru import Logger
 
 
-def create_elapsed[T, **P](logger: Logger) -> Callable[[Callable[P, T]], Callable[P, T]]:
+def create_elapsed_logger[T, **P](logger: Logger) -> Callable[[Callable[P, T]], Callable[P, T]]:
     def decorator[T, **P](func: Callable[P, T]) -> Callable[P, T]:
         @functools.wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
