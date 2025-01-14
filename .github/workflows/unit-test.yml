@@ -22,7 +22,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           poetry-version: "2.0.1"
           setup-command: |
-            poetry install --all-groups --no-interaction
+            poetry install --all-extras --no-interaction
 
       - name: Run tests
         run: |
