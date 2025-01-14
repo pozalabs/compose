@@ -9,14 +9,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         id: setup-python
         with:
           python-version: 3.12
           cache: pip
+
       - name: Install poetry
         if: steps.setup-python.outputs.cache-hit != 'true'
-        run: pip install poetry==1.8.0
+        run: pip install poetry==2.0.1
+
       - name: Publish package
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}

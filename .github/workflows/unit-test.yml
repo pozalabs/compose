@@ -17,11 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: POZAlabs/actions/.github/actions/setup-python@v1-beta
+      - uses: POZAlabs/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+          poetry-version: "2.0.1"
           setup-command: |
-            poetry install --all-extras --no-interaction
+            poetry install --all-groups --no-interaction
 
       - name: Run tests
         run: |
