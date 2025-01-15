@@ -7,6 +7,11 @@ on:
 jobs:
   publish-release:
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/pozalabs-compose/
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -20,9 +25,8 @@ jobs:
         if: steps.setup-python.outputs.cache-hit != 'true'
         run: pip install poetry==2.0.1
 
+      - name: Build project
+        run: poetry build
+
       - name: Publish package
-        env:
-          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          poetry config pypi-token.pypi $PYPI_TOKEN
-          poetry publish --build
+        uses: pypa/gh-action-pypi-publish@release/v1
