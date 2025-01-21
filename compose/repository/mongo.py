@@ -5,7 +5,7 @@ import functools
 import inspect
 import warnings
 from collections.abc import Iterable
-from typing import Any, ClassVar, Unpack, get_args, get_origin, get_type_hints
+from typing import Any, ClassVar, Self, Unpack, get_args, get_origin, get_type_hints
 
 import pendulum
 import pymongo
@@ -26,6 +26,15 @@ registry: dict[str, list[pymongo.IndexModel]] = {}
 class SessionRequirement(str, enum.Enum):
     REQUIRED = "required"
     OPTIONAL = "optional"
+
+
+class MongoDocument(dict[str, Any]):
+    @classmethod
+    def from_entity(cls, entity: Entity, **kwargs: Any) -> Self:
+        return entity.model_dump(
+            by_alias=True,
+            **{key: value for key, value in kwargs.items() if key not in {"by_alias"}},
+        )
 
 
 class MongoRepository[T: Entity](BaseRepository):
