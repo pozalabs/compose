@@ -178,18 +178,18 @@ class MongoRepository[T: Entity](BaseRepository):
         return list(query_result)
 
     def add(self, entity: T, session: ClientSession | None = None, **kwargs) -> None:
-        self.collection.insert_one(self.entity_to_document(entity), session=session, **kwargs)
+        self.collection.insert_one(MongoDocument.from_entity(entity), session=session, **kwargs)
 
     def add_many(self, entities: list[T], session: ClientSession | None = None, **kwargs) -> None:
         self.collection.insert_many(
-            [self.entity_to_document(entity) for entity in entities], session=session, **kwargs
+            [MongoDocument.from_entity(entity) for entity in entities], session=session, **kwargs
         )
 
     def update(self, entity: T, session: ClientSession | None = None, **kwargs) -> None:
-        schema = self.entity_to_document(entity)
+        document = MongoDocument.from_entity(entity)
         update_result = self.collection.update_one(
             {"_id": entity.id},
-            {"$set": schema},
+            {"$set": document},
             session=session,
             **kwargs,
         )
@@ -267,10 +267,6 @@ class MongoRepository[T: Entity](BaseRepository):
             raise ValueError("No origin base found")
 
         return get_args(orig_base)[0]
-
-    @staticmethod
-    def entity_to_document(entity: T) -> dict[str, Any]:
-        return entity.model_dump(by_alias=True)
 
 
 def setup_indexes(
