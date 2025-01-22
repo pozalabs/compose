@@ -33,7 +33,11 @@ class MongoDbContainer(_MongoDbContainer):
 
     def get_connection_url(self) -> str:
         connection_url = super().get_connection_url()
-        return f"{connection_url}/?replicaSet={self.replica_set_name}"
+        return (
+            f"{connection_url}/?replicaSet={self.replica_set_name}"
+            if self._with_replica_set
+            else connection_url
+        )
 
     def with_replica_set(self) -> Self:
         output = subprocess.run("openssl rand -base64 32".split(), capture_output=True)
