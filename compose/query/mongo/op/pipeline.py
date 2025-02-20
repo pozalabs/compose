@@ -8,3 +8,7 @@ class Pipeline(Operator):
 
     def expression(self) -> ListExpression:
         return Evaluable(func.Flatten(func.Filter(self.ops, func.NonEmpty()))).expression()
+
+
+def pipeline(*ops: Operator) -> ListExpression:
+    return Pipeline(*ops).expression()
