@@ -27,7 +27,6 @@ from . import (
 from .container import BaseModel, TimeStampedModel
 
 tp = typing
-repo = repository
 
 __all__ = [
     "BaseModel",
