@@ -12,7 +12,8 @@ jobs:
       url: https://pypi.org/project/pozalabs-compose/
     permissions:
       id-token: write
-      deployments: write
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
