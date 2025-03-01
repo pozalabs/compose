@@ -114,6 +114,9 @@ class OpenAPIJson(OpenAPIDoc):
         return endpoint
 
 
-def add_doc_routes(app: FastAPI, docs: list[OpenAPIDoc]) -> None:
+def add_doc_routes(app: FastAPI, docs: list[OpenAPIDoc], cond: bool) -> None:
+    if not cond:
+        return
+
     for doc in docs:
         doc.add_to_app(app)
