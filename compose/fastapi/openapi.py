@@ -97,7 +97,7 @@ class RedocHTML(OpenAPIDoc):
         return endpoint
 
 
-class OpenAPIJson(OpenAPIDoc):
+class OpenAPISchema(OpenAPIDoc):
     def __init__(self, path: str = "/openapi.json"):
         self.path = path
 

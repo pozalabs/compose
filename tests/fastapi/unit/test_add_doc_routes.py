@@ -29,7 +29,7 @@ def client(app: FastAPI) -> TestClient:
             [
                 compose.fastapi.SwaggerUIHTML(),
                 compose.fastapi.RedocHTML(),
-                compose.fastapi.OpenAPIJson(),
+                compose.fastapi.OpenAPISchema(),
             ],
             True,
             [http.HTTPStatus.OK, http.HTTPStatus.OK, http.HTTPStatus.OK],
