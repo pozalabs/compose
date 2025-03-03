@@ -12,7 +12,7 @@ from .exception_handler import (
 )
 from .openapi import (
     OpenAPIDoc,
-    OpenAPIJson,
+    OpenAPISchema,
     RedocHTML,
     SwaggerUIHTML,
     add_doc_routes,
@@ -36,7 +36,7 @@ __all__ = [
     "HTTPBearer",
     "NoContentResponse",
     "OpenAPIDoc",
-    "OpenAPIJson",
+    "OpenAPISchema",
     "RedocHTML",
     "SwaggerUIHTML",
     "UserInjector",
