@@ -1,6 +1,5 @@
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBasic
 
 import compose
 from src import constants
@@ -10,12 +9,7 @@ from src.user.entrypoint.router import router as user_router
 
 from . import exceptions
 
-http_basic = HTTPBasic()
-http_basic_auth = compose.fastapi.HTTPBasicAuth(
-    username="admin",
-    password="admin",
-    security=http_basic,
-).authenticator()
+http_basic = compose.fastapi.HTTPBasic.static(username="admin", password="admin")
 
 
 def create_app() -> FastAPI:
@@ -29,7 +23,7 @@ def create_app() -> FastAPI:
 
     _app.get("/health-check", include_in_schema=False)(compose.fastapi.health_check)
 
-    @_app.get("/auth/basic", dependencies=[Depends(http_basic_auth)], include_in_schema=False)
+    @_app.get("/auth/basic", dependencies=[Depends(http_basic)], include_in_schema=False)
     def basic_auth():
         return {"message": "Authenticated"}
 
