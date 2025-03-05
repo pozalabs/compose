@@ -1,11 +1,11 @@
 import http
 import secrets
 from collections.abc import Callable
-from typing import Annotated, Literal
+from typing import Literal, Self
 
-from fastapi import Depends, HTTPException, Request
+from fastapi import HTTPException, Request
 from fastapi.security import APIKeyHeader as FastAPIAPIKeyHeader
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import HTTPBasic as FastAPIHTTPBasic
 from fastapi.security import HTTPBearer as FastAPIHTTPBearer
 from fastapi.security.base import SecurityBase
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -19,30 +19,44 @@ def unauthorized_error(detail: str, headers: dict[str, str] | None = None) -> HT
     )
 
 
-class HTTPBasicAuth:
-    def __init__(self, username: str, password: str, security: HTTPBasic):
-        self.username = username
-        self.password = password
-        self.security = security
+class HTTPBasic[T](FastAPIHTTPBasic):
+    def __init__(
+        self,
+        *,
+        authenticator: Callable[[str, str], T],
+        scheme_name: str | None = None,
+        realm: str | None = None,
+        description: str | None = None,
+        auto_error: bool = True,
+    ):
+        super().__init__(
+            scheme_name=scheme_name,
+            realm=realm,
+            description=description,
+            auto_error=auto_error,
+        )
+        self.authenticator = authenticator
 
-    def authenticator(self) -> Callable[[HTTPBasicCredentials], None]:
-        security = self.security
+    async def __call__(self, request: Request) -> T:
+        credentials = await super().__call__(request)
+        return self.authenticator(credentials.username, credentials.password)
 
+    @classmethod
+    def static(cls, username: str, password: str) -> Self:
         def compare_digest(a: str, b: str) -> bool:
             return secrets.compare_digest(a.encode(), b.encode())
 
-        def authenticate(credentials: Annotated[HTTPBasicCredentials, Depends(security)]) -> None:
-            is_correct_username = compare_digest(credentials.username, self.username)
-            is_correct_password = compare_digest(credentials.password, self.password)
+        def authenticate(_username: str, _password: str) -> None:
+            is_correct_username = compare_digest(_username, username)
+            is_correct_password = compare_digest(_username, password)
 
             if not (is_correct_username and is_correct_password):
-                raise HTTPException(
-                    status_code=http.HTTPStatus.UNAUTHORIZED,
+                raise unauthorized_error(
                     detail="Incorrect username or password",
                     headers={"WWW-Authenticate": "Basic"},
                 )
 
-        return authenticate
+        return cls(authenticator=authenticate)
 
 
 class APIKeyHeader(FastAPIAPIKeyHeader):
