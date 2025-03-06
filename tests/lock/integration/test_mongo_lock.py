@@ -1,43 +1,39 @@
 import concurrent.futures
-import os
 import time
 
 import pymongo
-import pytest
-from pymongo.database import Database
-from testcontainers.mongodb import MongoDbContainer
 
 import compose
 
-mongodb = MongoDbContainer("mongo:7.0.0")
-
-
-@pytest.fixture(scope="module", autouse=True)
-def setup_mongodb(request: pytest.FixtureRequest):
-    mongodb.start()
-
-    def remove_container() -> None:
-        mongodb.stop()
-
-    request.addfinalizer(remove_container)
-
-    os.environ["MONGO_URI"] = mongodb.get_connection_url()
-    os.environ["MONGO_USERNAME"] = mongodb.username
-    os.environ["MONGO_PASSWORD"] = mongodb.password
-
-
-@pytest.fixture
-def mongo_client() -> pymongo.MongoClient:
-    return pymongo.MongoClient(
-        host=os.environ["MONGO_URI"],
-        username=os.environ["MONGO_USERNAME"],
-        password=os.environ["MONGO_PASSWORD"],
-    )
-
-
-@pytest.fixture
-def mongo_database(mongo_client: pymongo.MongoClient) -> Database:
-    return mongo_client.get_database("test")
+# mongodb = MongoDbContainer("mongo:7.0.0")
+#
+#
+# @pytest.fixture(scope="module", autouse=True)
+# def setup_mongodb(request: pytest.FixtureRequest):
+#     mongodb.start()
+#
+#     def remove_container() -> None:
+#         mongodb.stop()
+#
+#     request.addfinalizer(remove_container)
+#
+#     os.environ["MONGO_URI"] = mongodb.get_connection_url()
+#     os.environ["MONGO_USERNAME"] = mongodb.username
+#     os.environ["MONGO_PASSWORD"] = mongodb.password
+#
+#
+# @pytest.fixture
+# def mongo_client() -> pymongo.MongoClient:
+#     return pymongo.MongoClient(
+#         host=os.environ["MONGO_URI"],
+#         username=os.environ["MONGO_USERNAME"],
+#         password=os.environ["MONGO_PASSWORD"],
+#     )
+#
+#
+# @pytest.fixture
+# def mongo_database(mongo_client: pymongo.MongoClient) -> Database:
+#     return mongo_client.get_database("test")
 
 
 class Bank:
@@ -56,8 +52,11 @@ class Bank:
         self.balance = balance
 
 
-def test_lock(mongo_database: Database):
-    bank = Bank(lock_factory=compose.lock.MongoLock.acquirer(db=mongo_database))
+def test_lock(mongo_container: compose.testcontainers.MongoDbContainer):
+    mongo_client = pymongo.MongoClient(mongo_container.get_connection_url())
+    db = mongo_client.get_database("test")
+
+    bank = Bank(lock_factory=compose.lock.MongoLock.acquirer(db=db))
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = []

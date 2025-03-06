@@ -1,8 +1,5 @@
-import os
-
 import pendulum
 import pymongo
-import pytest
 from pymongo.client_session import ClientSession
 
 import compose
@@ -37,33 +34,35 @@ class AddUserHandler:
         return self.user_repository.find_by({"name": user.name}, session=session)
 
 
-mongodb = compose.testcontainers.MongoDbContainer("mongo:8.0.0").with_replica_set()
+# mongodb = compose.testcontainers.MongoDbContainer("mongo:8.0.0").with_replica_set()
+#
+#
+# @pytest.fixture(scope="module", autouse=True)
+# def setup_mongodb(request: pytest.FixtureRequest):
+#     mongodb.start()
+#
+#     def remove_container() -> None:
+#         mongodb.stop()
+#
+#     request.addfinalizer(remove_container)
+#
+#     os.environ["MONGO_URI"] = mongodb.get_connection_url()
+#     os.environ["MONGO_USERNAME"] = mongodb.username
+#     os.environ["MONGO_PASSWORD"] = mongodb.password
+#
+#
+# @pytest.fixture
+# def mongo_client() -> pymongo.MongoClient:
+#     return pymongo.MongoClient(
+#         host=os.environ["MONGO_URI"],
+#         username=os.environ["MONGO_USERNAME"],
+#         password=os.environ["MONGO_PASSWORD"],
+#     )
 
 
-@pytest.fixture(scope="module", autouse=True)
-def setup_mongodb(request: pytest.FixtureRequest):
-    mongodb.start()
+def test_transaction(mongo_container: compose.testcontainers.MongoDbContainer):
+    mongo_client = pymongo.MongoClient(mongo_container.get_connection_url())
 
-    def remove_container() -> None:
-        mongodb.stop()
-
-    request.addfinalizer(remove_container)
-
-    os.environ["MONGO_URI"] = mongodb.get_connection_url()
-    os.environ["MONGO_USERNAME"] = mongodb.username
-    os.environ["MONGO_PASSWORD"] = mongodb.password
-
-
-@pytest.fixture
-def mongo_client() -> pymongo.MongoClient:
-    return pymongo.MongoClient(
-        host=os.environ["MONGO_URI"],
-        username=os.environ["MONGO_USERNAME"],
-        password=os.environ["MONGO_PASSWORD"],
-    )
-
-
-def test_transaction(mongo_client: pymongo.MongoClient):
     handler = AddUserHandler(
         user_repository=UserRepository.create(mongo_client.get_database("test")),
         uow=compose.uow.MongoUnitOfWork(mongo_client.start_session),
