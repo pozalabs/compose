@@ -1,4 +1,7 @@
+import os
+
 import pendulum
+import pymongo
 import pytest
 from pymongo.client_session import ClientSession
 
@@ -46,11 +49,23 @@ def setup_mongodb(request: pytest.FixtureRequest):
 
     request.addfinalizer(remove_container)
 
+    os.environ["MONGO_URI"] = mongodb.get_connection_url()
+    os.environ["MONGO_USERNAME"] = mongodb.username
+    os.environ["MONGO_PASSWORD"] = mongodb.password
 
-def test_transaction():
-    mongo_client = mongodb.get_connection_client()
+
+@pytest.fixture
+def mongo_client() -> pymongo.MongoClient:
+    return pymongo.MongoClient(
+        host=os.environ["MONGO_URI"],
+        username=os.environ["MONGO_USERNAME"],
+        password=os.environ["MONGO_PASSWORD"],
+    )
+
+
+def test_transaction(mongo_client: pymongo.MongoClient):
     handler = AddUserHandler(
-        user_repository=UserRepository.create(mongo_client.get_database("compose-test")),
+        user_repository=UserRepository.create(mongo_client.get_database("test")),
         uow=compose.uow.MongoUnitOfWork(mongo_client.start_session),
     )
     actual = handler.handle(AddUser(name="test"))
