@@ -26,7 +26,7 @@ def mongodb_container(request: pytest.FixtureRequest):
 
 
 @pytest.fixture
-def mongo_client() -> pymongo.MongoClient:
+def mongo_client(mongodb_container: compose.testcontainers.MongoDbContainer) -> pymongo.MongoClient:
     return pymongo.MongoClient(
         host=os.environ["MONGO_URI"],
         username=os.environ["MONGO_USERNAME"],
