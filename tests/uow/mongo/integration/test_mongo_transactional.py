@@ -1,4 +1,5 @@
 import pendulum
+import pytest
 from pymongo.client_session import ClientSession
 
 import compose
@@ -33,15 +34,26 @@ class AddUserHandler:
         return self.user_repository.find_by({"name": user.name}, session=session)
 
 
-def test_transaction():
-    with compose.testcontainers.MongoDbContainer("mongo:8").with_replica_set() as container:
-        mongo_client = container.get_connection_client()
+mongodb = compose.testcontainers.MongoDbContainer("mongo:8.0.0").with_replica_set()
 
-        handler = AddUserHandler(
-            user_repository=UserRepository.create(mongo_client.get_database("compose-test")),
-            uow=compose.uow.MongoUnitOfWork(mongo_client.start_session),
-        )
-        actual = handler.handle(AddUser(name="test"))
+
+@pytest.fixture(scope="module", autouse=True)
+def setup_mongodb(request: pytest.FixtureRequest):
+    mongodb.start()
+
+    def remove_container() -> None:
+        mongodb.stop()
+
+    request.addfinalizer(remove_container)
+
+
+def test_transaction():
+    mongo_client = mongodb.get_connection_client()
+    handler = AddUserHandler(
+        user_repository=UserRepository.create(mongo_client.get_database("compose-test")),
+        uow=compose.uow.MongoUnitOfWork(mongo_client.start_session),
+    )
+    actual = handler.handle(AddUser(name="test"))
 
     expected = User(
         id=compose.types.PyObjectId(b"test-user-01"),
