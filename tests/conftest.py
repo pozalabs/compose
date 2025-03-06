@@ -10,7 +10,7 @@ pytest_plugins = [
 ]
 
 
-mongodb = compose.testcontainers.MongoDbContainer("mongo:8.0").with_replica_set()
+mongodb = compose.testcontainers.MongoDbContainer("mongo:8.0")
 
 
 @pytest.fixture(scope="session")
@@ -27,8 +27,4 @@ def mongodb_container(request: pytest.FixtureRequest):
 
 @pytest.fixture
 def mongo_client(mongodb_container: compose.testcontainers.MongoDbContainer) -> pymongo.MongoClient:
-    return pymongo.MongoClient(
-        host=os.environ["MONGO_URI"],
-        username=os.environ["MONGO_USERNAME"],
-        password=os.environ["MONGO_PASSWORD"],
-    )
+    return pymongo.MongoClient(mongodb_container.get_connection_url())
