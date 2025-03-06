@@ -13,7 +13,7 @@ pytest_plugins = [
 mongodb = compose.testcontainers.MongoDbContainer("mongo:8.0").with_replica_set()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=True)
 def mongodb_container(request: pytest.FixtureRequest):
     mongodb.start()
     request.addfinalizer(mongodb.stop)
