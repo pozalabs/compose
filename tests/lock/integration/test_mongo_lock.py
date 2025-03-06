@@ -52,8 +52,7 @@ class Bank:
         self.balance = balance
 
 
-def test_lock(mongo_container: compose.testcontainers.MongoDbContainer):
-    mongo_client = pymongo.MongoClient(mongo_container.get_connection_url())
+def test_lock(mongo_client: pymongo.MongoClient):
     db = mongo_client.get_database("test")
 
     bank = Bank(lock_factory=compose.lock.MongoLock.acquirer(db=db))

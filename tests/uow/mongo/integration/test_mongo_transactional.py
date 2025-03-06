@@ -60,9 +60,7 @@ class AddUserHandler:
 #     )
 
 
-def test_transaction(mongo_container: compose.testcontainers.MongoDbContainer):
-    mongo_client = pymongo.MongoClient(mongo_container.get_connection_url())
-
+def test_transaction(mongo_client: pymongo.MongoClient):
     handler = AddUserHandler(
         user_repository=UserRepository.create(mongo_client.get_database("test")),
         uow=compose.uow.MongoUnitOfWork(mongo_client.start_session),
