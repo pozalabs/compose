@@ -1,5 +1,6 @@
 import functools
 from collections.abc import Callable
+from typing import Any
 
 from pymongo.client_session import ClientSession, SessionOptions, TransactionOptions
 
@@ -12,10 +13,11 @@ class MongoUnitOfWork[T]:
 
     def with_transaction(
         self,
-        callback: Callable[[ClientSession], T],
+        callback: Callable[[ClientSession], T] | Callable[..., T],
         *,
         session_options: SessionOptions | None = None,
         transaction_options: TransactionOptions | None = None,
+        **kwargs: Any,
     ) -> T:
         session_options = session_options or SessionOptions()
         transaction_options = transaction_options or TransactionOptions()
@@ -26,7 +28,11 @@ class MongoUnitOfWork[T]:
             snapshot=session_options.snapshot,
         ) as session:
             result = session.with_transaction(
-                callback=unordered_partial(p=functools.partial(callback), t=ClientSession),
+                callback=(
+                    unordered_partial(p=functools.partial(callback), t=ClientSession)
+                    if isinstance(callback, functools.partial)
+                    else unordered_partial(p=functools.partial(callback, **kwargs), t=ClientSession)
+                ),
                 read_concern=transaction_options.read_concern,
                 write_concern=transaction_options.write_concern,
                 read_preference=transaction_options.read_preference,
