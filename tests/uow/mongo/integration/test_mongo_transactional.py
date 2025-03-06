@@ -1,0 +1,53 @@
+import pendulum
+from pymongo.client_session import ClientSession
+
+import compose
+
+
+class User(compose.entity.Entity):
+    name: str
+
+
+class UserRepository(compose.repository.MongoRepository[User]):
+    __collection_name__ = "user"
+
+
+class AddUser(compose.command.Command):
+    name: str
+
+
+class AddUserHandler:
+    def __init__(self, user_repository: UserRepository, uow: compose.uow.MongoUnitOfWork):
+        self.user_repository = user_repository
+        self.uow = uow
+
+    @compose.uow.mongo_transactional
+    def handle(self, cmd: AddUser, session: ClientSession) -> User:
+        user = User(
+            id=compose.types.PyObjectId(b"test-user-01"),
+            name=cmd.name,
+            created_at=pendulum.datetime(2025, 3, 6),
+            updated_at=pendulum.datetime(2025, 3, 6),
+        )
+        self.user_repository.add(user, session=session)
+        return self.user_repository.find_by({"name": user.name}, session=session)
+
+
+def test_transaction():
+    with compose.testcontainers.MongoDbContainer("mongo:8").with_replica_set() as container:
+        mongo_client = container.get_connection_client()
+
+        handler = AddUserHandler(
+            user_repository=UserRepository.create(mongo_client.get_database("compose-test")),
+            uow=compose.uow.MongoUnitOfWork(mongo_client.start_session),
+        )
+        actual = handler.handle(AddUser(name="test"))
+
+    expected = User(
+        id=compose.types.PyObjectId(b"test-user-01"),
+        name="test",
+        created_at=pendulum.datetime(2025, 3, 6),
+        updated_at=pendulum.datetime(2025, 3, 6),
+    )
+
+    assert actual == expected
