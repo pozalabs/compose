@@ -40,3 +40,25 @@ class MongoUnitOfWork[T]:
             )
 
         return result
+
+
+def mongo_transactional[T](func: Callable[..., T]) -> Callable[..., T]:
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs) -> T:
+        instance = args[0]
+
+        if not hasattr(instance, "__dict__"):
+            raise ValueError(f"`{instance.__class__.__name__}` does not have `__dict__` attribute")
+
+        uow: MongoUnitOfWork | None = next(
+            (t for t in instance.__dict__.values() if isinstance(t, MongoUnitOfWork)),
+            None,
+        )
+        if uow is None:
+            raise ValueError(
+                f"`{instance.__class__.__name__}` does not have `{MongoUnitOfWork.__name__}` attribute"
+            )
+
+        return uow.with_transaction(functools.partial(func, *args, **kwargs))
+
+    return wrapper
