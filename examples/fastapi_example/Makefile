@@ -6,3 +6,6 @@ build:
 
 up:
 	docker-compose -f docker-compose.local.yml up
+
+clean:
+	rm -rf compose
