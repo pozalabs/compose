@@ -48,7 +48,7 @@ class HTTPBasic[T](FastAPIHTTPBasic):
 
         def authenticate(_username: str, _password: str) -> None:
             is_correct_username = compare_digest(_username, username)
-            is_correct_password = compare_digest(_username, password)
+            is_correct_password = compare_digest(_password, password)
 
             if not (is_correct_username and is_correct_password):
                 raise unauthorized_error(
