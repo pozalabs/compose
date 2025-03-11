@@ -60,16 +60,16 @@ class Stage[T](Operator):
         raise NotImplementedError
 
 
-class Merge(Operator):
+class Merge[T](Operator):
     def __init__(self, *ops: Operator, initial: Any):
         self.ops = list(ops)
         self.initial = initial
 
-    def expression(self) -> Any:
+    def expression(self) -> T:
         return functools.reduce(operator.or_, [op.expression() for op in self.ops], self.initial)
 
     @classmethod
-    def dict(cls, *ops: Operator) -> Self:
+    def dict(cls, *ops: *tuple[Operator, ...]) -> Merge[dict[str, Any]]:
         return cls(*ops, initial={})
 
 
