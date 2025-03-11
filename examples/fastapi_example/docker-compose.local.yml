@@ -14,3 +14,16 @@ services:
     ports:
       - "8000:8000"
     restart: unless-stopped
+    depends_on:
+      - db
+
+  db:
+    container_name: compose-fastapi-example-db
+    image: mongo:8
+    platform: linux/arm64/v8
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
