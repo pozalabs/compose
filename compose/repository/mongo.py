@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import enum
 import functools
-import inspect
 import warnings
 from collections.abc import Iterable
-from typing import Any, ClassVar, Self, Unpack, get_args, get_origin, get_type_hints
+from typing import Any, ClassVar, Self, Unpack, get_args, get_origin
 
 import pendulum
 import pymongo
@@ -21,11 +19,6 @@ from ..query.mongo import MongoFilterQuery, MongoQuery
 from .base import BaseRepository
 
 registry: dict[str, list[pymongo.IndexModel]] = {}
-
-
-class SessionRequirement(str, enum.Enum):
-    REQUIRED = "required"
-    OPTIONAL = "optional"
 
 
 class MongoDocument(dict[str, Any]):
@@ -64,9 +57,6 @@ class MongoRepository[T: Entity](BaseRepository):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__()
-        cls._validate_session_requirement(
-            kwargs.get("session_requirement", SessionRequirement.OPTIONAL)
-        )
         indexes = cls.__indexes__ or []
         if cls.__collection_name__ not in registry:
             registry[cls.__collection_name__] = indexes
@@ -76,31 +66,6 @@ class MongoRepository[T: Entity](BaseRepository):
         registry[cls.__collection_name__].extend(
             [idx for idx in indexes if idx.document not in index_documents]
         )
-
-    @classmethod
-    def _validate_session_requirement(cls, requirement: SessionRequirement) -> None:
-        if requirement == SessionRequirement.OPTIONAL:
-            return
-
-        error_message = "Method {} does not have a session argument"
-        # 클래스 자체를 검사하기 때문에 `inspect.ismethod`를 사용하면 인스턴스 메서드가 아니라 클래스메서드를 리턴
-        for name, member in inspect.getmembers(cls, predicate=inspect.isfunction):
-            if name.startswith("__"):
-                continue
-
-            # https://stackoverflow.com/q/72510518
-            # `inspect.get_annotations`를 사용하면 `__future__.annotations`을 사용했을 때에는 문자열을,
-            # 그렇지 않은 경우에는 `type`을 리턴함. `__future__.annotations` 사용 여부에 관계 없이
-            # 항상 `type`을 얻기 위해 `typing.get_type_hints` 사용
-            if (type_hints := get_type_hints(member).get("session")) is None:
-                raise ValueError(error_message.format(name))
-
-            if not (args := get_args(type_hints)):
-                raise ValueError(error_message.format(name))
-
-            session = args[0]
-            if session is not ClientSession:
-                raise ValueError(error_message.format(name))
 
     @classmethod
     def create(cls, database: Database, **kwargs) -> MongoRepository:
