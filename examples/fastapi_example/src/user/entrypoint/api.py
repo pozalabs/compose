@@ -1,5 +1,7 @@
+from typing import Annotated
+
 from dependency_injector.wiring import inject
-from fastapi import Depends
+from fastapi import Depends, Query
 
 import compose
 from compose.query.mongo import op
@@ -7,7 +9,7 @@ from src import constants
 from src.dependency import provide
 from src.user import schema, service
 from src.user.adapter.repository import UserRepository
-from src.user.domain import command
+from src.user.domain import command, query
 
 from .router import router
 
@@ -48,16 +50,20 @@ def retrieve_user_by_email(
 
 @router.get(
     "/v1/users",
-    response_model=list[schema.User],
+    response_model=compose.schema.ListSchema[schema.User],
     tags=[constants.OpenApiTag.USER],
     summary="유저 목록 조회",
 )
 @inject
 @compose.fastapi.auto_wired(provide)
-def list_users(user_repository: UserRepository):
+def list_users(
+    qry: Annotated[query.ListUsers, Query()],
+    user_repository: UserRepository,
+):
     """`auto_wired` 데코레이터를 사용해 의존성 자동 주입"""
 
-    return [schema.User.model_validate(user.encode()) for user in user_repository.all()]
+    pagination = user_repository.filter(qry)
+    return compose.schema.ListSchema[schema.User].from_pagination(pagination)
 
 
 @router.post(
