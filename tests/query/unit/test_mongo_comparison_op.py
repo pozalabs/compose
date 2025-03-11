@@ -38,7 +38,5 @@ def test_empty_on_null(op: ComparisonOperator, expected: dict[str, Any]):
         (op.Ne.from_(age=30), {"age": {"$ne": 30}}),
     ],
 )
-def test_instantiate_using_from_(op: ComparisonOperator, expected: dict[str, Any]):
-    expression = EmptyOnNull.from_(op).expression()
-
-    assert expression == expected
+def test_instantiate_using_from_(operator: ComparisonOperator, expected: dict[str, Any]):
+    assert operator.expression() == expected
