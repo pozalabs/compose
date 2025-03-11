@@ -1,7 +1,7 @@
 from collections.abc import Callable, Iterable
-from typing import Any, TypeAlias
+from typing import TypeAlias
 
-from .base import Merge, Operator
+from .base import Operator
 from .raw import Raw
 from .types import DictExpression, ListExpression
 
@@ -62,7 +62,3 @@ class _Flatten:
 
 def Flatten(ops: Iterable[Expressionable]) -> list[Operator]:
     return _Flatten(ops).eval()
-
-
-def Q(*ops: *tuple[Operator, ...]) -> dict[str, Any]:
-    return Merge.dict(*ops).expression()
