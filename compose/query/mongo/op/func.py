@@ -1,7 +1,8 @@
 from collections.abc import Callable, Iterable
 from typing import TypeAlias
 
-from .base import Operator
+from .base import Merge, Operator
+from .pipeline import Pipeline as _Pipeline
 from .raw import Raw
 from .types import DictExpression, ListExpression
 
@@ -62,3 +63,11 @@ class _Flatten:
 
 def Flatten(ops: Iterable[Expressionable]) -> list[Operator]:
     return _Flatten(ops).eval()
+
+
+def Q(*ops: *tuple[Operator, ...]) -> DictExpression:
+    return Merge.dict(*ops).expression()
+
+
+def Pipeline(*ops: Operator) -> ListExpression:
+    return _Pipeline(*ops).expression()
