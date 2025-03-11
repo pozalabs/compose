@@ -27,6 +27,13 @@ class ComparisonOperator(Operator):
     def expression(self) -> dict[str, Any]:
         raise NotImplementedError
 
+    @classmethod
+    def from_(cls, **kwargs: Any) -> Self:
+        if (kv := next(iter(kwargs.items()), None)) is None:
+            raise ValueError("key-value pair is required")
+
+        return cls(**dict(zip(("field", "value"), kv)))
+
 
 class LogicalOperator(Operator):
     def __init__(self, *ops: Operator):
