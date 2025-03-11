@@ -1,7 +1,7 @@
 from collections.abc import Callable, Iterable
-from typing import TypeAlias
+from typing import Any, TypeAlias
 
-from .base import Operator
+from .base import Merge, Operator
 from .raw import Raw
 from .types import DictExpression, ListExpression
 
@@ -17,7 +17,7 @@ class _Map[T]:
         return [self.callback(item) for item in self.collection]
 
 
-def Map[T](collection: Iterable[T], callback: Callable[[T], Operator]) -> list[Operator]:  # noqa: N802
+def Map[T](collection: Iterable[T], callback: Callable[[T], Operator]) -> list[Operator]:
     return _Map(collection, callback).eval()
 
 
@@ -30,7 +30,7 @@ class _Filter:
         return [item for item in self.collection if self.predicate(item)]
 
 
-def Filter(collection: list[Operator], predicate: Callable[[Operator], bool]) -> list[Operator]:  # noqa: N802
+def Filter(collection: list[Operator], predicate: Callable[[Operator], bool]) -> list[Operator]:
     return _Filter(collection, predicate=predicate).eval()
 
 
@@ -60,5 +60,9 @@ class _Flatten:
         return result
 
 
-def Flatten(ops: Iterable[Expressionable]) -> list[Operator]:  # noqa: N802
+def Flatten(ops: Iterable[Expressionable]) -> list[Operator]:
     return _Flatten(ops).eval()
+
+
+def Q(*ops: *tuple[Operator, ...]) -> dict[str, Any]:
+    return Merge.dict(*ops).expression()

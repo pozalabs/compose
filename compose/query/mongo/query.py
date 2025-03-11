@@ -2,7 +2,6 @@ import abc
 from typing import Any
 
 from ..base import OffsetPaginationQuery, Query
-from .op import Merge, Operator
 
 
 class MongoQuery(Query, abc.ABC):
@@ -18,7 +17,3 @@ class MongoFilterQuery(OffsetPaginationQuery, MongoQuery):
 
 
 MongoOffsetFilterQuery = MongoFilterQuery
-
-
-def q(*ops: *tuple[Operator, ...]) -> dict[str, Any]:
-    return Merge.dict(*ops).expression()

@@ -2,8 +2,7 @@ from typing import Any
 
 import pytest
 
-from compose.query.mongo.op import And, Eq, Operator
-from compose.query.mongo.query import q
+from compose.query.mongo.op import And, Eq, Operator, Q
 
 
 @pytest.mark.parametrize(
@@ -26,4 +25,4 @@ from compose.query.mongo.query import q
     ],
 )
 def test_expression(ops: list[Operator], expected: dict[str, Any]):
-    assert q(*ops) == expected
+    assert Q(*ops) == expected
