@@ -1,17 +1,12 @@
-from src.user.domain.model import User
+import compose.repository
+from src.user.domain import model
 
-USER_DATA = []
 
+class UserRepository(compose.repository.MongoRepository[model.User]):
+    __collection_name__ = "user"
 
-class UserRepository:
-    def __init__(self):
-        self._data = USER_DATA
+    def find_by_name(self, name: str) -> model.User | None:
+        return self.find_by({"name": name})
 
-    def add(self, user: User) -> None:
-        self._data.append(user)
-
-    def find_by_name(self, name: str) -> User | None:
-        return next((user for user in self._data if user.name == name), None)
-
-    def all(self) -> list[User]:
-        return self._data
+    def all(self) -> list[model.User]:
+        return [model.User.model_validate(**item) for item in self.collection.find()]

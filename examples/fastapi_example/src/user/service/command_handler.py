@@ -12,7 +12,7 @@ class AddUserHandler:
         if (user := self.user_repository.find_by_name(cmd.name)) is not None:
             raise compose.exceptions.DomainValidationError(f"User {user.name} already exists")
 
-        user = model.User(name=cmd.name)
+        user = model.User(name=cmd.name, email=cmd.email)
         self.user_repository.add(user)
 
         return schema.User.model_validate(user.encode())

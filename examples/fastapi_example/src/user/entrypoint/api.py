@@ -2,6 +2,7 @@ from dependency_injector.wiring import inject
 from fastapi import Depends
 
 import compose
+from compose.query.mongo import op
 from src import constants
 from src.dependency import provide
 from src.user import schema, service
@@ -23,6 +24,23 @@ def retrieve_user(
     user_repository: UserRepository = Depends(provide(UserRepository)),
 ):
     if (user := user_repository.find_by_name(name)) is None:
+        raise compose.exceptions.DoesNotExistError()
+
+    return schema.User.model_validate(user.encode())
+
+
+@router.get(
+    "/v1/users/emails/{email}",
+    response_model=schema.User,
+    tags=[constants.OpenApiTag.USER],
+    summary="유저 조회",
+)
+@inject
+def retrieve_user_by_email(
+    email: str,
+    user_repository: UserRepository = Depends(provide(UserRepository)),
+):
+    if (user := user_repository.find_by(op.func.Q(op.Eq(email=email)))) is None:
         raise compose.exceptions.DoesNotExistError()
 
     return schema.User.model_validate(user.encode())

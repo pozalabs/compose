@@ -5,7 +5,9 @@ from src.user.adapter.repository import UserRepository
 
 
 class AdapterContainer(containers.DeclarativeContainer):
-    user_repository = providers.Factory(UserRepository)
+    database = providers.Dependency()
+
+    user_repository = providers.Factory(UserRepository.create, database=database)
 
 
 class ServiceContainer(containers.DeclarativeContainer):
@@ -18,5 +20,7 @@ class ServiceContainer(containers.DeclarativeContainer):
 
 
 class UserContainer(containers.DeclarativeContainer):
-    adapter = providers.Container(AdapterContainer)
+    database = providers.Dependency()
+
+    adapter = providers.Container(AdapterContainer, database=database)
     service = providers.Container(ServiceContainer, adapter=adapter)
