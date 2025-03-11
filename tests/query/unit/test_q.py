@@ -2,7 +2,8 @@ from typing import Any
 
 import pytest
 
-from compose.query.mongo.op import And, Eq, Operator, Q
+from compose.query.mongo.op import And, Eq, Operator
+from compose.query.mongo.op.func import Q
 
 
 @pytest.mark.parametrize(
