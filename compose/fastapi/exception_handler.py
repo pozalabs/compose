@@ -5,7 +5,7 @@ from typing import ClassVar, Self
 from fastapi import Request, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 
@@ -37,6 +37,13 @@ class ExceptionHandlerInfo:
                 error_type=error_type or status_code.name.lower(),
                 response_cls=response_cls or cls.default_response_cls,
             ),
+        )
+
+    @classmethod
+    def for_unauthorized_error(cls, response_cls: type[Response] | None = None) -> Self:
+        return cls(
+            exc_class_or_status_code=http.HTTPStatus.UNAUTHORIZED,
+            handler=create_unauthorized_error_handler(response_cls or cls.default_response_cls),
         )
 
     @classmethod
@@ -109,17 +116,26 @@ def create_exception_handler(
     response_cls: type[Response],
 ) -> ExceptionHandler:
     def exception_handler(request: Request, exc: Exception) -> Response:
-        response = schema.Error(
-            title=str(exc),
-            type=error_type,
-            detail=getattr(exc, "detail", None),
-            invalid_params=(
-                (invalid_params := getattr(exc, "invalid_params", None))
-                and [
-                    schema.InvalidParam.model_validate(obj=invalid_param)
-                    for invalid_param in invalid_params
-                ]
-            ),
+        response = exc_to_error_schema(exc=exc, error_type=error_type)
+        return response_cls(content=jsonable_encoder(response), status_code=status_code)
+
+    return exception_handler
+
+
+def create_unauthorized_error_handler(response_cls: type[Response]) -> ExceptionHandler:
+    def exception_handler(request: Request, exc: Exception) -> Response:
+        if isinstance(exc, HTTPException) and exc.headers.get(
+            "WWW-Authenticate", ""
+        ).lower().startswith("basic"):
+            return PlainTextResponse(
+                content=exc.detail,
+                status_code=exc.status_code,
+                headers=exc.headers,
+            )
+
+        response = exc_to_error_schema(
+            exc=exc,
+            error_type=(status_code := http.HTTPStatus.UNAUTHORIZED).name.lower(),
         )
         return response_cls(content=jsonable_encoder(response), status_code=status_code)
 
