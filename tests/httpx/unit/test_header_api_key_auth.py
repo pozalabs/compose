@@ -29,20 +29,20 @@ def client(app: FastAPI) -> TestClient:
     "auth, expected_status_code",
     [
         (
-            compose.httpx.HeaderAPIKeyAuth(api_key="api-key"),
+            compose.httpx.HeaderAPIKeyAuth.single("api-key"),
             http.HTTPStatus.OK,
         ),
         (
-            compose.httpx.HeaderAPIKeyAuth(api_key="invali-api-key"),
+            compose.httpx.HeaderAPIKeyAuth.single("invali-api-key"),
             http.HTTPStatus.UNAUTHORIZED,
         ),
     ],
     ids=(
         "올바른 API Key를 사용한 인증",
-        "올바르지 않은 API Key한 인증",
+        "올바르지 않은 API Key를 사용한 인증",
     ),
 )
-def test_header_api_key_auth(
+def test_single_key_auth(
     app: FastAPI,
     client: TestClient,
     auth: compose.httpx.HeaderAPIKeyAuth,
