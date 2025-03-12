@@ -126,6 +126,21 @@ def create_exception_handler(
     return exception_handler
 
 
+def exc_to_error_schema(exc: Exception, error_type: str) -> schema.Error:
+    return schema.Error(
+        title=str(exc),
+        type=error_type,
+        detail=getattr(exc, "detail", None),
+        invalid_params=(
+            (invalid_params := getattr(exc, "invalid_params", None))
+            and [
+                schema.InvalidParam.model_validate(obj=invalid_param)
+                for invalid_param in invalid_params
+            ]
+        ),
+    )
+
+
 def create_http_exception_handler(response_cls: type[Response]) -> ExceptionHandler:
     def http_exception_handler(request: Request, exc: HTTPException) -> Response:
         status_code = http.HTTPStatus(exc.status_code)
