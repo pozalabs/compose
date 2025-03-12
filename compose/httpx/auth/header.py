@@ -4,7 +4,7 @@ from typing import Self
 import httpx
 
 
-class HeaderAPIKeyAuth(httpx.Auth):
+class HeaderAuth(httpx.Auth):
     def __init__(self, secrets: dict[str, str]) -> None:
         self.secrets = secrets
 

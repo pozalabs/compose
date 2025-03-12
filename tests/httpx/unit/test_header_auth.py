@@ -69,17 +69,17 @@ def client(app: FastAPI) -> TestClient:
     [
         (
             "/items/single-key-auth",
-            compose.httpx.HeaderAPIKeyAuth.single("api-key"),
+            compose.httpx.HeaderAuth.single("api-key"),
             http.HTTPStatus.OK,
         ),
         (
             "/items/single-key-auth",
-            compose.httpx.HeaderAPIKeyAuth.single("invali-api-key"),
+            compose.httpx.HeaderAuth.single("invali-api-key"),
             http.HTTPStatus.UNAUTHORIZED,
         ),
         (
             "/items/multi-keys-auth",
-            compose.httpx.HeaderAPIKeyAuth(
+            compose.httpx.HeaderAuth(
                 {"x-client-id": "client-id", "x-client-secret": "client-secret"}
             ),
             http.HTTPStatus.OK,
@@ -95,7 +95,7 @@ def test_single_key_auth(
     app: FastAPI,
     client: TestClient,
     endpoint: str,
-    auth: compose.httpx.HeaderAPIKeyAuth,
+    auth: compose.httpx.HeaderAuth,
     expected_status_code: int,
 ):
     response = client.get(endpoint, auth=auth)
