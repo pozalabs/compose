@@ -15,6 +15,7 @@ EXCEPTION_HANDLER_INFOS = (
         exc_cls=compose.exceptions.AuthorizationError,
         status_code=http.HTTPStatus.UNAUTHORIZED,
     ),
+    compose.fastapi.ExceptionHandlerInfo.for_unauthorized_error(),
     compose.fastapi.ExceptionHandlerInfo.for_request_validation_error(),
     compose.fastapi.ExceptionHandlerInfo.for_pydantic_validation_error(),
     compose.fastapi.ExceptionHandlerInfo.default(),
