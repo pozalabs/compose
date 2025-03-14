@@ -26,3 +26,24 @@ import compose
 )
 def test_some_or_none[T](iterable: Iterable[T], expected: T | None):
     assert compose.func.some_or_none(iterable) == expected
+
+
+@pytest.mark.parametrize(
+    "v, expected",
+    [(1, 1)],
+)
+def test_can_unwrap[T](v: T | None, expected: T):
+    assert compose.func.unwrap(v, ValueError("Unexpected value")) == expected
+
+
+@pytest.mark.parametrize(
+    "v, exc",
+    [
+        (None, ValueError("Unexpected value")),
+    ],
+)
+def test_cannot_unwrap[T](v: T | None, exc: Exception):
+    with pytest.raises(type(exc)) as exc_info:
+        compose.func.unwrap(v, exc)
+
+    assert exc is exc_info.value
