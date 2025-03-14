@@ -80,3 +80,30 @@ class SortArray(Operator):
                 "sortBy": Merge.dict(*self.sort_by).expression(),
             }
         }
+
+
+class IndexOfArray(Operator):
+    def __init__(
+        self,
+        array: Any,
+        search: Any,
+        /,
+        *,
+        start: Any | None = None,
+        end: Any | None = None,
+    ):
+        self.array = array
+        self.search = search
+        self.start = start
+        self.end = end
+
+        if self.end is not None and self.start is None:
+            raise ValueError("`end` must be used with `start`")
+
+    def expression(self) -> DictExpression:
+        args = [self.array, self.search]
+        for v in (self.start, self.end):
+            if v is not None:
+                args.append(v)
+
+        return Evaluable({"$indexOfArray": args}).expression()
