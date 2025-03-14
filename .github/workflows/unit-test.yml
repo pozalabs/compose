@@ -17,25 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-name: Run unit tests
-
-on:
-  workflow_call:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version:
-          - "3.12"
-      fail-fast: false
-
-    name: Python ${{ matrix.python-version }}
-
-    steps:
-      - uses: actions/checkout@v4
-
       - uses: astral-sh/setup-uv@v5
         with:
           version: "0.6.6"
