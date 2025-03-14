@@ -27,10 +27,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Run tests
-        run: |
-          uv run pytest -vv -s tests -m unit
-
+      - name: Install the project
+        run: uv sync --all-extras --dev
 
       - name: Run tests
         run: |
