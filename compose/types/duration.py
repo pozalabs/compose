@@ -1,12 +1,12 @@
 from typing import Any, Self
 
-from . import vo
+from . import primitive
 
 SECONDS_PER_MINUTE = 60
 SECONDS_PER_HOUR = 60 * SECONDS_PER_MINUTE
 
 
-class Seconds(vo.Int):
+class Seconds(primitive.Int):
     def __new__(cls, v: Any, /) -> Self:
         v = super().__new__(cls, v)
         if v < 0:
