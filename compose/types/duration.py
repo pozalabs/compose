@@ -1,9 +1,7 @@
 from typing import Any, Self
 
+from .. import constants
 from . import primitive
-
-SECONDS_PER_MINUTE = 60
-SECONDS_PER_HOUR = 60 * SECONDS_PER_MINUTE
 
 
 class Seconds(primitive.Int):
@@ -15,8 +13,8 @@ class Seconds(primitive.Int):
 
     @classmethod
     def from_hours(cls, hours: float) -> Self:
-        return cls(hours * SECONDS_PER_HOUR)
+        return cls(hours * constants.SECONDS_PER_HOUR)
 
     @classmethod
     def from_minutes(cls, minutes: float) -> Self:
-        return cls(minutes * SECONDS_PER_MINUTE)
+        return cls(minutes * constants.SECONDS_PER_MINUTE)
