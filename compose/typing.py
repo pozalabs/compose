@@ -1,7 +1,10 @@
-from collections.abc import Callable, Generator
-from typing import Any, Self
+from __future__ import annotations
 
-from .types import PyObjectId
+from collections.abc import Callable, Generator
+from typing import TYPE_CHECKING, Any, Self
+
+if TYPE_CHECKING:
+    from .types import PyObjectId
 
 type Validator = Callable[[Any], Self]
 type ValidatorGenerator = Generator[Validator, None, None]
