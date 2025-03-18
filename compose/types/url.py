@@ -3,7 +3,7 @@ from __future__ import annotations
 import urllib.parse
 from typing import Any, ClassVar, Self, cast
 
-from .vo import Str
+from .primitive import Str
 
 
 class S3ContentUrl(Str):
