@@ -49,22 +49,13 @@ class ValidatablePrimitive[T]:
         ]
 
 
-class Str(str, CoreSchemaGettable[str]):
-    @classmethod
-    def __get_validators__(cls) -> typing.ValidatorGenerator:
-        yield caster(cls)
+class Str(str, ValidatablePrimitive[str], CoreSchemaGettable[str]): ...
 
 
-class Int(int, CoreSchemaGettable[int]):
-    @classmethod
-    def __get_validators__(cls) -> typing.ValidatorGenerator:
-        yield caster(cls)
+class Int(int, ValidatablePrimitive[int], CoreSchemaGettable[int]): ...
 
 
-class Float(float, CoreSchemaGettable[float]):
-    @classmethod
-    def __get_validators__(cls) -> typing.ValidatorGenerator:
-        yield caster(cls)
+class Float(float, ValidatablePrimitive[float], CoreSchemaGettable[float]): ...
 
 
 def _create_list_type[T](t: type[T], /) -> type[list[T]]:
@@ -75,7 +66,7 @@ def _create_list_type[T](t: type[T], /) -> type[list[T]]:
         type[list[T]],
         types.new_class(
             f"{t.__name__.title()}List",
-            (list[t], CoreSchemaGettable[list[t]]),
+            (list[t], ValidatablePrimitive[t], CoreSchemaGettable[list[t]]),
             exec_body=lambda ns: ns.update(
                 {
                     "__get_validators__": classmethod(__get_validators__),
