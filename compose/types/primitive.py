@@ -1,10 +1,13 @@
 import types
 from collections.abc import Callable
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, Self, cast
 
 from compose import typing
 
 from .helper import CoreSchemaGettable
+
+MARKER_IS_COMPOSE_VALIDATOR = "_is_compose_validator"
+MARKER_COMPOSE_VALIDATORS = "_compose_validators"
 
 
 def caster[T](factory: Callable[[Any], T], /) -> Callable[[Any], T]:
@@ -12,6 +15,38 @@ def caster[T](factory: Callable[[Any], T], /) -> Callable[[Any], T]:
         return factory(v)
 
     return _cast
+
+
+def validator[**P, T](func: Callable[P, T]) -> Callable[P, T]:
+    setattr(func, MARKER_IS_COMPOSE_VALIDATOR, True)
+    return func
+
+
+class ValidatablePrimitive[T]:
+    if TYPE_CHECKING:
+
+        def __init__(self, *args, **kwargs) -> None: ...
+
+    @classmethod
+    def __get_validators__(cls) -> typing.ValidatorGenerator:
+        yield from getattr(cls, MARKER_COMPOSE_VALIDATORS, [])
+
+    @classmethod
+    @validator
+    def cast(cls, v: T) -> Self:
+        return cls(v)
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
+        cls._compose_validators = [
+            getattr(cls, name)
+            for name, member in cls.__dict__.items()
+            if (
+                isinstance(member, classmethod)
+                and hasattr(member.__wrapped__, MARKER_IS_COMPOSE_VALIDATOR)
+            )
+        ]
 
 
 class Str(str, CoreSchemaGettable[str]):
