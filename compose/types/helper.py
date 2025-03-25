@@ -19,8 +19,8 @@ class SupportsGetValidators(Protocol):
 def chain(*validators: Callable[[Any], Any]) -> Callable[[Any], Any]:
     def apply_chain(v: Any) -> Any:
         result = copy.deepcopy(v)
-        for validator in validators:
-            result = validator(result)
+        for _validator in validators:
+            result = _validator(result)
         return result
 
     return apply_chain
