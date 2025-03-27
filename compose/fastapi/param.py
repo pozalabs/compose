@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Callable
 from typing import Annotated, Any, get_args
 
@@ -101,3 +103,7 @@ class OffsetPaginationParams:
     def __init__(self, page: int = 1, per_page: int = 10) -> None:
         self.page = page
         self.per_page = per_page
+
+    @classmethod
+    def as_depends(cls) -> type[OffsetPaginationParams]:
+        return as_depends(cls)
