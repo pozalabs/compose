@@ -65,6 +65,10 @@ def as_query[Q: BaseModel](q: type[Q], /) -> type[Q]:
     return Annotated[q, Depends(to_query(q))]
 
 
+def as_depends[T](t: type[T], /) -> type[T]:
+    return Annotated[t, Depends(t)]
+
+
 def create_model_dependency_resolver[T: container.BaseModel](
     model_type: type[T],
     dependencies: dict[str, tuple[type, Any]],
@@ -91,3 +95,9 @@ def with_depends[T: container.BaseModel](model_type: type[T], **params: Any) -> 
         model_type,
         Depends(create_model_dependency_resolver(model_type, params)),
     ]
+
+
+class OffsetPaginationParams:
+    def __init__(self, page: int = 1, per_page: int = 10) -> None:
+        self.page = page
+        self.per_page = per_page
