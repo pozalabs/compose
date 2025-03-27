@@ -8,7 +8,7 @@ import pendulum
 from compose import types
 
 from . import utils
-from .base import ComparisonOperator, Operator
+from .base import ComparisonOperator, EqualityOperator, Operator
 from .types import DictExpression
 
 
@@ -27,16 +27,18 @@ def _expression_factory(mongo_operator: str) -> Callable[[ComparisonOperator], D
     return expression
 
 
-def create_comparison_operator(name: str, mongo_operator: str) -> type[ComparisonOperator]:
+def create_comparison_operator[T](
+    name: str, mongo_operator: str, base: tuple[type[T], ...] = (ComparisonOperator,)
+) -> type[T]:
     return utils.create_operator(
         name=name,
-        base=(ComparisonOperator,),
+        base=base,
         expression_factory=_expression_factory(mongo_operator),
     )
 
 
-Eq = create_comparison_operator(name="Eq", mongo_operator="$eq")
-Ne = create_comparison_operator(name="Ne", mongo_operator="$ne")
+Eq = create_comparison_operator(name="Eq", mongo_operator="$eq", base=(EqualityOperator,))
+Ne = create_comparison_operator(name="Ne", mongo_operator="$ne", base=(EqualityOperator,))
 Gt = create_comparison_operator(name="Gt", mongo_operator="$gt")
 Gte = create_comparison_operator(name="Gte", mongo_operator="$gte")
 Lt = create_comparison_operator(name="Lt", mongo_operator="$lt")
