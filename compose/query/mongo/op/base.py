@@ -35,6 +35,24 @@ class ComparisonOperator(Operator):
         return cls(**dict(zip(("field", "value"), kv)))
 
 
+class EqualityOperator(ComparisonOperator):
+    @abc.abstractmethod
+    def expression(self) -> dict[str, Any]:
+        raise NotImplementedError
+
+    @classmethod
+    def is_null(cls, field: str) -> Self:
+        return cls(field=field, value=None)
+
+    @classmethod
+    def is_true(cls, field: str) -> Self:
+        return cls(field=field, value=True)
+
+    @classmethod
+    def is_false(cls, field: str) -> Self:
+        return cls(field=field, value=False)
+
+
 class LogicalOperator(Operator):
     def __init__(self, *ops: Operator):
         self.ops = list(ops)
