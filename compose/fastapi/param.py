@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Callable
 from typing import Annotated, Any, get_args
 
@@ -92,6 +90,7 @@ def create_model_dependency_resolver[T: container.BaseModel](
     return wrapper
 
 
+# `from __future__ import annotations` 사용시 동작하지 않음
 def with_depends[T: container.BaseModel](model_type: type[T], **params: Any) -> type[T]:
     return Annotated[
         model_type,
@@ -100,10 +99,10 @@ def with_depends[T: container.BaseModel](model_type: type[T], **params: Any) -> 
 
 
 class OffsetPaginationParams:
-    def __init__(self, page: int = 1, per_page: int = 10) -> None:
+    def __init__(self, page: int = 1, per_page: int = 10):
         self.page = page
         self.per_page = per_page
 
     @classmethod
-    def as_depends(cls) -> type[OffsetPaginationParams]:
+    def as_depends(cls) -> type["OffsetPaginationParams"]:
         return as_depends(cls)
