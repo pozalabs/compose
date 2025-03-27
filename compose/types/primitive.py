@@ -41,7 +41,8 @@ class ValidatablePrimitive[T]:
 
         cls._compose_validators = [
             getattr(cls, name)
-            for name, member in cls.__dict__.items()
+            for base_cls in cls.__mro__
+            for name, member in base_cls.__dict__.items()
             if (
                 isinstance(member, classmethod)
                 and hasattr(member.__wrapped__, MARKER_IS_COMPOSE_VALIDATOR)

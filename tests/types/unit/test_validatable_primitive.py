@@ -26,3 +26,21 @@ def test_valid():
 def test_invalid():
     with pytest.raises(ValidationError):
         ta.validate_python("Too long name")
+
+
+class NameWithoutValidator(compose.types.Str): ...
+
+
+class Person(compose.BaseModel):
+    name: NameWithoutValidator
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        NameWithoutValidator("valid name"),
+        Person(name=NameWithoutValidator("valid name")).name,
+    ],
+)
+def test_casting(name: NameWithoutValidator | str):
+    assert isinstance(name, NameWithoutValidator) is True
