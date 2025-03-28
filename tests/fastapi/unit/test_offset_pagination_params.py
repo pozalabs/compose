@@ -1,3 +1,5 @@
+import http
+
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -27,3 +29,16 @@ def test_pagination_params_injected(params: dict[str, int] | None, expected: dic
     response = client.get(url="/items", params=params)
 
     assert response.json() == expected
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        dict(page=-1, per_page=10),
+        dict(page=1, per_page=-1),
+    ],
+)
+def test_cannot_use_invalid_pagination_params(params):
+    response = client.get(url="/items", params=params)
+
+    assert response.status_code == http.HTTPStatus.UNPROCESSABLE_ENTITY
