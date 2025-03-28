@@ -1,11 +1,12 @@
 from collections.abc import Callable
+from dataclasses import asdict
 from typing import Annotated, Any, get_args
 
 import pydantic_core
 from fastapi import Depends, Query
 from pydantic import BaseModel, Field, Json, create_model, field_validator
 
-from compose import container
+from compose import container, query
 
 
 def dict_to_json(v: dict[str, Any] | None) -> str | None:
@@ -36,9 +37,19 @@ def to_query[Q: BaseModel](q: type[Q], /) -> type[Q]:
     field_definitions = {}
     for field_name, field_info in q.model_fields.items():
         annotation = field_info.annotation
+
+        metadata = {}
+        for item in field_info.metadata:
+            metadata |= asdict(item)
+
         field_definitions[field_name] = (
             annotation,
-            Field(Query(**{arg: getattr(field_info, arg, None) for arg in field_args})),
+            Field(
+                Query(
+                    **{arg: getattr(field_info, arg, None) for arg in field_args},
+                    **metadata,
+                )
+            ),
         )
         if not (args := get_args(annotation)):
             continue
@@ -63,10 +74,6 @@ def to_query[Q: BaseModel](q: type[Q], /) -> type[Q]:
 
 def as_query[Q: BaseModel](q: type[Q], /) -> type[Q]:
     return Annotated[q, Depends(to_query(q))]
-
-
-def as_depends[T](t: type[T], /) -> type[T]:
-    return Annotated[t, Depends(t)]
 
 
 def create_model_dependency_resolver[T: container.BaseModel](
@@ -98,11 +105,9 @@ def with_depends[T: container.BaseModel](model_type: type[T], **params: Any) -> 
     ]
 
 
-class OffsetPaginationParams:
-    def __init__(self, page: int = 1, per_page: int = 10):
-        self.page = page
-        self.per_page = per_page
+class _OffsetPaginationParams(query.Query):
+    page: int = Field(1, ge=1)
+    per_page: int = Field(10, ge=1)
 
-    @classmethod
-    def as_depends(cls) -> type["OffsetPaginationParams"]:
-        return as_depends(cls)
+
+OffsetPaginationParams = as_query(_OffsetPaginationParams)
