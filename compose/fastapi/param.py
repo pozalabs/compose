@@ -99,4 +99,4 @@ class _OffsetPaginationParams(query.Query):
     per_page: int = Field(10, gt=0)
 
 
-OffsetPaginationParams = to_query(_OffsetPaginationParams)
+OffsetPaginationParams = as_query(_OffsetPaginationParams)
