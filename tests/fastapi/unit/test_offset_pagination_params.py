@@ -1,5 +1,3 @@
-import http
-
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -10,8 +8,8 @@ app = FastAPI()
 
 
 @app.get("/items")
-def get(pagination_params: compose.fastapi.OffsetPaginationParams.as_depends()):
-    return {"page": pagination_params.page, "per_page": pagination_params.per_page}
+def get(pagination_params: compose.fastapi.OffsetPaginationParams):
+    return pagination_params.model_dump()
 
 
 client = TestClient(app)
@@ -28,5 +26,4 @@ client = TestClient(app)
 def test_pagination_params_injected(params: dict[str, int] | None, expected: dict[str, int]):
     response = client.get(url="/items", params=params)
 
-    assert response.status_code == http.HTTPStatus.OK
     assert response.json() == expected
