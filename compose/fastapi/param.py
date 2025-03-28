@@ -106,8 +106,8 @@ def with_depends[T: container.BaseModel](model_type: type[T], **params: Any) -> 
 
 
 class _OffsetPaginationParams(query.Query):
-    page: int = Field(1, gt=0)
-    per_page: int = Field(10, gt=0)
+    page: int = Field(1, ge=1)
+    per_page: int = Field(10, ge=1)
 
 
 OffsetPaginationParams = as_query(_OffsetPaginationParams)
