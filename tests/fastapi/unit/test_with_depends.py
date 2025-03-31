@@ -45,7 +45,7 @@ def app() -> FastAPI:
     def update_item(
         cmd: compose.fastapi.with_depends(
             UpdateItem,
-            item_id=(int, Path(...)),
+            item_id=compose.fastapi.WithPath.int(),
         ),
     ):
         return {"item_id": cmd.item_id, "item_name": cmd.name}
