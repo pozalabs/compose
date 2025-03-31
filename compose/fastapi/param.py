@@ -3,10 +3,10 @@ from dataclasses import asdict
 from typing import Annotated, Any, get_args
 
 import pydantic_core
-from fastapi import Depends, Query
+from fastapi import Depends, Path, Query, params
 from pydantic import BaseModel, Field, Json, create_model, field_validator
 
-from compose import container, query
+from compose import container, query, types
 
 
 def dict_to_json(v: dict[str, Any] | None) -> str | None:
@@ -98,11 +98,27 @@ def create_model_dependency_resolver[T: container.BaseModel](
 
 
 # `from __future__ import annotations` 사용시 동작하지 않음
-def with_depends[T: container.BaseModel](model_type: type[T], **params: Any) -> type[T]:
+def with_depends[T: container.BaseModel](model_type: type[T], **kwargs: Any) -> type[T]:
     return Annotated[
         model_type,
-        Depends(create_model_dependency_resolver(model_type, params)),
+        Depends(create_model_dependency_resolver(model_type, kwargs)),
     ]
+
+
+class WithPath:
+    @classmethod
+    def object_id(
+        cls, path: params.Path | None = None
+    ) -> tuple[type[types.PyObjectId], params.Path]:
+        return types.PyObjectId, path or Path(...)
+
+    @classmethod
+    def int(cls, path: params.Path | None = None) -> tuple[type[int], params.Path]:
+        return int, path or Path(...)
+
+    @classmethod
+    def str(cls, path: params.Path | None = None) -> tuple[type[str], params.Path]:
+        return str, path or Path(...)
 
 
 class _OffsetPaginationParams(query.Query):

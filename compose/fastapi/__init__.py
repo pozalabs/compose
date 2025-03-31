@@ -19,7 +19,7 @@ from .openapi import (
     additional_responses,
     openapi_tags,
 )
-from .param import OffsetPaginationParams, as_query, to_query, with_depends
+from .param import OffsetPaginationParams, WithPath, as_query, to_query, with_depends
 from .response import NoContentResponse, ZipStreamingResponse
 from .routing import APIRouter
 from .security import APIKeyHeader, CookieAuth, HTTPBasic, HTTPBearer, unauthorized_error
@@ -41,6 +41,7 @@ __all__ = [
     "RedocHTML",
     "SwaggerUIHTML",
     "UserInjector",
+    "WithPath",
     "ZipStreamingResponse",
     "add_doc_routes",
     "additional_responses",
