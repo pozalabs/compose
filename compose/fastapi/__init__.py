@@ -23,11 +23,12 @@ from .param import OffsetPaginationParams, WithPath, as_query, to_query, with_de
 from .response import NoContentResponse, ZipStreamingResponse
 from .routing import APIRouter
 from .security import APIKeyHeader, CookieAuth, HTTPBasic, HTTPBearer, unauthorized_error
-from .wiring import auto_wired
+from .wiring import AutoWired, auto_wired
 
 __all__ = [
     "APIKeyHeader",
     "APIRouter",
+    "AutoWired",
     "CommandUpdater",
     "CookieAuth",
     "ExceptionHandler",
