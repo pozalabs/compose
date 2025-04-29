@@ -33,3 +33,11 @@ def test_validate_on_copy(copy_model: Callable[[Model], Model]):
 
     with pytest.raises(ValidationError):
         copy_model(model)
+
+
+def test_from_model():
+    model = Model(name="test")
+    actual = SchemaModel.from_model(model)
+    expected = SchemaModel(name="test")
+
+    assert actual == expected
