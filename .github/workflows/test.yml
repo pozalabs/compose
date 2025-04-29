@@ -9,9 +9,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  UV_VERSION: "0.6.6"
-
 jobs:
   unit-test:
     strategy:
@@ -22,7 +19,7 @@ jobs:
     secrets: inherit
     with:
       python-version: ${{ matrix.python-version }}
-      uv-version: ${{ env.UV_VERSION }}
+      uv-version: "0.6.6"
 
   integration-test:
     strategy:
@@ -33,5 +30,5 @@ jobs:
     secrets: inherit
     with:
       python-version: ${{ matrix.python-version }}
-      uv-version: ${{ env.UV_VERSION }}
+      uv-version: "0.6.6"
     
