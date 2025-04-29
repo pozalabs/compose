@@ -22,7 +22,7 @@ jobs:
     secrets: inherit
     with:
       python-version: ${{ matrix.python-version }}
-      uv-version: $UV_VERSION
+      uv-version: ${{ env.UV_VERSION }}
 
   integration-test:
     strategy:
@@ -33,5 +33,5 @@ jobs:
     secrets: inherit
     with:
       python-version: ${{ matrix.python-version }}
-      uv-version: $UV_VERSION
+      uv-version: ${{ env.UV_VERSION }}
     
