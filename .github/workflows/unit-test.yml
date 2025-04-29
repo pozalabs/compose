@@ -21,6 +21,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           version: ${{ inputs.uv-version }}
+          python-version: ${{ inputs.python-version }}
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
