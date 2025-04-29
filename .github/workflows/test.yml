@@ -11,8 +11,14 @@ concurrency:
 
 jobs:
   unit-test:
+    strategy:
+      matrix:
+        python-version: [3.12, 3.13]
+
     uses: ./.github/workflows/unit-test.yml
     secrets: inherit
+    with:
+      python-version: ${{ matrix.python-version }}
 
   integration-test:
     uses: ./.github/workflows/integration-test.yml

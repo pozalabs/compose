@@ -2,17 +2,15 @@ name: Run unit tests
 
 on:
   workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version:
-          - "3.12"
-      fail-fast: false
-
-    name: Python ${{ matrix.python-version }}
+    name: Python ${{ inputs.python-version }}
 
     steps:
       - uses: actions/checkout@v4
