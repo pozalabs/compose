@@ -6,6 +6,9 @@ on:
       python-version:
         required: true
         type: string
+      uv-version:
+        required: true
+        type: string
 
 jobs:
   test:
@@ -17,7 +20,7 @@ jobs:
 
       - uses: astral-sh/setup-uv@v5
         with:
-          version: "0.6.6"
+          version: ${{ inputs.uv-version }}
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
