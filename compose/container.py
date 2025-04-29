@@ -17,6 +17,10 @@ Model = TypeVar("Model", bound=PydanticBaseModel)
 
 
 class BaseModel(PydanticBaseModel):
+    @classmethod
+    def from_model(cls, model: BaseModel) -> Self:
+        return cls.model_validate(model.model_dump())
+
     def json(
         self,
         indent: int | None = None,
