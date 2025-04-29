@@ -21,5 +21,11 @@ jobs:
       python-version: ${{ matrix.python-version }}
 
   integration-test:
+    strategy:
+      matrix:
+        python-version: [3.12, 3.13]
+
     uses: ./.github/workflows/integration-test.yml
     secrets: inherit
+    with:
+      python-version: ${{ matrix.python-version }}
