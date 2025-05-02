@@ -89,6 +89,9 @@ class Project(Stage[DictExpression]):
         exclude: Iterable[str] | None = None,
         ref: dict[str, Any] | None = None,
     ) -> Self:
+        if include is None and exclude is None and ref is None:
+            raise ValueError("At least one of `include`, `exclude`, or `ref` must be provided")
+
         return cls(
             *(Spec.include(field) for field in (include or {})),
             *(Spec.exclude(field) for field in (exclude or {})),
