@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import Any, Self
 
 from .base import Evaluable, Merge, Operator, Stage
@@ -80,6 +81,22 @@ class Project(Stage[DictExpression]):
     @classmethod
     def from_attrs(cls, **attrs: Any) -> Self:
         return cls(*(Spec(field, spec) for field, spec in attrs.items()))
+
+    @classmethod
+    def from_(
+        cls,
+        include: Iterable[str] | None = None,
+        exclude: Iterable[str] | None = None,
+        ref: dict[str, Any] | None = None,
+    ) -> Self:
+        if include is None and exclude is None and ref is None:
+            raise ValueError("At least one of `include`, `exclude`, or `ref` must be provided")
+
+        return cls(
+            *(Spec.include(field) for field in (include or {})),
+            *(Spec.exclude(field) for field in (exclude or {})),
+            *(Spec(field, spec) for field, spec in (ref or {}).items()),
+        )
 
 
 class Lookup(Stage[DictExpression]):
