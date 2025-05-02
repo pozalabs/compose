@@ -1,3 +1,4 @@
+from .byte_unit import Byte
 from .datetime import DateRange, DateTime
 from .duration import Seconds
 from .helper import CoreSchemaGettable, SupportsGetValidators, chain, get_pydantic_core_schema
@@ -7,6 +8,7 @@ from .url import S3ContentUrl
 from .web import ContentDisposition
 
 __all__ = [
+    "Byte",
     "ContentDisposition",
     "CoreSchemaGettable",
     "DateRange",
