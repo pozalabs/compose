@@ -26,7 +26,7 @@ class Result[K: Hashable, T]:
 
 
 class AsyncTaskExecutor:
-    def __init__(self, concurrency: int, timeout: int | None = None):
+    def __init__(self, concurrency: int, timeout: float | None = None):
         self.concurrency = concurrency
         self.timeout = timeout
 
@@ -36,7 +36,7 @@ class AsyncTaskExecutor:
         jobs: list[AsyncJob[K, P, T]],
         group: Literal[True] = True,
         concurrency: int | None = None,
-        timeout: int | None = None,
+        timeout: float | None = None,
     ) -> dict[K, Result[K, T]]: ...
 
     @overload
@@ -45,7 +45,7 @@ class AsyncTaskExecutor:
         jobs: list[AsyncJob[K, P, T]],
         group: Literal[False] = False,
         concurrency: int | None = None,
-        timeout: int | None = None,
+        timeout: float | None = None,
     ) -> list[Result[K, T]]: ...
 
     async def execute[K, **P, T](
@@ -53,7 +53,7 @@ class AsyncTaskExecutor:
         jobs: list[AsyncJob[K, P, T]],
         group: bool = False,
         concurrency: int | None = None,
-        timeout: int | None = None,
+        timeout: float | None = None,
     ) -> list[Result[K, T]] | dict[K, Result[K, T]]:
         result = await self._execute(
             jobs=jobs,
@@ -67,7 +67,7 @@ class AsyncTaskExecutor:
         self,
         jobs: list[AsyncJob[K, P, T]],
         concurrency: int | None = None,
-        timeout: int | None = None,
+        timeout: float | None = None,
     ) -> list[Result[K, T]]:
         concurrency = concurrency if concurrency is not None else self.concurrency
         timeout = timeout if timeout is not None else self.timeout
