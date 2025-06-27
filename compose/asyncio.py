@@ -85,8 +85,11 @@ async def execute_jobs[K, **P, T](
     jobs: list[AsyncJob[K, P, T]],
     semaphore: asyncio.Semaphore,
 ) -> list[Result[K, T]]:
-    async with asyncio.TaskGroup() as tg:
-        tasks = [tg.create_task(execute_job(job=job, semaphore=semaphore)) for job in jobs]
+    try:
+        async with asyncio.TaskGroup() as tg:
+            tasks = [tg.create_task(execute_job(job=job, semaphore=semaphore)) for job in jobs]
+    except* Exception as eg:
+        raise eg.exceptions[0]
 
     return [task.result() for task in tasks]
 
