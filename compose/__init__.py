@@ -1,4 +1,5 @@
 from . import (
+    asyncio,
     auth,
     aws,
     command,
@@ -33,6 +34,7 @@ tp = typing
 __all__ = [
     "BaseModel",
     "TimeStampedModel",
+    "asyncio",
     "auth",
     "aws",
     "command",
