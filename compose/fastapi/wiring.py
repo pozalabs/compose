@@ -1,6 +1,6 @@
 import inspect
 from collections.abc import Callable
-from typing import Any
+from typing import Annotated, Any
 
 from dependency_injector.wiring import inject
 from fastapi import Depends
@@ -28,7 +28,9 @@ def auto_wired[F: Callable[..., Any]](
             updated_param = param
             try:
                 provided = provider(param.annotation)
-                updated_param = updated_param.replace(default=Depends(provided))
+                updated_param = updated_param.replace(
+                    annotation=Annotated[param.annotation, Depends(provided)]
+                )
             except ValueError:
                 pass
 
