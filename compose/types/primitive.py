@@ -96,3 +96,20 @@ def create_list_type[T]() -> Callable[[type[T]], type[list[T]]]:
 TypedList = create_list_type()
 StrList = TypedList(str)
 IntList = TypedList(int)
+
+
+class ListMeta(type):
+    _cache = {}
+
+    def __getitem__(self, item):
+        type_name = item.__name__
+
+        if (cached := self._cache.get(type_name)) is not None:
+            return cached
+
+        result = _create_list_type(item)
+        self._cache[type_name] = result
+        return result
+
+
+class List[T](list[T], metaclass=ListMeta): ...
