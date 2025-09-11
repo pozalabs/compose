@@ -99,13 +99,11 @@ class DependencyJob[K: Hashable, **P, T]:
         key: K,
         dependencies: set[K],
         func: Callable[P, T],
-        *args: P.args,
         **kwargs: P.kwargs,
     ):
         self.key = key
         self.dependencies = dependencies
         self.func = func
-        self.args = args
         self.kwargs = kwargs
 
     @classmethod
@@ -153,7 +151,7 @@ class DependencyExecutor:
                 while ready_queue and len(active_futures) < max_workers:
                     job_key = ready_queue.popleft()
                     job = job_map[job_key]
-                    future = executor.submit(job.func, *job.args, **job.kwargs)
+                    future = executor.submit(job.func, **job.kwargs)
                     active_futures[future] = job_key
 
                 if not active_futures:
