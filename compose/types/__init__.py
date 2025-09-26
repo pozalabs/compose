@@ -1,6 +1,6 @@
 from .byte_unit import Byte
 from .datetime import DateRange, DateTime
-from .duration import Seconds
+from .duration import MilliSeconds, Seconds
 from .helper import CoreSchemaGettable, SupportsGetValidators, chain, get_pydantic_core_schema
 from .object_id import PyObjectId
 from .primitive import Float, Int, IntList, List, Str, StrList, TypedList, validator
@@ -17,6 +17,7 @@ __all__ = [
     "Int",
     "IntList",
     "List",
+    "MilliSeconds",
     "PyObjectId",
     "S3ContentUrl",
     "Seconds",
