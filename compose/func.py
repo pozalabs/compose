@@ -1,8 +1,8 @@
-from collections.abc import Iterable
+from collections.abc import Iterator
 
 
-def some_or_none[T](iterable: Iterable[T], /) -> T | None:
-    return next(iter(iterable), None)
+def find[T](iterator: Iterator[T], /) -> T | None:
+    return next(iterator, None)
 
 
 def unwrap[T](v: T | None, exc: Exception, /) -> T:
