@@ -20,7 +20,7 @@ import compose
         "일치하는 값을 리턴할 수 없는 리스트 컴프리헨션",
     ),
 )
-def test_some_or_none[T](iterator: Iterator[T], expected: T | None):
+def test_find[T](iterator: Iterator[T], expected: T | None):
     assert compose.func.find(iterator) == expected
 
 
