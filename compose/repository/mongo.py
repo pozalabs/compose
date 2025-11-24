@@ -3,7 +3,7 @@ from __future__ import annotations
 import functools
 import warnings
 from collections.abc import Iterable
-from typing import Any, ClassVar, Self, Unpack, get_args, get_origin
+from typing import Any, ClassVar, Self, Unpack, get_args, get_origin, overload
 
 import pendulum
 import pymongo
@@ -86,6 +86,26 @@ class MongoRepository[T: Entity](BaseRepository):
     ) -> T | None:
         return self.find_by({"_id": entity_id}, session=session, **kwargs)
 
+    @overload
+    def find_by(
+        self,
+        filter_: dict[str, Any],
+        *,
+        projection: None = None,
+        session: ClientSession | None = None,
+        **kwargs,
+    ) -> T | None: ...
+
+    @overload
+    def find_by(
+        self,
+        filter_: dict[str, Any],
+        *,
+        projection: dict[str, Any],
+        session: ClientSession | None = None,
+        **kwargs,
+    ) -> dict[str, Any] | None: ...
+
     def find_by(
         self,
         filter_: dict[str, Any],
@@ -112,6 +132,28 @@ class MongoRepository[T: Entity](BaseRepository):
     ) -> dict[str, Any] | None:
         query_result = self.collection.aggregate(qry.to_query(), session=session, **kwargs)
         return next(query_result, None)
+
+    @overload
+    def list_by(
+        self,
+        filter_: dict[str, Any],
+        *,
+        projection: None = None,
+        sort: list[tuple[str, int]] | None = None,
+        session: ClientSession | None = None,
+        **kwargs,
+    ) -> list[T]: ...
+
+    @overload
+    def list_by(
+        self,
+        filter_: dict[str, Any],
+        *,
+        projection: dict[str, Any],
+        sort: list[tuple[str, int]] | None = None,
+        session: ClientSession | None = None,
+        **kwargs,
+    ) -> list[dict[str, Any]]: ...
 
     def list_by(
         self,
