@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import dataclasses
+import enum
 import logging
 import sys
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Protocol, Self, Unpack
+
+from typing_extensions import deprecated
 
 try:
     from loguru import logger
@@ -14,11 +18,11 @@ except ImportError:
     )
 
 if TYPE_CHECKING:
-    from loguru import Logger
+    from loguru import BasicHandlerConfig, Logger, Record
 
 
 class InterceptHandler(logging.Handler):
-    """https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging"""  # noqa: E501
+    """https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging"""
 
     def emit(self, record: logging.LogRecord) -> None:
         try:
@@ -68,20 +72,87 @@ def get_default_logging_config(serialize_log: bool) -> dict[str, Any]:
     }
 
 
+@deprecated("'get_default_logger' is deprecated. Use 'create_logger' instead")
 def get_default_logger(
     log_level: int,
     serialize_log: bool,
-    **config: Any,
+    **config: Unpack[BasicHandlerConfig],
 ) -> Logger:
     intercept_handler = InterceptHandler()
     logging.basicConfig(handlers=[intercept_handler], level=log_level, force=True)
     intercept(intercept_handler=intercept_handler)
+    logger.configure(handlers=[get_default_logging_config(serialize_log) | config])
+    return logger
+
+
+class LogFilterOp(Protocol):
+    def __call__(self, record: Record) -> bool: ...
+
+
+class LogFilterNotContains:
+    def __init__(self, pattern: str):
+        self.pattern = pattern
+
+    def __call__(self, record: Record) -> bool:
+        return self.pattern not in record["message"]
+
+
+class LogFilter:
+    def __init__(self, *ops: *tuple[LogFilterOp, ...]):
+        self.ops = list(ops)
+
+    def __call__(self, record: Record) -> bool:
+        return all(op(record) for op in self.ops)
+
+
+class LogFormat(enum.StrEnum):
+    SERIALIZED = "{message}"
+    NON_SERIALIZED = (
+        "{time:YYYY-MM-DD HH:mm:ss.SSS} | <level>{level: <8}</level> | <level>{message}</level>"
+    )
+
+
+@dataclasses.dataclass
+class LogDisplayConfig:
+    format: str
+    colorize: bool
+    serialize: bool
+
+    @classmethod
+    def serialized(cls) -> Self:
+        return cls(
+            format=LogFormat.SERIALIZED,
+            colorize=False,
+            serialize=True,
+        )
+
+    @classmethod
+    def non_serialized(cls) -> Self:
+        return cls(
+            format=LogFormat.NON_SERIALIZED,
+            colorize=True,
+            serialize=False,
+        )
+
+
+def create_logger(level: int = logging.INFO, **config: Unpack[BasicHandlerConfig]) -> Logger:
+    intercept_handler = InterceptHandler()
+    logging.basicConfig(handlers=[intercept_handler], level=level, force=True)
+    intercept(intercept_handler=intercept_handler)
+
     logger.configure(
         handlers=[
             {
-                **get_default_logging_config(serialize_log),
-                **config,
+                "sink": sys.stdout,
+                "diagnose": False,
+                "filter": LogFilter(
+                    LogFilterNotContains("/health-check"),
+                    LogFilterNotContains("/metrics"),
+                ),
+                **dataclasses.asdict(LogDisplayConfig.non_serialized()),
             }
+            | config
         ]
     )
+
     return logger
