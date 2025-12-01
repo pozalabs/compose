@@ -11,6 +11,10 @@ class Schema(container.BaseModel):
     model_config = ConfigDict(json_schema_extra=schema_by_field_name())
 
 
+class Id[T](Schema):
+    id: T
+
+
 class TimeStampedSchema(container.TimeStampedModel, Schema): ...
 
 
