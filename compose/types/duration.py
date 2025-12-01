@@ -4,11 +4,11 @@ from .. import constants
 from . import primitive
 
 
-class Seconds(primitive.Int):
+class Seconds(primitive.Float):
     def __new__(cls, v: Any, /) -> Self:
         v = super().__new__(cls, v)
         if v < 0:
-            raise ValueError("`Seconds` must be a non-negative integer")
+            raise ValueError(f"`{cls.__name__}` must be a non-negative float")
         return v
 
     @classmethod
