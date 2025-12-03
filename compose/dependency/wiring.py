@@ -236,3 +236,19 @@ def create_provider[T](
         )
 
     return provider
+
+
+def get_wiring_packages(*container_types: *tuple[type[containers.Container], ...]) -> set[str]:
+    return {get_container_package(c) for c in container_types}
+
+
+def get_container_package(container_type: type[containers.Container]) -> str:
+    parts = container_type.__module__.split(".")
+
+    if len(parts) >= 2:
+        root, package, *_ = parts
+        return f"{root}.{package}"
+
+    raise ValueError(
+        f"Invalid module path for {container_type.__name__}: expected 'root.package.*', got '{container_type.__module__}'"
+    )
