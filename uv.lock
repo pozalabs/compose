@@ -862,7 +862,7 @@ wheels = [
 
 [[package]]
 name = "pozalabs-compose"
-version = "1.28.1"
+version = "1.29.0"
 source = { editable = "." }
 dependencies = [
     { name = "authlib" },

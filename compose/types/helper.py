@@ -13,7 +13,7 @@ class SupportsGetValidators(Protocol):
     """Naming Convention: https://github.com/python/typeshed/issues/4174"""
 
     @classmethod
-    def __get_validators__(cls) -> Generator[[Callable[[Any], Any]], None, None]: ...
+    def __get_validators__(cls) -> Generator[Callable[[Any], Any], None, None]: ...
 
 
 def chain(*validators: Callable[[Any], Any]) -> Callable[[Any], Any]:
