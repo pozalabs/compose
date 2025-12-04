@@ -1,7 +1,6 @@
 import mimetypes
 import os
 import urllib.parse
-from collections.abc import Iterable
 from typing import ClassVar, Self, TypedDict
 
 from .primitive import Str
@@ -44,7 +43,7 @@ class MimeType(Str):
         cls._is_known_mime_types_registered = True
 
     @classmethod
-    def register(cls, types: Iterable[MimeTypeInfo]) -> None:
+    def register(cls, *types: *tuple[MimeTypeInfo, ...]) -> None:
         for t in [*types]:
             mimetypes.add_type(**t)
 
