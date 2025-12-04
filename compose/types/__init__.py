@@ -5,7 +5,7 @@ from .helper import CoreSchemaGettable, SupportsGetValidators, chain, get_pydant
 from .object_id import PyObjectId
 from .primitive import Float, Int, IntList, List, Str, StrList, TypedList, validator
 from .url import S3ContentUrl
-from .web import ContentDisposition
+from .web import ContentDisposition, MimeType, MimeTypeInfo
 
 __all__ = [
     "Byte",
@@ -18,6 +18,8 @@ __all__ = [
     "IntList",
     "List",
     "MilliSeconds",
+    "MimeType",
+    "MimeTypeInfo",
     "PyObjectId",
     "S3ContentUrl",
     "Seconds",
