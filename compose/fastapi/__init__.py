@@ -21,7 +21,7 @@ from .openapi import (
 )
 from .param import OffsetPaginationParams, WithPath, as_query, to_query, with_depends
 from .response import NoContentResponse, ZipStreamingResponse
-from .routing import APIRouter
+from .routing import APIRouter, create_auto_wired_route
 from .security import APIKeyHeader, CookieAuth, HTTPBasic, HTTPBearer, unauthorized_error
 from .wiring import AutoWired, auto_wired
 
@@ -48,6 +48,7 @@ __all__ = [
     "additional_responses",
     "as_query",
     "auto_wired",
+    "create_auto_wired_route",
     "create_exception_handler",
     "create_with_user",
     "health_check",
