@@ -52,5 +52,9 @@ class MimeType(Str):
         mime_type, _ = mimetypes.guess_type(url)
         return cls(mime_type or cls.default_type)
 
+    @classmethod
+    def default(cls) -> Self:
+        return cls(cls.default_type)
+
 
 MimeType.register_known_types()
