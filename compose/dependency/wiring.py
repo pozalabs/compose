@@ -1,5 +1,4 @@
 import enum
-import functools
 import importlib
 import inspect
 from collections.abc import Callable, Iterable
@@ -111,7 +110,6 @@ class ConflictResolution(str, enum.Enum):
     ERROR = "error"
 
 
-@functools.lru_cache(32)
 def resolve(
     type_: type[Any] | str,
     container: Container,
