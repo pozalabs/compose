@@ -21,7 +21,7 @@ type SettingPreprocessors = dict[str, SettingPreprocessor]
 class ParameterStoreParameterPrefix(str):
     @classmethod
     def create(cls, service_name: str, app_env: AppEnv) -> Self:
-        return cls(f"/{service_name}/{app_env}/")
+        return cls(f"/{service_name}/{app_env.lower()}/")
 
 
 def get_parameters_from_ssm(
