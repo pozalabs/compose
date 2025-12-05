@@ -4,7 +4,7 @@ if not is_package_installed("fastapi"):
     raise ImportError("Install `fastapi` to use `compose.fastapi` package")
 
 from .depends import CommandUpdater, UserInjector, create_with_user
-from .endpoint import health_check
+from .endpoint import SpecialEndpoint, health_check
 from .exception_handler import (
     ExceptionHandler,
     ExceptionHandlerInfo,
@@ -19,6 +19,7 @@ from .openapi import (
     additional_responses,
     openapi_tags,
 )
+from .otel import NonInstrumentedUrls
 from .param import OffsetPaginationParams, WithPath, as_query, to_query, with_depends
 from .response import NoContentResponse, ZipStreamingResponse
 from .routing import APIRouter, create_auto_wired_route
@@ -36,10 +37,12 @@ __all__ = [
     "HTTPBasic",
     "HTTPBearer",
     "NoContentResponse",
+    "NonInstrumentedUrls",
     "OffsetPaginationParams",
     "OpenAPIDoc",
     "OpenAPISchema",
     "RedocHTML",
+    "SpecialEndpoint",
     "SwaggerUIHTML",
     "UserInjector",
     "WithPath",
