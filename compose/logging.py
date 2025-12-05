@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import enum
 import logging
+import os
 import sys
 from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any, Protocol, Self, Unpack
@@ -156,3 +157,9 @@ def create_logger(level: int = logging.INFO, **config: Unpack[BasicHandlerConfig
     )
 
     return logger
+
+
+class LogLevel(int):
+    @classmethod
+    def from_env(cls, env: str) -> Self:
+        return cls(os.getenv(env, logging.INFO))
