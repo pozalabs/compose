@@ -1,5 +1,5 @@
 from .consumer import MessageConsumer
-from .consumer_runner import ThreadMessageConsumerRunner
+from .consumer_runner import FastAPIMessageConsumerRunner, ThreadMessageConsumerRunner
 from .messagebus import MessageBus
 from .model import EventMessage, SqsEventMessage
 from .publisher import EventPublisher
@@ -8,18 +8,19 @@ from .queue.local import LocalMessageQueue, event_store
 from .signal_handler import DefaultSignalHandler, SignalHandler, ThreadSignalHandler
 
 __all__ = [
-    "EventMessage",
-    "SqsEventMessage",
-    "MessageQueue",
-    "LocalMessageQueue",
-    "event_store",
-    "MessageConsumer",
-    "ThreadMessageConsumerRunner",
-    "MessageBus",
-    "EventPublisher",
-    "SignalHandler",
     "DefaultSignalHandler",
+    "EventMessage",
+    "EventPublisher",
+    "FastAPIMessageConsumerRunner",
+    "LocalMessageQueue",
+    "MessageBus",
+    "MessageConsumer",
+    "MessageQueue",
+    "SignalHandler",
+    "SqsEventMessage",
+    "ThreadMessageConsumerRunner",
     "ThreadSignalHandler",
+    "event_store",
 ]
 
 try:

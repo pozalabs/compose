@@ -1,12 +1,13 @@
 import asyncio
+import contextlib
 import logging
 import signal
 import threading
 import time
 import types
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 
-from .consumer import MessageConsumer
+from .consumer import MessageConsumerType
 from .signal_handler import SignalHandler, ThreadSignalHandler
 
 logger = logging.getLogger("compose")
@@ -15,14 +16,14 @@ logger = logging.getLogger("compose")
 class ThreadMessageConsumerRunner:
     def __init__(
         self,
-        message_consumer_factory: Callable[[], MessageConsumer],
+        message_consumer_factory: Callable[[], MessageConsumerType],
         signal_handler_factory: Callable[[], SignalHandler] = ThreadSignalHandler,
     ):
         self.message_consumer_factory = message_consumer_factory
         self.signal_handler_factory = signal_handler_factory
 
         self._received_signal = False
-        self._consumers: list[MessageConsumer] = []
+        self._consumers: list[MessageConsumerType] = []
 
         for signum in (signal.SIGINT, signal.SIGTERM):
             signal.signal(signum, self.handle_signal)
@@ -56,3 +57,29 @@ class ThreadMessageConsumerRunner:
     def handle_signal(self, signum: int, _: types.FrameType) -> None:
         logger.info(f"Received {signal.Signals(signum).name}, exiting gracefully")
         self._received_signal = True
+
+
+class FastAPIMessageConsumerRunner:
+    def __init__(
+        self,
+        message_consumer_factory: Callable[[], MessageConsumerType],
+    ):
+        self.message_consumer_factory = message_consumer_factory
+        self._consumer: MessageConsumerType | None = None
+        self._thread: threading.Thread | None = None
+
+    def _run_in_thread(self) -> None:
+        self._consumer = self.message_consumer_factory()
+        asyncio.run(self._consumer.run())
+
+    @contextlib.contextmanager
+    def lifespan(self, timeout: int = 30) -> Generator[None, None, None]:
+        self._thread = threading.Thread(target=self._run_in_thread)
+        self._thread.start()
+
+        yield
+
+        if self._consumer is not None:
+            self._consumer.shutdown()
+        if self._thread is not None:
+            self._thread.join(timeout=timeout)
