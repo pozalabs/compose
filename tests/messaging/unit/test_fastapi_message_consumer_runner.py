@@ -83,9 +83,10 @@ def test_lifespan_graceful_shutdown_before_consumer_ready():
     slow_consumer = SlowStartupFakeConsumer(startup_delay=0.2)
     runner = compose.messaging.FastAPIMessageConsumerRunner(
         message_consumer_factory=lambda: slow_consumer,
+        shutdown_timeout=1,
     )
 
-    with runner.lifespan(timeout=1):
+    with runner.lifespan():
         pass
 
 
@@ -168,6 +169,57 @@ def test_lifespan_with_fastapi():
         assert fake_consumer.run_called
 
     assert fake_consumer.shutdown_called
+
+
+def test_run_and_shutdown_separately(
+    runner: compose.messaging.FastAPIMessageConsumerRunner,
+    fake_consumer: FakeMessageConsumer,
+):
+    runner.run()
+    _wait_until(lambda: fake_consumer.run_called)
+    assert fake_consumer.run_called
+
+    runner.shutdown()
+    assert fake_consumer.shutdown_called
+
+
+def test_run_shutdown_with_fastapi():
+    fake_consumer = FakeMessageConsumer()
+    runner = compose.messaging.FastAPIMessageConsumerRunner(
+        message_consumer_factory=lambda: fake_consumer,
+    )
+
+    other_resource_started = False
+    other_resource_stopped = False
+
+    @contextlib.asynccontextmanager
+    async def lifespan(_app: FastAPI):
+        nonlocal other_resource_started, other_resource_stopped
+
+        other_resource_started = True
+        runner.run()
+
+        yield
+
+        runner.shutdown()
+        other_resource_stopped = True
+
+    app = FastAPI(lifespan=lifespan)
+
+    @app.get("/health")
+    def health():
+        return {"status": "ok"}
+
+    with TestClient(app) as client:
+        response = client.get("/health")
+        assert response.status_code == 200
+
+        _wait_until(lambda: fake_consumer.run_called)
+        assert fake_consumer.run_called
+        assert other_resource_started
+
+    assert fake_consumer.shutdown_called
+    assert other_resource_stopped
 
 
 def _wait_until(condition, timeout: float = 5.0, interval: float = 0.01):
