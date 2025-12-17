@@ -4,26 +4,42 @@ on:
   pull_request:
     types: [closed]
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "배포할 버전 (예: v1.33.0)"
+        required: true
+        type: string
+      dry_run:
+        description: "Dry run (release 생성 안함)"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   create-release:
-    if: github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'Deploy')
+    if: |
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'Deploy'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v5
 
-      - name: Extract version from PR title
+      - name: Extract version
         id: version
         run: |
-          VERSION=$(echo "${{ github.event.pull_request.title }}" | grep -oE 'v[0-9.]+')
-          if [ -z "$VERSION" ]; then
-            echo "::error::버전을 PR 제목에서 찾을 수 없습니다: ${{ github.event.pull_request.title }}"
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            TAG="${{ inputs.version }}"
+          else
+            TAG=$(echo "${{ github.event.pull_request.title }}" | grep -oE 'v[0-9.]+')
+          fi
+          if [ -z "$TAG" ]; then
+            echo "::error::버전을 찾을 수 없습니다"
             exit 1
           fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Get draft release notes
         id: draft
@@ -47,6 +63,7 @@ jobs:
           fi
 
       - name: Create release
+        if: inputs.dry_run != true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -56,8 +73,22 @@ jobs:
             --target main
 
       - name: Delete draft release
-        if: steps.draft.outputs.has_draft == 'true'
+        if: inputs.dry_run != true && steps.draft.outputs.has_draft == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release delete "${{ steps.draft.outputs.draft_tag }}" --yes
+
+      - name: Dry run summary
+        if: inputs.dry_run == true
+        run: |
+          echo "## Dry Run 결과" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**버전:** ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Draft 존재:** ${{ steps.draft.outputs.has_draft }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Release Notes:**" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.draft.outputs.body }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
