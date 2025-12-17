@@ -73,7 +73,7 @@ class FastAPIMessageConsumerRunner:
             self._consumer = self.message_consumer_factory()
             asyncio.run(self._consumer.run())
         except Exception as exc:
-            logger.exception(f"Error in message consumer: {exc}", exc_info=exc)
+            logger.exception(f"Error in message consumer: {exc}")
             raise
 
     @contextlib.contextmanager
