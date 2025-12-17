@@ -16,7 +16,7 @@ argument-hint: <version> (예: 1.33.0)
    - assignee: me
    - priority: 3 (Medium)
    - labels: Deploy
-2. **브랜치 생성**: Linear 이슈의 gitBranchName으로 브랜치 생성
+2. **브랜치 생성**: Linear 이슈의 gitBranchName으로 브랜치 생성 (git switch -c gitBranchName)
 3. **버전 업그레이드**: pyproject.toml의 version을 $ARGUMENTS로 변경
 4. **커밋**: `u: v$ARGUMENTS 배포` 형식으로 커밋
 5. **PR 생성**: 템플릿 형식으로 PR 생성 (Deploy 라벨 추가)
