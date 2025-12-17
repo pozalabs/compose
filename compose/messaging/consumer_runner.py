@@ -69,8 +69,12 @@ class FastAPIMessageConsumerRunner:
         self._thread: threading.Thread | None = None
 
     def _run_in_thread(self) -> None:
-        self._consumer = self.message_consumer_factory()
-        asyncio.run(self._consumer.run())
+        try:
+            self._consumer = self.message_consumer_factory()
+            asyncio.run(self._consumer.run())
+        except Exception as exc:
+            logger.exception(f"Error in message consumer: {exc}", exc_info=exc)
+            raise
 
     @contextlib.contextmanager
     def lifespan(self, timeout: int = 30) -> Generator[None, None, None]:
