@@ -1,0 +1,94 @@
+name: Deploy Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "배포할 버전 (예: v1.33.0)"
+        required: true
+        type: string
+      dry_run:
+        description: "Dry run (release 생성 안함)"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  create-release:
+    if: |
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event.pull_request.merged && contains(github.event.pull_request.labels.*.name, 'Deploy'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Extract version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            TAG="${{ inputs.version }}"
+          else
+            TAG=$(echo "${{ github.event.pull_request.title }}" | grep -oE 'v[0-9.]+')
+          fi
+          if [ -z "$TAG" ]; then
+            echo "::error::버전을 찾을 수 없습니다"
+            exit 1
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Get draft release notes
+        id: draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # release-drafter가 생성한 draft release 찾기
+          DRAFT_TAG=$(gh release list --json tagName,isDraft -q '.[] | select(.isDraft) | .tagName' | head -1)
+
+          if [ -n "$DRAFT_TAG" ]; then
+            echo "draft_tag=$DRAFT_TAG" >> $GITHUB_OUTPUT
+            # draft의 body 가져오기
+            DRAFT_BODY=$(gh release view "$DRAFT_TAG" --json body -q '.body')
+            echo "body<<EOF" >> $GITHUB_OUTPUT
+            echo "$DRAFT_BODY" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "has_draft=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_draft=false" >> $GITHUB_OUTPUT
+            echo "body=- ${{ github.event.pull_request.title }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create release
+        if: inputs.dry_run != true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" \
+            --title "${{ steps.version.outputs.tag }}" \
+            --notes "${{ steps.draft.outputs.body }}" \
+            --target main
+
+      - name: Delete draft release
+        if: inputs.dry_run != true && steps.draft.outputs.has_draft == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete "${{ steps.draft.outputs.draft_tag }}" --yes
+
+      - name: Dry run summary
+        if: inputs.dry_run == true
+        run: |
+          echo "## Dry Run 결과" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**버전:** ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Draft 존재:** ${{ steps.draft.outputs.has_draft }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Release Notes:**" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.draft.outputs.body }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

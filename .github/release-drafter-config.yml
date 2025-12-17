@@ -7,6 +7,8 @@ categories:
     label: "bug"
   - title: "📝 Documentation"
     label: "documentation"
+exclude-labels:
+  - "Deploy"
 change-template: "- $TITLE #$NUMBER @$AUTHOR"
 template: |
   $CHANGES
