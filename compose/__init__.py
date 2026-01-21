@@ -1,5 +1,6 @@
 from . import (
     asyncio,
+    audio,
     auth,
     aws,
     command,
@@ -36,6 +37,7 @@ __all__ = [
     "BaseModel",
     "TimeStampedModel",
     "asyncio",
+    "audio",
     "auth",
     "aws",
     "command",
