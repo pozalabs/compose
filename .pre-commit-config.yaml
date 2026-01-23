@@ -11,3 +11,10 @@ repos:
     rev: 0.6.6
     hooks:
       - id: uv-lock
+  - repo: local
+    hooks:
+      - id: fix-compose-imports
+        name: Fix compose imports
+        entry: uv run fix-compose-imports
+        language: system
+        types: [python]
