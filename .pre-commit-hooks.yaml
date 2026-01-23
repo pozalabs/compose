@@ -1,0 +1,5 @@
+- id: fix-compose-imports
+  name: Fix compose imports
+  entry: python tools/fix_imports.py
+  language: python
+  types: [python]
