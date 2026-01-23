@@ -19,9 +19,6 @@ dependencies = [
     "pydantic-settings>=2.12.0",
 ]
 
-[project.scripts]
-fix-compose-imports = "compose.tool.fix_imports:main"
-
 [tool.hatch.build.targets.sdist]
 include = ["compose"]
 

@@ -15,6 +15,6 @@ repos:
     hooks:
       - id: fix-compose-imports
         name: Fix compose imports
-        entry: uv run fix-compose-imports
+        entry: python tools/fix_imports.py
         language: system
         types: [python]
