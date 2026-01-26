@@ -145,6 +145,7 @@ def create_logger(level: int = logging.INFO, **config: Unpack[BasicHandlerConfig
         handlers=[
             {
                 "sink": sys.stdout,
+                "level": level,
                 "diagnose": False,
                 "filter": LogFilter(
                     LogFilterNotContains("/health-check"),
