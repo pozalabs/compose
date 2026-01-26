@@ -67,17 +67,27 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ steps.version.outputs.tag }}" \
-            --title "${{ steps.version.outputs.tag }}" \
-            --notes "${{ steps.draft.outputs.body }}" \
-            --target main
+          TAG="${{ steps.version.outputs.tag }}"
+          DRAFT_TAG="${{ steps.draft.outputs.draft_tag }}"
 
-      - name: Delete draft release
-        if: inputs.dry_run != true && steps.draft.outputs.has_draft == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release delete "${{ steps.draft.outputs.draft_tag }}" --yes
+          if [ "$DRAFT_TAG" == "$TAG" ]; then
+            # 동일 버전의 draft가 있으면 publish로 전환
+            # draft release는 태그가 없으므로 먼저 생성
+            git tag "$TAG"
+            git push origin "$TAG"
+            gh release edit "$TAG" --draft=false
+          else
+            # 새 release 생성
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --notes "${{ steps.draft.outputs.body }}" \
+              --target main
+
+            # 다른 버전의 draft가 있으면 삭제
+            if [ -n "$DRAFT_TAG" ]; then
+              gh release delete "$DRAFT_TAG" --yes
+            fi
+          fi
 
       - name: Dry run summary
         if: inputs.dry_run == true
