@@ -3,6 +3,7 @@ on:
   push:
     tags:
       - 'v*'
+    workflow_dispatch:
 
 jobs:
   publish-package:
@@ -19,7 +20,7 @@ jobs:
 
       - uses: astral-sh/setup-uv@v5
         with:
-          version: "0.6.6"
+          version: "0.9.26"
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
