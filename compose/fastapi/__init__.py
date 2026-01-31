@@ -4,7 +4,7 @@ if not is_package_installed("fastapi"):
     raise ImportError("Install `fastapi` to use `compose.fastapi` package")
 
 from .depends import CommandUpdater, UserInjector, create_with_user
-from .endpoint import SpecialEndpoint, health_check
+from .endpoint import SpecialEndpoint, add_health_check_endpoint, health_check
 from .exception_handler import (
     ExceptionHandler,
     ExceptionHandlerInfo,
@@ -48,6 +48,7 @@ __all__ = [
     "WithPath",
     "ZipStreamingResponse",
     "add_doc_routes",
+    "add_health_check_endpoint",
     "additional_responses",
     "as_query",
     "auto_wired",
