@@ -23,9 +23,9 @@ _OVERRIDE_METHODS = {
 }
 
 
-def _with_default_overrides(func: Callable[..., Any]) -> Callable[..., Any]:
+def _with_default_overrides[**P, T](func: Callable[P, T]) -> Callable[P, T]:
     @functools.wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> Any:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
         for key, value in _OVERRIDE_DEFAULTS.items():
             kwargs.setdefault(key, value)
         return func(*args, **kwargs)
