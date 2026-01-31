@@ -22,11 +22,27 @@ _OVERRIDE_METHODS = {
     "add_api_route",
 }
 
-APIRouter = _FastAPIRouter
 
-for method_name in _OVERRIDE_METHODS:
-    func = getattr(APIRouter, method_name)
-    func.__kwdefaults__ = func.__kwdefaults__ | _OVERRIDE_DEFAULTS
+def _with_default_overrides(func: Callable[..., Any]) -> Callable[..., Any]:
+    @functools.wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        for key, value in _OVERRIDE_DEFAULTS.items():
+            kwargs.setdefault(key, value)
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+class APIRouter(_FastAPIRouter):
+    pass
+
+
+for _method_name in _OVERRIDE_METHODS:
+    setattr(
+        APIRouter,
+        _method_name,
+        _with_default_overrides(getattr(_FastAPIRouter, _method_name)),
+    )
 
 
 @functools.lru_cache(1)
