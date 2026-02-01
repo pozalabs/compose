@@ -9,13 +9,14 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 
-from compose import schema
+from ..schema import Error, InvalidParam
 
 type ExceptionHandler[E: Exception] = Callable[[Request, E], Response | Awaitable[Response]]
 
 
 class ExceptionHandlerInfo:
     default_response_cls: ClassVar[type[Response]] = JSONResponse
+    default_error_schema_cls: ClassVar[type[Error]] = Error
 
     def __init__(
         self, exc_class_or_status_code: int | type[Exception], handler: ExceptionHandler
@@ -29,6 +30,7 @@ class ExceptionHandlerInfo:
         status_code: http.HTTPStatus,
         error_type: str | None = None,
         response_cls: type[Response] | None = None,
+        error_schema_cls: type[Error] | None = None,
     ) -> Self:
         return cls(
             exc_class_or_status_code=status_code,
@@ -36,14 +38,22 @@ class ExceptionHandlerInfo:
                 status_code=status_code,
                 error_type=error_type or status_code.name.lower(),
                 response_cls=response_cls or cls.default_response_cls,
+                error_schema_cls=error_schema_cls or cls.default_error_schema_cls,
             ),
         )
 
     @classmethod
-    def for_unauthorized_error(cls, response_cls: type[Response] | None = None) -> Self:
+    def for_unauthorized_error(
+        cls,
+        response_cls: type[Response] | None = None,
+        error_schema_cls: type[Error] | None = None,
+    ) -> Self:
         return cls(
             exc_class_or_status_code=http.HTTPStatus.UNAUTHORIZED,
-            handler=create_unauthorized_error_handler(response_cls or cls.default_response_cls),
+            handler=create_unauthorized_error_handler(
+                response_cls=response_cls or cls.default_response_cls,
+                error_schema_cls=error_schema_cls or cls.default_error_schema_cls,
+            ),
         )
 
     @classmethod
@@ -53,6 +63,7 @@ class ExceptionHandlerInfo:
         status_code: int,
         error_type: str | None = None,
         response_cls: type[Response] | None = None,
+        error_schema_cls: type[Error] | None = None,
     ) -> Self:
         return cls(
             exc_class_or_status_code=exc_cls,
@@ -60,25 +71,37 @@ class ExceptionHandlerInfo:
                 status_code=status_code,
                 error_type=error_type or http.HTTPStatus(status_code).name.lower(),
                 response_cls=response_cls or cls.default_response_cls,
+                error_schema_cls=error_schema_cls or cls.default_error_schema_cls,
             ),
         )
 
     @classmethod
-    def default(cls) -> Self:
+    def default(
+        cls,
+        error_schema_cls: type[Error] | None = None,
+    ) -> Self:
         return cls(
             exc_class_or_status_code=Exception,
             handler=create_exception_handler(
                 status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR,
                 error_type=http.HTTPStatus.INTERNAL_SERVER_ERROR.name.lower(),
                 response_cls=cls.default_response_cls,
+                error_schema_cls=error_schema_cls or cls.default_error_schema_cls,
             ),
         )
 
     @classmethod
-    def for_http_exception(cls, response_cls: type[Response] | None = None) -> Self:
+    def for_http_exception(
+        cls,
+        response_cls: type[Response] | None = None,
+        error_schema_cls: type[Error] | None = None,
+    ) -> Self:
         return cls(
             exc_class_or_status_code=HTTPException,
-            handler=create_http_exception_handler(response_cls or cls.default_response_cls),
+            handler=create_http_exception_handler(
+                response_cls=response_cls or cls.default_response_cls,
+                error_schema_cls=error_schema_cls or cls.default_error_schema_cls,
+            ),
         )
 
     @classmethod
@@ -86,12 +109,16 @@ class ExceptionHandlerInfo:
         cls,
         exception_handler: ExceptionHandler | None = None,
         response_cls: type[Response] | None = None,
+        error_schema_cls: type[Error] | None = None,
     ) -> Self:
         return cls(
             exc_class_or_status_code=RequestValidationError,
             handler=(
                 exception_handler
-                or create_default_validation_error_handler(response_cls or cls.default_response_cls)
+                or create_default_validation_error_handler(
+                    response_cls=response_cls or cls.default_response_cls,
+                    error_schema_cls=error_schema_cls or cls.default_error_schema_cls,
+                )
             ),
         )
 
@@ -100,12 +127,16 @@ class ExceptionHandlerInfo:
         cls,
         exception_handler: ExceptionHandler | None = None,
         response_cls: type[Response] | None = None,
+        error_schema_cls: type[Error] | None = None,
     ) -> Self:
         return cls(
             exc_class_or_status_code=ValidationError,
             handler=(
                 exception_handler
-                or create_default_validation_error_handler(response_cls or cls.default_response_cls)
+                or create_default_validation_error_handler(
+                    response_cls=response_cls or cls.default_response_cls,
+                    error_schema_cls=error_schema_cls or cls.default_error_schema_cls,
+                )
             ),
         )
 
@@ -114,15 +145,21 @@ def create_exception_handler(
     status_code: int,
     error_type: str,
     response_cls: type[Response],
+    error_schema_cls: type[Error] = Error,
 ) -> ExceptionHandler:
     def exception_handler(request: Request, exc: Exception) -> Response:
-        response = exc_to_error_schema(exc=exc, error_type=error_type)
+        response = exc_to_error_schema(
+            exc=exc, error_type=error_type, error_schema_cls=error_schema_cls
+        )
         return response_cls(content=jsonable_encoder(response), status_code=status_code)
 
     return exception_handler
 
 
-def create_unauthorized_error_handler(response_cls: type[Response]) -> ExceptionHandler:
+def create_unauthorized_error_handler(
+    response_cls: type[Response],
+    error_schema_cls: type[Error] = Error,
+) -> ExceptionHandler:
     def exception_handler(request: Request, exc: Exception) -> Response:
         if isinstance(exc, HTTPException) and exc.headers.get(
             "WWW-Authenticate", ""
@@ -136,33 +173,38 @@ def create_unauthorized_error_handler(response_cls: type[Response]) -> Exception
         response = exc_to_error_schema(
             exc=exc,
             error_type=(status_code := http.HTTPStatus.UNAUTHORIZED).name.lower(),
+            error_schema_cls=error_schema_cls,
         )
         return response_cls(content=jsonable_encoder(response), status_code=status_code)
 
     return exception_handler
 
 
-def exc_to_error_schema(exc: Exception, error_type: str) -> schema.Error:
-    return schema.Error(
+def exc_to_error_schema[T: Error](
+    exc: Exception,
+    error_type: str,
+    error_schema_cls: type[T] = Error,
+) -> T:
+    return error_schema_cls(
         title=str(exc),
         type=error_type,
         detail=getattr(exc, "detail", None),
         invalid_params=(
             (invalid_params := getattr(exc, "invalid_params", None))
-            and [
-                schema.InvalidParam.model_validate(obj=invalid_param)
-                for invalid_param in invalid_params
-            ]
+            and [InvalidParam.model_validate(obj=invalid_param) for invalid_param in invalid_params]
         ),
     )
 
 
-def create_http_exception_handler(response_cls: type[Response]) -> ExceptionHandler:
+def create_http_exception_handler(
+    response_cls: type[Response],
+    error_schema_cls: type[Error] = Error,
+) -> ExceptionHandler:
     def http_exception_handler(request: Request, exc: HTTPException) -> Response:
         status_code = http.HTTPStatus(exc.status_code)
         return response_cls(
             content=jsonable_encoder(
-                schema.Error(
+                error_schema_cls(
                     title=exc.detail,
                     type=status_code.name.lower(),
                 )
@@ -174,13 +216,16 @@ def create_http_exception_handler(response_cls: type[Response]) -> ExceptionHand
     return http_exception_handler
 
 
-def create_default_validation_error_handler(response_cls: type[Response]) -> ExceptionHandler:
+def create_default_validation_error_handler(
+    response_cls: type[Response],
+    error_schema_cls: type[Error] = Error,
+) -> ExceptionHandler:
     def validation_error_handler(
         request: Request, exc: RequestValidationError | ValidationError
     ) -> Response:
         return response_cls(
             content=jsonable_encoder(
-                schema.Error.from_validation_error(exc=exc, title="Validation failed"),
+                error_schema_cls.from_validation_error(exc=exc, title="Validation failed"),
             ),
             status_code=http.HTTPStatus.UNPROCESSABLE_ENTITY,
         )
