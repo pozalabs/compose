@@ -5,6 +5,7 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 
 import compose
+from compose import schema
 
 
 def test_error_handler_info_for_status_code():
@@ -48,6 +49,64 @@ def test_error_handler_info_for_exc():
         invalid_params=None,
     )
     expected = JSONResponse(content=content, status_code=http.HTTPStatus.UNAUTHORIZED)
+
+    assert isinstance(response, JSONResponse)
+    assert response.body == expected.body
+    assert response.status_code == expected.status_code
+
+
+def test_error_handler_info_for_exc_with_custom_error_schema():
+    class CustomError(schema.Error):
+        code: str = "custom_code"
+
+    class AuthorizationError(compose.exceptions.BaseError):
+        pass
+
+    error_handler = compose.fastapi.ExceptionHandlerInfo.for_exc(
+        exc_cls=AuthorizationError,
+        status_code=http.HTTPStatus.UNAUTHORIZED,
+        error_type=http.HTTPStatus.UNAUTHORIZED.name.lower(),
+        error_schema_cls=CustomError,
+    )
+    response = error_handler.handler(
+        mock.Mock(spec=Request),
+        AuthorizationError(message="Unauthorized", detail="Wrong password"),
+    )
+
+    content = dict(
+        title="Unauthorized",
+        type="unauthorized",
+        detail="Wrong password",
+        invalid_params=None,
+        code="custom_code",
+    )
+    expected = JSONResponse(content=content, status_code=http.HTTPStatus.UNAUTHORIZED)
+
+    assert isinstance(response, JSONResponse)
+    assert response.body == expected.body
+    assert response.status_code == expected.status_code
+
+
+def test_exception_handler_info_subclass_with_default_error_schema():
+    class CustomError(schema.Error):
+        code: str = "subclass_code"
+
+    class CustomExceptionHandlerInfo(compose.fastapi.ExceptionHandlerInfo):
+        default_error_schema_cls = CustomError
+
+    error_handler = CustomExceptionHandlerInfo.for_status_code(
+        status_code=http.HTTPStatus.BAD_REQUEST,
+    )
+    response = error_handler.handler(mock.Mock(spec=Request), ValueError("Bad request"))
+
+    content = dict(
+        title="Bad request",
+        type="bad_request",
+        detail=None,
+        invalid_params=None,
+        code="subclass_code",
+    )
+    expected = JSONResponse(content=content, status_code=http.HTTPStatus.BAD_REQUEST)
 
     assert isinstance(response, JSONResponse)
     assert response.body == expected.body
