@@ -8,21 +8,21 @@ from ..entity import Entity
 from .mongo import MongoRepository
 
 
-class _Finder[T: Entity]:
+class _Finder:
     def __init__(self, field: str) -> None:
         self._field = field
 
     @overload
-    def __get__(self, obj: None, objtype: type[MongoRepository[T]]) -> _Finder[T]: ...
+    def __get__[T: Entity](self, obj: None, objtype: type[MongoRepository[T]]) -> _Finder: ...
 
     @overload
-    def __get__(
+    def __get__[T: Entity](
         self, obj: MongoRepository[T], objtype: type[MongoRepository[T]]
     ) -> _BoundFinder[T]: ...
 
-    def __get__(
+    def __get__[T: Entity](
         self, obj: MongoRepository[T] | None, objtype: type[MongoRepository[T]]
-    ) -> _Finder[T] | _BoundFinder[T]:
+    ) -> _Finder | _BoundFinder[T]:
         if obj is None:
             return self
         return _BoundFinder(obj, self._field)
@@ -37,21 +37,21 @@ class _BoundFinder[T: Entity]:
         return self._repo.find_by({self._field: value}, session=session)
 
 
-class _Lister[T: Entity]:
+class _Lister:
     def __init__(self, field: str) -> None:
         self._field = field
 
     @overload
-    def __get__(self, obj: None, objtype: type[MongoRepository[T]]) -> _Lister[T]: ...
+    def __get__[T: Entity](self, obj: None, objtype: type[MongoRepository[T]]) -> _Lister: ...
 
     @overload
-    def __get__(
+    def __get__[T: Entity](
         self, obj: MongoRepository[T], objtype: type[MongoRepository[T]]
     ) -> _BoundLister[T]: ...
 
-    def __get__(
+    def __get__[T: Entity](
         self, obj: MongoRepository[T] | None, objtype: type[MongoRepository[T]]
-    ) -> _Lister[T] | _BoundLister[T]:
+    ) -> _Lister | _BoundLister[T]:
         if obj is None:
             return self
         return _BoundLister(obj, self._field)
@@ -72,9 +72,9 @@ class _BoundLister[T: Entity]:
         return self._repo.list_by({self._field: value}, sort=sort, session=session)
 
 
-def finder[T: Entity](field: str) -> _Finder[T]:
+def finder(field: str) -> _Finder:
     return _Finder(field)
 
 
-def lister[T: Entity](field: str) -> _Lister[T]:
+def lister(field: str) -> _Lister:
     return _Lister(field)
