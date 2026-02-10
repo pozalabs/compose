@@ -37,11 +37,11 @@ def resolve_by_name_from_container_provider(
     name: str,
     container: providers.Container,
     provider_types: Iterable[type[providers.Provider]],
-) -> providers.Factory:
+) -> providers.Provider | None:
     if not isinstance(name, str):
         raise ValueError("`name` must be string")
 
-    for provider_name, provider in container.providers.items():
+    for provider_name, provider in container.providers.items():  # type: ignore[union-attr]
         if not isinstance(provider, (providers.Container, *provider_types)):
             continue
 
@@ -49,18 +49,22 @@ def resolve_by_name_from_container_provider(
             return provider
 
         if isinstance(provider, providers.Container):
-            return resolve_by_name_from_container_provider(
+            result = resolve_by_name_from_container_provider(
                 name=name,
                 container=provider,
                 provider_types=provider_types,
             )
+            if result is not None:
+                return result
+
+    return None
 
 
 def resolve_by_name(
     name: str,
     container: Container,
     provider_types: Iterable[type[providers.Provider]],
-) -> providers.Factory:
+) -> providers.Provider:
     if not isinstance(name, str):
         raise ValueError("`name` must be string")
 
@@ -117,7 +121,7 @@ def resolve(
     *,
     name: str | None = None,
     conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
-) -> providers.Factory:
+) -> providers.Provider:
     """
     의존성 전체 등록 경로를 참조하지 않고 의존성을 해결합니다. 다른 패키지의 의존성을 참조하는 경우
     의존 대상 선언 경로에 깊게 의존하는 것을 방지합니다. `container_cls`는 최상위 컨테이너일수도,
