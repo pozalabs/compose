@@ -2,7 +2,9 @@ import http
 from unittest import mock
 
 from fastapi import Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 
 import compose
 from compose import schema
@@ -111,3 +113,50 @@ def test_exception_handler_info_subclass_with_default_error_schema():
     assert isinstance(response, JSONResponse)
     assert response.body == expected.body
     assert response.status_code == expected.status_code
+
+
+def test_default_exception_handlers_return_default_set():
+    handlers = compose.fastapi.default_exception_handlers()
+
+    exc_classes = [h.exc_class_or_status_code for h in handlers]
+    assert exc_classes == [
+        compose.exceptions.DoesNotExistError,
+        compose.exceptions.NotAllowedError,
+        compose.exceptions.DomainValidationError,
+        compose.exceptions.AuthorizationError,
+        RequestValidationError,
+        ValidationError,
+        Exception,
+    ]
+
+
+def test_default_exception_handlers_include_extras():
+    custom = compose.fastapi.ExceptionHandlerInfo.for_exc(
+        ValueError,
+        http.HTTPStatus.BAD_REQUEST,
+    )
+
+    handlers = compose.fastapi.default_exception_handlers(custom)
+
+    exc_classes = [h.exc_class_or_status_code for h in handlers]
+    assert exc_classes == [
+        compose.exceptions.DoesNotExistError,
+        compose.exceptions.NotAllowedError,
+        compose.exceptions.DomainValidationError,
+        compose.exceptions.AuthorizationError,
+        ValueError,
+        RequestValidationError,
+        ValidationError,
+        Exception,
+    ]
+
+
+def test_default_exception_handlers_use_subclass():
+    class CustomExceptionHandlerInfo(compose.fastapi.ExceptionHandlerInfo):
+        pass
+
+    handlers = compose.fastapi.default_exception_handlers(
+        handler_info_cls=CustomExceptionHandlerInfo,
+    )
+
+    assert all(isinstance(h, CustomExceptionHandlerInfo) for h in handlers)

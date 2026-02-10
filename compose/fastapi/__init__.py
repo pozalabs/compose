@@ -9,6 +9,7 @@ from .exception_handler import (
     ExceptionHandler,
     ExceptionHandlerInfo,
     create_exception_handler,
+    default_exception_handlers,
 )
 from .openapi import (
     OpenAPIDoc,
@@ -55,6 +56,7 @@ __all__ = [
     "create_auto_wired_route",
     "create_exception_handler",
     "create_with_user",
+    "default_exception_handlers",
     "health_check",
     "openapi_tags",
     "to_query",
