@@ -138,5 +138,4 @@ def test_lister_return_entity_list(
 ):
     result = fake_repo.list_by_status("active")
 
-    assert len(result) == 1
-    assert isinstance(result[0], Model)
+    assert result == [Model(**model_data)]
