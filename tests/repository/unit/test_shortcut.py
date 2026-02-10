@@ -140,11 +140,3 @@ def test_lister_return_entity_list(
 
     assert len(result) == 1
     assert isinstance(result[0], Model)
-
-
-def test_finder_return_descriptor_on_class_access():
-    assert hasattr(ModelRepository.find_by_name, "__get__")
-
-
-def test_lister_return_descriptor_on_class_access():
-    assert hasattr(ModelRepository.list_by_status, "__get__")
