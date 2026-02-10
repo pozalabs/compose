@@ -6,7 +6,7 @@ import pydantic_core
 from fastapi import Depends, Path, Query, params
 from pydantic import BaseModel, Field, Json, create_model, field_validator
 
-from compose import container, query, types
+from compose import query, types
 
 
 def dict_to_json(v: dict[str, Any] | None) -> str | None:
@@ -76,7 +76,7 @@ def as_query[Q: BaseModel](q: type[Q], /) -> Any:
     return Depends(to_query(q))
 
 
-def create_model_dependency_resolver[T: container.BaseModel](
+def create_model_dependency_resolver[T: BaseModel](
     model_type: type[T],
     dependencies: dict[str, tuple[type, Any]],
 ) -> Callable[..., Any]:
@@ -97,7 +97,7 @@ def create_model_dependency_resolver[T: container.BaseModel](
     return wrapper
 
 
-def with_fields[T: container.BaseModel](model_type: type[T], **kwargs: Any) -> Any:
+def with_fields[T: BaseModel](model_type: type[T], **kwargs: Any) -> Any:
     return Depends(create_model_dependency_resolver(model_type, kwargs))
 
 
