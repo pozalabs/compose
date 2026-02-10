@@ -1,5 +1,5 @@
 import http
-from typing import Any
+from typing import Annotated, Any
 
 import pytest
 from fastapi import FastAPI
@@ -19,7 +19,7 @@ class ListItems(compose.query.Query):
 
 
 @app.get("/items")
-def get(q: compose.fastapi.as_query(ListItems)):
+def get(q: Annotated[ListItems, compose.fastapi.as_query(ListItems)]):
     return q.model_dump()
 
 
