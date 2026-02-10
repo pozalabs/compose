@@ -9,6 +9,12 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 
+from ..exceptions import (
+    AuthorizationError,
+    DoesNotExistError,
+    DomainValidationError,
+    NotAllowedError,
+)
 from ..schema import Error, InvalidParam
 
 type ExceptionHandler[E: Exception] = Callable[[Request, E], Response | Awaitable[Response]]
@@ -139,6 +145,22 @@ class ExceptionHandlerInfo:
                 )
             ),
         )
+
+
+def default_exception_handlers(
+    *extras: *tuple[ExceptionHandlerInfo, ...],
+    handler_info_cls: type[ExceptionHandlerInfo] = ExceptionHandlerInfo,
+) -> tuple[ExceptionHandlerInfo, ...]:
+    return (
+        handler_info_cls.for_exc(DoesNotExistError, http.HTTPStatus.NOT_FOUND),
+        handler_info_cls.for_exc(NotAllowedError, http.HTTPStatus.FORBIDDEN),
+        handler_info_cls.for_exc(DomainValidationError, http.HTTPStatus.UNPROCESSABLE_ENTITY),
+        handler_info_cls.for_exc(AuthorizationError, http.HTTPStatus.UNAUTHORIZED),
+        *extras,
+        handler_info_cls.for_request_validation_error(),
+        handler_info_cls.for_pydantic_validation_error(),
+        handler_info_cls.default(),
+    )
 
 
 def create_exception_handler(
