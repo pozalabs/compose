@@ -78,6 +78,17 @@ def test_finder_return_entity(
     assert result.name == model_data["name"]
 
 
+def test_finder_return_none_when_not_found(
+    fake_repo: ModelRepository,
+    fake_collection: Collection,
+):
+    fake_collection.find_one.return_value = None
+
+    result = fake_repo.find_by_name("nonexistent")
+
+    assert result is None
+
+
 def test_lister_delegate_to_list_by(
     fake_repo: ModelRepository,
     fake_collection: Collection,
@@ -106,6 +117,21 @@ def test_lister_pass_sort(
     )
 
 
+def test_lister_pass_session(
+    fake_repo: ModelRepository,
+    fake_collection: Collection,
+):
+    session = mock.Mock()
+    fake_repo.list_by_status("active", session=session)
+
+    fake_collection.find.assert_called_once_with(
+        filter={"status": "active"},
+        projection=None,
+        sort=None,
+        session=session,
+    )
+
+
 def test_lister_return_entity_list(
     fake_repo: ModelRepository,
     model_data: dict[str, Any],
@@ -117,7 +143,8 @@ def test_lister_return_entity_list(
 
 
 def test_finder_return_descriptor_on_class_access():
-    assert isinstance(
-        ModelRepository.find_by_name,
-        compose.repository.shortcut._Finder,
-    )
+    assert hasattr(ModelRepository.find_by_name, "__get__")
+
+
+def test_lister_return_descriptor_on_class_access():
+    assert hasattr(ModelRepository.list_by_status, "__get__")
