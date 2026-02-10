@@ -1,8 +1,6 @@
-from .._internal import is_package_installed
-
-if not is_package_installed("httpx"):
-    raise ImportError("Install `httpx` extra to use httpx features")
-
-from .auth.header import HeaderAuth
+try:
+    from .auth.header import HeaderAuth
+except ImportError:
+    raise ImportError("Install `httpx` extra to use httpx features") from None
 
 __all__ = ["HeaderAuth"]
