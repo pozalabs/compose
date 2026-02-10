@@ -1,8 +1,6 @@
-from .._internal import is_package_installed
-
-if not is_package_installed("testcontainers"):
-    raise ImportError("Install `testcontainers` to use testing fixtures")
-
-from .mongodb import MongoDbContainer
+try:
+    from .mongodb import MongoDbContainer
+except ImportError:
+    raise ImportError("Install `testcontainers` to use testing fixtures") from None
 
 __all__ = ["MongoDbContainer"]

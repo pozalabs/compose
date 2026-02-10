@@ -1,31 +1,29 @@
-from .._internal import is_package_installed
-
-if not is_package_installed("fastapi"):
-    raise ImportError("Install `fastapi` to use `compose.fastapi` package")
-
-from .depends import CommandUpdater, UserInjector, create_with_user
-from .endpoint import SpecialEndpoint, add_health_check_endpoint, health_check
-from .exception_handler import (
-    ExceptionHandler,
-    ExceptionHandlerInfo,
-    create_exception_handler,
-    default_exception_handlers,
-)
-from .openapi import (
-    OpenAPIDoc,
-    OpenAPISchema,
-    RedocHTML,
-    SwaggerUIHTML,
-    add_doc_routes,
-    additional_responses,
-    openapi_tags,
-)
-from .otel import NonInstrumentedUrls
-from .param import OffsetPaginationParams, WithPath, as_query, to_query, with_fields
-from .response import NoContentResponse, ZipStreamingResponse
-from .routing import APIRouter, create_auto_wired_route
-from .security import APIKeyHeader, CookieAuth, HTTPBasic, HTTPBearer, unauthorized_error
-from .wiring import AutoWired, auto_wired
+try:
+    from .depends import CommandUpdater, UserInjector, create_with_user
+    from .endpoint import SpecialEndpoint, add_health_check_endpoint, health_check
+    from .exception_handler import (
+        ExceptionHandler,
+        ExceptionHandlerInfo,
+        create_exception_handler,
+        default_exception_handlers,
+    )
+    from .openapi import (
+        OpenAPIDoc,
+        OpenAPISchema,
+        RedocHTML,
+        SwaggerUIHTML,
+        add_doc_routes,
+        additional_responses,
+        openapi_tags,
+    )
+    from .otel import NonInstrumentedUrls
+    from .param import OffsetPaginationParams, WithPath, as_query, to_query, with_fields
+    from .response import NoContentResponse, ZipStreamingResponse
+    from .routing import APIRouter, create_auto_wired_route
+    from .security import APIKeyHeader, CookieAuth, HTTPBasic, HTTPBearer, unauthorized_error
+    from .wiring import AutoWired, auto_wired
+except ImportError:
+    raise ImportError("Install `fastapi` to use `compose.fastapi` package") from None
 
 __all__ = [
     "APIKeyHeader",
