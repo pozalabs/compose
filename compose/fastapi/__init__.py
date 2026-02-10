@@ -20,7 +20,7 @@ from .openapi import (
     openapi_tags,
 )
 from .otel import NonInstrumentedUrls
-from .param import OffsetPaginationParams, WithPath, as_query, to_query, with_depends
+from .param import OffsetPaginationParams, WithPath, as_query, to_query, with_fields
 from .response import NoContentResponse, ZipStreamingResponse
 from .routing import APIRouter, create_auto_wired_route
 from .security import APIKeyHeader, CookieAuth, HTTPBasic, HTTPBearer, unauthorized_error
@@ -59,7 +59,7 @@ __all__ = [
     "openapi_tags",
     "to_query",
     "unauthorized_error",
-    "with_depends",
+    "with_fields",
 ]
 
 

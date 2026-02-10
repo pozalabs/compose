@@ -1,5 +1,5 @@
 import http
-from typing import Any
+from typing import Annotated, Any
 
 import pytest
 from fastapi import FastAPI, Path
@@ -43,19 +43,25 @@ def app() -> FastAPI:
 
     @_app.patch("/items/{item_id}")
     def update_item(
-        cmd: compose.fastapi.with_depends(
+        cmd: Annotated[
             UpdateItem,
-            item_id=compose.fastapi.WithPath.int(),
-        ),
+            compose.fastapi.with_fields(
+                UpdateItem,
+                item_id=compose.fastapi.WithPath.int(),
+            ),
+        ],
     ):
         return {"item_id": cmd.item_id, "item_name": cmd.name}
 
     @_app.patch("/user/items/{item_id}")
     def update_item_with_user(
-        cmd: compose.fastapi.with_depends(
-            with_user(UpdateItemWithUser),
-            item_id=(int, Path(...)),
-        ),
+        cmd: Annotated[
+            UpdateItemWithUser,
+            compose.fastapi.with_fields(
+                with_user(UpdateItemWithUser),
+                item_id=(int, Path(...)),
+            ),
+        ],
     ):
         return {"item_id": cmd.item_id, "item_name": cmd.name, "user_id": cmd.user_id}
 
@@ -82,7 +88,7 @@ def client(app) -> TestClient:
         ),
     ],
 )
-def test_with_depends(
+def test_with_fields(
     endpoint: str,
     payload: dict[str, Any],
     expected: dict[str, Any],
@@ -93,7 +99,7 @@ def test_with_depends(
     assert response.json() == expected
 
 
-def test_with_depends_raise_validation_error_on_invalid_depends(client: TestClient):
+def test_with_fields_raise_validation_error_on_invalid_depends(client: TestClient):
     response = client.patch("/items/not_integer", json={"name": "item_name"})
 
     assert response.status_code == http.HTTPStatus.UNPROCESSABLE_ENTITY

@@ -6,7 +6,7 @@ import pydantic_core
 from fastapi import Depends, Path, Query, params
 from pydantic import BaseModel, Field, Json, create_model, field_validator
 
-from compose import container, query, types
+from compose import query, types
 
 
 def dict_to_json(v: dict[str, Any] | None) -> str | None:
@@ -72,11 +72,11 @@ def to_query[Q: BaseModel](q: type[Q], /) -> type[Q]:
     )
 
 
-def as_query[Q: BaseModel](q: type[Q], /) -> type[Q]:
-    return Annotated[q, Depends(to_query(q))]
+def as_query[Q: BaseModel](q: type[Q], /) -> Any:
+    return Depends(to_query(q))
 
 
-def create_model_dependency_resolver[T: container.BaseModel](
+def create_model_dependency_resolver[T: BaseModel](
     model_type: type[T],
     dependencies: dict[str, tuple[type, Any]],
 ) -> Callable[..., Any]:
@@ -97,12 +97,8 @@ def create_model_dependency_resolver[T: container.BaseModel](
     return wrapper
 
 
-# `from __future__ import annotations` 사용시 동작하지 않음
-def with_depends[T: container.BaseModel](model_type: type[T], **kwargs: Any) -> type[T]:
-    return Annotated[
-        model_type,
-        Depends(create_model_dependency_resolver(model_type, kwargs)),
-    ]
+def with_fields[T: BaseModel](model_type: type[T], **kwargs: Any) -> Any:
+    return Depends(create_model_dependency_resolver(model_type, kwargs))
 
 
 class WithPath:
@@ -126,4 +122,4 @@ class _OffsetPaginationParams(query.Query):
     per_page: int = Field(10, ge=1)
 
 
-OffsetPaginationParams = as_query(_OffsetPaginationParams)
+OffsetPaginationParams = Annotated[_OffsetPaginationParams, as_query(_OffsetPaginationParams)]
