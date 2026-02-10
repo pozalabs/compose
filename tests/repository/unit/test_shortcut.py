@@ -43,7 +43,7 @@ def fake_repo(fake_collection: Collection) -> ModelRepository:
     return ModelRepository(fake_collection)
 
 
-def test_finder_delegates_to_find_by(
+def test_finder_delegate_to_find_by(
     fake_repo: ModelRepository,
     fake_collection: Collection,
 ):
@@ -55,7 +55,7 @@ def test_finder_delegates_to_find_by(
     )
 
 
-def test_finder_passes_session(
+def test_finder_pass_session(
     fake_repo: ModelRepository,
     fake_collection: Collection,
 ):
@@ -68,7 +68,7 @@ def test_finder_passes_session(
     )
 
 
-def test_finder_returns_entity(
+def test_finder_return_entity(
     fake_repo: ModelRepository,
     model_data: dict[str, Any],
 ):
@@ -78,7 +78,7 @@ def test_finder_returns_entity(
     assert result.name == model_data["name"]
 
 
-def test_lister_delegates_to_list_by(
+def test_lister_delegate_to_list_by(
     fake_repo: ModelRepository,
     fake_collection: Collection,
 ):
@@ -92,7 +92,7 @@ def test_lister_delegates_to_list_by(
     )
 
 
-def test_lister_passes_sort(
+def test_lister_pass_sort(
     fake_repo: ModelRepository,
     fake_collection: Collection,
 ):
@@ -106,7 +106,7 @@ def test_lister_passes_sort(
     )
 
 
-def test_lister_returns_entity_list(
+def test_lister_return_entity_list(
     fake_repo: ModelRepository,
     model_data: dict[str, Any],
 ):
@@ -116,7 +116,7 @@ def test_lister_returns_entity_list(
     assert isinstance(result[0], Model)
 
 
-def test_finder_returns_descriptor_on_class_access():
+def test_finder_return_descriptor_on_class_access():
     assert isinstance(
         ModelRepository.find_by_name,
         compose.repository.shortcut._Finder,
