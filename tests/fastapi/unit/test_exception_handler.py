@@ -115,7 +115,7 @@ def test_exception_handler_info_subclass_with_default_error_schema():
     assert response.status_code == expected.status_code
 
 
-def test_default_exception_handlers_기본_세트():
+def test_default_exception_handlers_return_default_set():
     handlers = compose.fastapi.default_exception_handlers()
 
     exc_classes = [h.exc_class_or_status_code for h in handlers]
@@ -130,7 +130,7 @@ def test_default_exception_handlers_기본_세트():
     ]
 
 
-def test_default_exception_handlers_extras_포함():
+def test_default_exception_handlers_include_extras():
     custom = compose.fastapi.ExceptionHandlerInfo.for_exc(
         ValueError,
         http.HTTPStatus.BAD_REQUEST,
@@ -151,7 +151,7 @@ def test_default_exception_handlers_extras_포함():
     ]
 
 
-def test_default_exception_handlers_서브클래스_사용():
+def test_default_exception_handlers_use_subclass():
     class CustomExceptionHandlerInfo(compose.fastapi.ExceptionHandlerInfo):
         pass
 
