@@ -74,8 +74,7 @@ def test_finder_return_entity(
 ):
     result = fake_repo.find_by_name("name01")
 
-    assert isinstance(result, Model)
-    assert result.name == model_data["name"]
+    assert result == Model(**model_data)
 
 
 def test_finder_return_none_when_not_found(
