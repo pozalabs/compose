@@ -36,7 +36,7 @@ class SQLRepository[T: SQLEntity](BaseRepository):
         table = self.__table__
         stmt = select(table).filter_by(**filter_)
 
-        if sort:
+        if sort is not None:
             order_clauses = [
                 table.c[col].asc() if direction == 1 else table.c[col].desc()
                 for col, direction in sort
