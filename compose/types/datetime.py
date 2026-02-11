@@ -1,31 +1,26 @@
 import datetime
-from collections.abc import Callable, Generator
 from dataclasses import dataclass
 from typing import Any, Self
 
 import pendulum
 from pydantic import GetCoreSchemaHandler
-from pydantic_core import CoreSchema
-
-from .helper import get_pydantic_core_schema
+from pydantic_core import CoreSchema, core_schema
 
 
 class DateTime(pendulum.DateTime):
     """https://stackoverflow.com/a/76719893"""
 
     @classmethod
-    def __get_validators__(cls) -> Generator[Callable[[Any], pendulum.DateTime], None, None]:
-        yield cls._instance
-
-    @classmethod
-    def _instance(cls, v: datetime.datetime | pendulum.DateTime) -> pendulum.DateTime:
-        return pendulum.instance(obj=v, tz=pendulum.UTC)
-
-    @classmethod
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
     ) -> CoreSchema:
-        return get_pydantic_core_schema(cls, handler(datetime.datetime))
+        return core_schema.no_info_after_validator_function(
+            cls._validate, handler(datetime.datetime)
+        )
+
+    @classmethod
+    def _validate(cls, v: datetime.datetime) -> pendulum.DateTime:
+        return pendulum.instance(obj=v, tz=pendulum.UTC)
 
 
 @dataclass
