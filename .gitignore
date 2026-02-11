@@ -134,3 +134,4 @@ tmp*.py
 .DS_Store
 
 examples/*/compose
+examples/*.db
