@@ -1,8 +1,7 @@
-from typing import Any, ClassVar, Generic, TypeVar
+from typing import Any, ClassVar, Generic
 
 from . import container, field
-
-IdT = TypeVar("IdT")
+from .typing import IdT
 
 
 class Entity(container.TimeStampedModel, Generic[IdT]):

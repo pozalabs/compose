@@ -1,8 +1,7 @@
-from typing import Generic, TypeVar
+from typing import Generic
 
 from .. import container, field, types
-
-IdT = TypeVar("IdT")
+from ..typing import IdT
 
 
 class Event(container.BaseModel, Generic[IdT]):

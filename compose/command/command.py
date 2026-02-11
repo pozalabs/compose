@@ -1,10 +1,9 @@
-from typing import Generic, TypeVar
+from typing import Generic
 
 from pydantic import ConfigDict
 
 from .. import container, schema
-
-IdT = TypeVar("IdT")
+from ..typing import IdT
 
 
 class Command(container.BaseModel): ...

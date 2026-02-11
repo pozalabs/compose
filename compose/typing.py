@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import io
 from collections.abc import Callable, Generator
-from typing import IO, TYPE_CHECKING, Annotated, Any, Self
+from typing import IO, TYPE_CHECKING, Annotated, Any, Self, TypeVar
 
 from pydantic import GetPydanticSchema
 from pydantic_core import core_schema
 
 if TYPE_CHECKING:
     from .types import PyObjectId
+
+IdT = TypeVar("IdT")
 
 type Validator = Callable[[Any], Self]
 type ValidatorGenerator = Generator[Validator, None, None]
