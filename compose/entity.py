@@ -1,5 +1,7 @@
 from typing import Any, ClassVar, Generic
 
+from pydantic import Field
+
 from . import container, field
 from .typing import IdT
 
@@ -30,6 +32,15 @@ try:
 
     class MongoEntity(Entity[types.PyObjectId]):
         id: types.PyObjectId = field.IdField(default_factory=types.PyObjectId)
+
+except ImportError:
+    pass
+
+try:
+    from sqlalchemy.orm import Session  # noqa: F401
+
+    class SQLEntity(Entity[int | None]):
+        id: int | None = Field(default=None)
 
 except ImportError:
     pass
