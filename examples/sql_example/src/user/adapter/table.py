@@ -2,12 +2,12 @@ from sqlalchemy import Column, Integer, MetaData, String, Table
 
 metadata = MetaData()
 
-products_table = Table(
-    "products",
+users_table = Table(
+    "users",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("name", String(100)),
-    Column("price", Integer),
+    Column("email", String(100)),
     Column("created_at", String),
     Column("updated_at", String),
 )

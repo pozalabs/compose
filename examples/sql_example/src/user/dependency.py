@@ -1,26 +1,26 @@
 from dependency_injector import containers, providers
-from src.product import service
-from src.product.adapter.repository import ProductRepository
+from src.user import service
+from src.user.adapter.repository import UserRepository
 
 from compose.uow.sql import SQLUnitOfWork
 
 
 class AdapterContainer(containers.DeclarativeContainer):
-    product_repository = providers.Factory(ProductRepository)
+    user_repository = providers.Factory(UserRepository)
 
 
 class ServiceContainer(containers.DeclarativeContainer):
     adapter = providers.DependenciesContainer()
     session_factory = providers.Dependency()
 
-    add_product_handler = providers.Factory(
-        service.AddProductHandler,
-        product_repository=adapter.product_repository,
+    add_user_handler = providers.Factory(
+        service.AddUserHandler,
+        user_repository=adapter.user_repository,
         uow=providers.Factory(SQLUnitOfWork, session_factory=session_factory),
     )
 
 
-class ProductContainer(containers.DeclarativeContainer):
+class UserContainer(containers.DeclarativeContainer):
     session_factory = providers.Dependency()
 
     adapter = providers.Container(AdapterContainer)

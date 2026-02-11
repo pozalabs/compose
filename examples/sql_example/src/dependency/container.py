@@ -1,20 +1,20 @@
 from dependency_injector import providers
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from src.product.dependency import ProductContainer
+from src.user.dependency import UserContainer
 
 import compose
 
 PACKAGES = {
-    "src.product",
+    "src.user",
 }
 
 
 class ApplicationContainer(compose.dependency.DeclarativeContainer):
-    engine = providers.Singleton(create_engine, "sqlite:///products.db")
+    engine = providers.Singleton(create_engine, "sqlite:///users.db")
     session_factory = providers.Singleton(sessionmaker, bind=engine)
 
-    product = providers.Container(ProductContainer, session_factory=session_factory)
+    user = providers.Container(UserContainer, session_factory=session_factory)
 
 
 wirer = compose.dependency.create_wirer(packages=PACKAGES)

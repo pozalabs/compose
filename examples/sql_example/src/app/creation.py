@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from src import constants
 from src.dependency import ApplicationContainer, wirer
 from src.logging import logger  # noqa: F401
-from src.product.adapter.table import metadata
-from src.product.entrypoint.router import router as product_router
+from src.user.adapter.table import metadata
+from src.user.entrypoint.router import router as user_router
 
 import compose
 
@@ -57,7 +57,7 @@ def add_exception_handlers(_app: FastAPI) -> None:
 
 
 def add_routers(_app: FastAPI) -> None:
-    _app.include_router(product_router)
+    _app.include_router(user_router)
 
 
 def create_tables(_app: FastAPI) -> None:
