@@ -1,0 +1,11 @@
+services:
+  app:
+    container_name: compose-sql-example-app
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    platform: linux/amd64
+    image: compose-sql-example-app:latest
+    command: python main.py
+    volumes:
+      - .:/app
