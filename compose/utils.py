@@ -15,10 +15,10 @@ def descendants_of[T](cls: type[T]) -> Generator[type[T], None, None]:
 def unordered_partial[RT, T](p: functools.partial[RT], t: T) -> Callable[..., RT]:
     type_hints = get_type_hints(p.func)
 
-    exclude_keys = {*p.keywords.keys(), "return"}
+    exclude_keys = {*p.keywords, "return"}
     candidates = [k for k, v in type_hints.items() if v == t and k not in exclude_keys]
 
-    if not candidates or len(candidates) > 1:
+    if len(candidates) != 1:
         raise TypeError(
             f"Cannot inject argument of type {t} into {p}. "
             f"Expected exactly one argument of type {t}, "
@@ -27,10 +27,10 @@ def unordered_partial[RT, T](p: functools.partial[RT], t: T) -> Callable[..., RT
 
     arg_name = candidates[0]
 
-    def wrapper(arg: Any) -> T:
+    def wrapper(arg: Any) -> RT:
         return p(**{arg_name: arg})
 
-    return functools.partial(wrapper)
+    return wrapper
 
 
 def ident[T](x: T) -> T:
