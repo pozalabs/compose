@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/python:3.12.5-slim-bookworm as builder
+FROM public.ecr.aws/docker/library/python:3.12.5-slim-bookworm AS builder
 
 RUN apt-get update --fix-missing && apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends \
@@ -17,7 +17,7 @@ RUN poetry config virtualenvs.create false && \
 
 COPY . /app
 
-FROM public.ecr.aws/docker/library/python:3.12.5-slim-bookworm as runner
+FROM public.ecr.aws/docker/library/python:3.12.5-slim-bookworm AS runner
 
 RUN apt-get update --fix-missing && apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends \
