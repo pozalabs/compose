@@ -1,3 +1,10 @@
-from .mongo import MongoLock, MongoLockAcquirer
+from .exceptions import LockAcquisitionFailedError
 
-__all__ = ["MongoLock", "MongoLockAcquirer"]
+__all__ = ["LockAcquisitionFailedError"]
+
+try:
+    from .mongo import MongoLock, MongoLockAcquirer
+
+    __all__ += ["MongoLock", "MongoLockAcquirer"]
+except ImportError:
+    pass
