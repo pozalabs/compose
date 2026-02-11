@@ -7,7 +7,7 @@ from pymongo.collection import Collection
 import compose
 
 
-class Model(compose.entity.Entity):
+class Model(compose.entity.MongoEntity):
     name: str
     status: str
 

@@ -1,3 +1,8 @@
-from .mongo import MongoUnitOfWork, mongo_transactional
+__all__: list[str] = []
 
-__all__ = ["MongoUnitOfWork", "mongo_transactional"]
+try:
+    from .mongo import MongoUnitOfWork, mongo_transactional
+
+    __all__ += ["MongoUnitOfWork", "mongo_transactional"]
+except ImportError:
+    pass

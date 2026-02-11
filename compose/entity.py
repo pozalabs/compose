@@ -1,10 +1,11 @@
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Generic
 
-from . import container, field, types
+from . import container, field
+from .typing import IdT
 
 
-class Entity(container.TimeStampedModel):
-    id: types.PyObjectId = field.IdField(default_factory=types.PyObjectId)
+class Entity(container.TimeStampedModel, Generic[IdT]):
+    id: IdT
 
     updatable_fields: ClassVar[set[str]] = set()
 
@@ -22,3 +23,13 @@ class Entity(container.TimeStampedModel):
                 continue
 
             setattr(self, key, value)
+
+
+try:
+    from . import types
+
+    class MongoEntity(Entity[types.PyObjectId]):
+        id: types.PyObjectId = field.IdField(default_factory=types.PyObjectId)
+
+except ImportError:
+    pass
