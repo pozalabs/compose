@@ -25,8 +25,8 @@ class DateTime(pendulum.DateTime):
 
 @dataclass
 class DateRange:
-    start: DateTime
-    end: DateTime
+    start: pendulum.DateTime
+    end: pendulum.DateTime
 
     @classmethod
     def day_of(
