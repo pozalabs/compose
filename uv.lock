@@ -870,6 +870,10 @@ dependencies = [
     { name = "pendulum" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+]
+
+[package.optional-dependencies]
+mongo = [
     { name = "pymongo", extra = ["aws"] },
 ]
 
@@ -885,6 +889,7 @@ dev = [
     { name = "opentelemetry-distro", extra = ["otlp"] },
     { name = "opentelemetry-test-utils" },
     { name = "pre-commit" },
+    { name = "pymongo", extra = ["aws"] },
     { name = "pyrefly" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
@@ -900,8 +905,9 @@ requires-dist = [
     { name = "pendulum", specifier = ">=3.1.0,<4.0.0" },
     { name = "pydantic", specifier = ">=2.7.4,<3.0.0" },
     { name = "pydantic-settings", specifier = ">=2.12.0" },
-    { name = "pymongo", extras = ["aws"], specifier = ">=4.6.3,<5.0.0" },
+    { name = "pymongo", extras = ["aws"], marker = "extra == 'mongo'", specifier = ">=4.6.3,<5.0.0" },
 ]
+provides-extras = ["mongo"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -915,6 +921,7 @@ dev = [
     { name = "opentelemetry-distro", extras = ["otlp"], specifier = ">=0.46b0,<0.47.0" },
     { name = "opentelemetry-test-utils", specifier = ">=0.46b0,<0.47.0" },
     { name = "pre-commit", specifier = ">=3.7.1,<4.0.0" },
+    { name = "pymongo", extras = ["aws"], specifier = ">=4.6.3,<5.0.0" },
     { name = "pyrefly", specifier = ">=0.52.0" },
     { name = "pytest", specifier = ">=8.2.2,<9.0.0" },
     { name = "pytest-asyncio", specifier = ">=1.0.0" },
