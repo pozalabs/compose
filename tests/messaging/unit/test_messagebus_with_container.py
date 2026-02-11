@@ -4,13 +4,11 @@ import compose
 from compose.messaging.messagebus import MessageBus
 
 
-class SomethingHappened(compose.event.Event):
-    ...
+class SomethingHappened(compose.event.MongoEvent): ...
 
 
 class SomethingHappenedHandler:
-    def handle(self, evt: SomethingHappened) -> None:
-        ...
+    def handle(self, evt: SomethingHappened) -> None: ...
 
 
 class ApplicationContainer(containers.DeclarativeContainer):

@@ -19,8 +19,7 @@ class InMemoryMessageQueue(compose.messaging.MessageQueue):
         self._queue.remove(message)
 
 
-class SomeEvent(compose.event.Event):
-    ...
+class SomeEvent(compose.event.MongoEvent): ...
 
 
 def test_publish():

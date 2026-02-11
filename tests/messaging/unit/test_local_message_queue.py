@@ -12,7 +12,7 @@ def local_message_queue() -> compose.messaging.LocalMessageQueue:
     compose.messaging.event_store.reset(token)
 
 
-class SomeEvent(compose.event.Event):
+class SomeEvent(compose.event.MongoEvent):
     name: str
 
 

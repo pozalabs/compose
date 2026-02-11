@@ -16,7 +16,7 @@ messagebus = compose.messaging.MessageBus(event_handler_dependency_resolver)
 message_queue = compose.messaging.LocalMessageQueue()
 
 
-class OrderPlaced(compose.event.Event):
+class OrderPlaced(compose.event.MongoEvent):
     sku: str
 
 
