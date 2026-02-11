@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/python:3.12.5-slim-bookworm as builder
+FROM public.ecr.aws/docker/library/python:3.12.5-slim-bookworm AS builder
 
 RUN apt-get update --fix-missing && apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends \
@@ -8,15 +8,16 @@ RUN pip install --upgrade pip && pip install poetry==2.1.1
 
 WORKDIR /app
 
-COPY poetry.lock pyproject.toml /app/
+COPY pyproject.toml /app/
 
 RUN poetry config virtualenvs.create false && \
+    poetry lock && \
     poetry install --only main --no-root && \
     poetry cache clear --all . --quiet
 
 COPY . /app
 
-FROM public.ecr.aws/docker/library/python:3.12.5-slim-bookworm as runner
+FROM public.ecr.aws/docker/library/python:3.12.5-slim-bookworm AS runner
 
 RUN apt-get update --fix-missing && apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends \
