@@ -9,7 +9,7 @@ from typing import Any, ClassVar, Self
 from .types import DictExpression, ListExpression
 
 
-class Operator:
+class Operator(abc.ABC):
     @abc.abstractmethod
     def expression(self) -> Any:
         raise NotImplementedError
