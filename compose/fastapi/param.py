@@ -105,7 +105,9 @@ class WithPath:
     @classmethod
     def object_id(
         cls, path: params.Path | None = None
-    ) -> tuple[type[types.PyObjectId], params.Path]:
+    ) -> "tuple[type[types.PyObjectId], params.Path]":
+        if not hasattr(types, "PyObjectId"):
+            raise ImportError("WithPath.object_id requires `bson`. Install `pymongo`")
         return types.PyObjectId, path or Path(...)
 
     @classmethod

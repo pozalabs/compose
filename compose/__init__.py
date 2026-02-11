@@ -1,7 +1,6 @@
 from . import (
     asyncio,
     auth,
-    aws,
     command,
     concurrent,
     constants,
@@ -36,7 +35,6 @@ __all__ = [
     "TimeStampedModel",
     "asyncio",
     "auth",
-    "aws",
     "command",
     "concurrent",
     "constants",
@@ -96,6 +94,13 @@ try:
     from . import httpx  # noqa: F401
 
     __all__.append("httpx")
+except ImportError:
+    pass
+
+try:
+    from . import aws  # noqa: F401
+
+    __all__.append("aws")
 except ImportError:
     pass
 

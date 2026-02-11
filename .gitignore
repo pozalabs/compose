@@ -132,4 +132,6 @@ dmypy.json
 .vscode
 tmp*.py
 .DS_Store
-examples/fastapi_example/compose
+
+examples/*/compose
+examples/*.db

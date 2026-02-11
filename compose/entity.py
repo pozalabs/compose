@@ -1,5 +1,7 @@
 from typing import Any, ClassVar, Generic
 
+from pydantic import Field
+
 from . import container, field
 from .typing import IdT
 
@@ -26,10 +28,19 @@ class Entity(container.TimeStampedModel, Generic[IdT]):
 
 
 try:
-    from . import types
+    from .types import PyObjectId
 
-    class MongoEntity(Entity[types.PyObjectId]):
-        id: types.PyObjectId = field.IdField(default_factory=types.PyObjectId)
+    class MongoEntity(Entity[PyObjectId]):
+        id: PyObjectId = field.IdField(default_factory=PyObjectId)
+
+except ImportError:
+    pass
+
+try:
+    from sqlalchemy.orm import Session  # noqa: F401
+
+    class SQLEntity(Entity[int | None]):
+        id: int | None = Field(default=None)
 
 except ImportError:
     pass
