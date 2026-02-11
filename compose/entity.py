@@ -28,10 +28,10 @@ class Entity(container.TimeStampedModel, Generic[IdT]):
 
 
 try:
-    from . import types
+    from .types import PyObjectId
 
-    class MongoEntity(Entity[types.PyObjectId]):
-        id: types.PyObjectId = field.IdField(default_factory=types.PyObjectId)
+    class MongoEntity(Entity[PyObjectId]):
+        id: PyObjectId = field.IdField(default_factory=PyObjectId)
 
 except ImportError:
     pass
