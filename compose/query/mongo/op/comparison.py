@@ -28,7 +28,7 @@ def _expression_factory(mongo_operator: str) -> Callable[[ComparisonOperator], D
 
 
 def create_comparison_operator[T](
-    name: str, mongo_operator: str, base: tuple[type[T], ...] = (ComparisonOperator,)
+    name: str, mongo_operator: str, base: tuple[type[T], ...]
 ) -> type[T]:
     return utils.create_operator(
         name=name,
@@ -39,12 +39,12 @@ def create_comparison_operator[T](
 
 Eq = create_comparison_operator(name="Eq", mongo_operator="$eq", base=(EqualityOperator,))
 Ne = create_comparison_operator(name="Ne", mongo_operator="$ne", base=(EqualityOperator,))
-Gt = create_comparison_operator(name="Gt", mongo_operator="$gt")
-Gte = create_comparison_operator(name="Gte", mongo_operator="$gte")
-Lt = create_comparison_operator(name="Lt", mongo_operator="$lt")
-Lte = create_comparison_operator(name="Lte", mongo_operator="$lte")
-In = create_comparison_operator(name="In", mongo_operator="$in")
-Nin = create_comparison_operator(name="Nin", mongo_operator="$nin")
+Gt = create_comparison_operator(name="Gt", mongo_operator="$gt", base=(ComparisonOperator,))
+Gte = create_comparison_operator(name="Gte", mongo_operator="$gte", base=(ComparisonOperator,))
+Lt = create_comparison_operator(name="Lt", mongo_operator="$lt", base=(ComparisonOperator,))
+Lte = create_comparison_operator(name="Lte", mongo_operator="$lte", base=(ComparisonOperator,))
+In = create_comparison_operator(name="In", mongo_operator="$in", base=(ComparisonOperator,))
+Nin = create_comparison_operator(name="Nin", mongo_operator="$nin", base=(ComparisonOperator,))
 
 
 class Regex(ComparisonOperator):
