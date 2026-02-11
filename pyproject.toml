@@ -18,9 +18,6 @@ dependencies = [
     "pydantic-settings>=2.12.0",
 ]
 
-[project.optional-dependencies]
-mongo = ["pymongo[aws]>=4.6.3,<5.0.0"]
-
 [tool.hatch.build.targets.sdist]
 include = ["compose"]
 
