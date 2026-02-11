@@ -8,9 +8,7 @@ from pydantic_core import CoreSchema, core_schema
 
 class PyObjectId(bson.ObjectId):
     @classmethod
-    def validate(
-        cls, v: bson.ObjectId | bytes, _: core_schema.ValidationInfo = None
-    ) -> bson.ObjectId:
+    def validate(cls, v: bson.ObjectId | bytes, _: core_schema.ValidationInfo) -> bson.ObjectId:
         return cls._validate(v)
 
     @classmethod
@@ -26,7 +24,7 @@ class PyObjectId(bson.ObjectId):
         cls,
         schema: core_schema.CoreSchema,
         handler: Callable[[Any], core_schema.CoreSchema],
-    ) -> CoreSchema:
+    ) -> dict[str, Any]:
         return dict(type="string")
 
     @classmethod
