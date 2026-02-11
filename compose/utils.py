@@ -33,9 +33,5 @@ def unordered_partial[RT, T](p: functools.partial[RT], t: T) -> Callable[..., RT
     return wrapper
 
 
-def ident[T](x: T) -> T:
-    return x
-
-
 def uuid4_hex() -> str:
     return uuid.uuid4().hex
