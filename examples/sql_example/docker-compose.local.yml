@@ -6,6 +6,8 @@ services:
       dockerfile: docker/Dockerfile
     platform: linux/amd64
     image: compose-sql-example-app:latest
-    command: python main.py
+    command: uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
     volumes:
       - .:/app
