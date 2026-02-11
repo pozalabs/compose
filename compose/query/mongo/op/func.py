@@ -45,7 +45,7 @@ class _Flatten:
         self.ops = list(ops)
 
     def eval(self) -> list[Operator]:
-        result = []
+        result: list[Operator] = []
         for op in self.ops:
             exp = op.expression() if isinstance(op, Operator) else op
 
