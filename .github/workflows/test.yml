@@ -13,7 +13,7 @@ jobs:
   unit-test:
     strategy:
       matrix:
-        python-version: [3.12, 3.13]
+        python-version: [3.12, 3.13, 3.14]
 
     uses: ./.github/workflows/unit-test.yml
     secrets: inherit
@@ -24,7 +24,7 @@ jobs:
   integration-test:
     strategy:
       matrix:
-        python-version: [3.12, 3.13]
+        python-version: [3.12, 3.13, 3.14]
 
     uses: ./.github/workflows/integration-test.yml
     secrets: inherit
