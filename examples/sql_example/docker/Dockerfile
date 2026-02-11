@@ -8,9 +8,10 @@ RUN pip install --upgrade pip && pip install poetry==2.1.1
 
 WORKDIR /app
 
-COPY poetry.lock pyproject.toml /app/
+COPY pyproject.toml /app/
 
 RUN poetry config virtualenvs.create false && \
+    poetry lock --no-update && \
     poetry install --only main --no-root && \
     poetry cache clear --all . --quiet
 
