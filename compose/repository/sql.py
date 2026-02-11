@@ -59,11 +59,12 @@ class SQLRepository[T: SQLEntity](BaseRepository):
 
     def update(self, entity: T, session: Session) -> None:
         table = self.__table__
-        row = entity.model_dump(exclude={"id"})
+        row = entity.model_dump(mode="json", exclude={"id"})
 
         if "updated_at" in row:
-            row["updated_at"] = pendulum.DateTime.utcnow()
-            entity.updated_at = row["updated_at"]
+            now = pendulum.DateTime.utcnow()
+            entity.updated_at = now
+            row["updated_at"] = now.isoformat()
 
         session.execute(update(table).where(table.c.id == entity.id).values(**row))
 
@@ -84,7 +85,7 @@ class SQLRepository[T: SQLEntity](BaseRepository):
 
     @staticmethod
     def _to_row(entity: T) -> dict[str, Any]:
-        row = entity.model_dump()
+        row = entity.model_dump(mode="json")
         if row.get("id") is None:
             row.pop("id", None)
         return row
