@@ -19,7 +19,8 @@ class InMemoryMessageQueue(compose.messaging.MessageQueue):
         self._queue.remove(message)
 
 
-class SomeEvent(compose.event.MongoEvent): ...
+class SomeEvent(compose.event.Event[compose.types.PyObjectId]):
+    id: compose.types.PyObjectId = compose.field.IdField(default_factory=compose.types.PyObjectId)
 
 
 def test_publish():

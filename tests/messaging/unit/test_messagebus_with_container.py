@@ -4,7 +4,8 @@ import compose
 from compose.messaging.messagebus import MessageBus
 
 
-class SomethingHappened(compose.event.MongoEvent): ...
+class SomethingHappened(compose.event.Event[compose.types.PyObjectId]):
+    id: compose.types.PyObjectId = compose.field.IdField(default_factory=compose.types.PyObjectId)
 
 
 class SomethingHappenedHandler:
