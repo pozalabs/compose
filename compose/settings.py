@@ -7,7 +7,7 @@ from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings as PydanticBaseSettings
 from pydantic_settings import PydanticBaseSettingsSource
 
-from . import utils
+from . import func
 from .enums import AppEnv
 
 if TYPE_CHECKING:
@@ -47,7 +47,7 @@ def get_parameters_from_ssm(
         for parameter in response["Parameters"]:
             key = parameter["Name"].split("/")[-1].lower()
             value = parameter["Value"]
-            result[key] = preprocessors.get(key, utils.ident)(value)
+            result[key] = preprocessors.get(key, func.ident)(value)
 
         next_token = response.get("NextToken")
         has_next = next_token is not None
