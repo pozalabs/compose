@@ -105,3 +105,9 @@ class Evaluable(Operator):
                 return [Evaluable(v).expression() for v in self.op]
             case _:
                 return self.op
+
+
+def evaluate(value: Any) -> Any:
+    if isinstance(value, Operator):
+        return value.expression()
+    return value
