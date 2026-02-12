@@ -1,6 +1,8 @@
 from collections.abc import Iterable
 from typing import Any, Self
 
+from compose.deprecation import deprecated_alias
+
 from .base import Evaluable, Merge, Operator, Stage
 from .evaulation import Expr
 from .logical import And, Nor, Or
@@ -113,7 +115,7 @@ class Lookup(Stage[DictExpression]):
         }
 
 
-class MatchLookup(Lookup):
+class EqualityLookup(Lookup):
     def __init__(self, from_: str, local_field: str, foreign_field: str, as_: str | None = None):
         super().__init__(from_=from_, as_=as_)
         self.local_field = local_field
@@ -230,7 +232,7 @@ class Search(Stage[DictExpression]):
         return {"$search": {"index": self.index} | self.op.expression()}
 
 
-class Pagination(Stage[DictExpression]):
+class OffsetPagination(Stage[DictExpression]):
     def __init__(
         self,
         page: int | None = None,
@@ -296,3 +298,7 @@ class Sample(Stage[DictExpression]):
 
     def expression(self) -> DictExpression:
         return {"$sample": {"size": self.size}}
+
+
+MatchLookup = deprecated_alias("MatchLookup", EqualityLookup)
+Pagination = deprecated_alias("Pagination", OffsetPagination)
