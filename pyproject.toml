@@ -9,7 +9,7 @@ authors = [
     { name = "soyeon", email = "soyeon@pozalabs.com" },
     { name = "joowan", email = "joowan@pozalabs.com" },
 ]
-requires-python = ">=3.12,<3.14"
+requires-python = ">=3.12,<3.15"
 dependencies = [
     "pendulum>=3.1.0,<4.0.0",
     "pydantic>=2.7.4,<3.0.0",
@@ -37,15 +37,15 @@ dev = [
     "pre-commit>=3.7.1,<4.0.0",
     "pytest>=8.2.2,<9.0.0",
     "boto3-stubs-lite[essential,ssm]>=1.34.79,<2.0.0",
-    "uvicorn[standard]>=0.29.0,<0.30.0",
+    "uvicorn[standard]>=0.29.0,<1.0.0",
     "gunicorn>=21.2.0,<22.0.0",
-    "opentelemetry-test-utils>=0.46b0,<0.47.0",
+    "opentelemetry-test-utils>=0.46b0,<1.0.0",
     "testcontainers[mongodb]>=4.7.2,<5.0.0",
     "boto3>=1.28.73,<2.0.0",
     "loguru>=0.7.2,<0.8.0",
     "fastapi>=0.115.2,<0.116.0",
     "sentry-sdk[fastapi,loguru,pymongo]>=2.2.0,<3.0.0",
-    "opentelemetry-distro[otlp]>=0.46b0,<0.47.0",
+    "opentelemetry-distro[otlp]>=0.46b0,<1.0.0",
     "bcrypt>=4.2.0,<5.0.0",
     "httpx>=0.27.2,<0.28.0",
     "pytest-asyncio>=1.0.0",
