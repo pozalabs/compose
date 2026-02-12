@@ -183,9 +183,11 @@ def create_unauthorized_error_handler(
     error_schema_cls: type[Error] = Error,
 ) -> ExceptionHandler:
     def exception_handler(request: Request, exc: Exception) -> Response:
-        if isinstance(exc, HTTPException) and exc.headers.get(
-            "WWW-Authenticate", ""
-        ).lower().startswith("basic"):
+        if (
+            isinstance(exc, HTTPException)
+            and exc.headers is not None
+            and exc.headers.get("WWW-Authenticate", "").lower().startswith("basic")
+        ):
             return PlainTextResponse(
                 content=exc.detail,
                 status_code=exc.status_code,
@@ -205,7 +207,7 @@ def create_unauthorized_error_handler(
 def exc_to_error_schema[T: Error](
     exc: Exception,
     error_type: str,
-    error_schema_cls: type[T] = Error,
+    error_schema_cls: type[T],
 ) -> T:
     return error_schema_cls(
         title=str(exc),

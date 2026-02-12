@@ -1,6 +1,7 @@
-from typing import Any, Self, get_args
+from collections.abc import Sequence
+from typing import Any, Protocol, Self, get_args
 
-from pydantic import ConfigDict, ValidationError
+from pydantic import ConfigDict
 
 from .. import container
 from ..pagination import Pagination
@@ -59,6 +60,10 @@ class InvalidParam(container.BaseModel):
     type: str
 
 
+class HasErrors(Protocol):
+    def errors(self) -> Sequence[Any]: ...
+
+
 class Error(container.BaseModel):
     title: str
     type: str
@@ -66,7 +71,7 @@ class Error(container.BaseModel):
     invalid_params: list[InvalidParam] | None = None
 
     @classmethod
-    def from_validation_error(cls, exc: ValidationError, title: str) -> Self:
+    def from_validation_error(cls, exc: HasErrors, title: str) -> Self:
         invalid_params = []
         for error in exc.errors():
             invalid_params.append(
