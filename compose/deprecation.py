@@ -12,7 +12,6 @@ def deprecated_alias[T](old_name: str, new_class: type[T]) -> type[T]:
             category=ComposeDeprecationWarning,
             stacklevel=2,
         )
-        super(alias, self).__init__(*args, **kwargs)
+        new_class.__init__(self, *args, **kwargs)
 
-    alias = type(old_name, (new_class,), {"__init__": __init__})
-    return alias
+    return type(old_name, (new_class,), {"__init__": __init__})  # type: ignore[return-value]
