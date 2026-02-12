@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from compose.query.mongo.op import ComparisonOperator, EmptyOnNull, Eq, Ne
+from compose.query.mongo.op import ComparisonOperator, Eq, Ne, SkipNull
 
 
 class CustomOp(ComparisonOperator):
@@ -25,7 +25,7 @@ class CustomOp(ComparisonOperator):
     ),
 )
 def test_empty_on_null(op: ComparisonOperator, expected: dict[str, Any]):
-    expression = EmptyOnNull(op).expression()
+    expression = SkipNull(op).expression()
 
     assert expression == expected
 

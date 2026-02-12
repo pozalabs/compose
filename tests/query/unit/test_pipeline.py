@@ -2,15 +2,15 @@ import pendulum
 import pytest
 
 from compose.query.mongo.op import (
-    EmptyOnNull,
     Eq,
+    EqualityLookup,
     Limit,
     ListExpression,
     Match,
-    MatchLookup,
     Pipeline,
     Range,
     Set,
+    SkipNull,
     Sort,
     SortBy,
     Spec,
@@ -31,7 +31,7 @@ from compose.query.mongo.op import (
                     ),
                 ),
                 Pipeline(
-                    MatchLookup(
+                    EqualityLookup(
                         from_="from",
                         local_field="local_field",
                         foreign_field="foreign_field",
@@ -73,7 +73,7 @@ def test_expression(op: Pipeline, expected: ListExpression):
 
 def test_skip_empty_stage():
     op = Pipeline(
-        Match(EmptyOnNull(Eq(field="status", value=None))),
+        Match(SkipNull(Eq(field="status", value=None))),
         Sort(SortBy.asc("created_at")),
         Limit(10),
     )
