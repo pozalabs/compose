@@ -5,10 +5,10 @@ import pytest
 
 from compose.query.mongo import op
 from compose.query.mongo.op import (
-    EmptyOnNull,
     Eq,
     Match,
     Operator,
+    SkipNull,
     Sort,
     SortBy,
 )
@@ -19,7 +19,7 @@ from compose.query.mongo.op import (
     [
         (
             [
-                Match.and_(EmptyOnNull(Eq(field="a", value=None))),
+                Match.and_(SkipNull(Eq(field="a", value=None))),
                 Sort(SortBy(field="a", direction=pymongo.ASCENDING)),
             ],
             op.func.NonEmpty(),

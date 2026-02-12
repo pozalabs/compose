@@ -1,13 +1,13 @@
 import pytest
 
-from compose.query.mongo.op import DictExpression, Pagination, Set, Spec
+from compose.query.mongo.op import DictExpression, OffsetPagination, Set, Spec
 
 
 @pytest.mark.parametrize(
     "pagination, expected",
     [
         (
-            Pagination(page=1, per_page=10),
+            OffsetPagination(page=1, per_page=10),
             {
                 "$facet": {
                     "metadata": [{"$count": "total"}],
@@ -16,11 +16,11 @@ from compose.query.mongo.op import DictExpression, Pagination, Set, Spec
             },
         ),
         (
-            Pagination(),
+            OffsetPagination(),
             {"$facet": {"metadata": [{"$count": "total"}], "items": []}},
         ),
         (
-            Pagination(
+            OffsetPagination(
                 page=1,
                 per_page=10,
                 metadata_ops=[Set(Spec(field="field", spec="value"))],
@@ -39,7 +39,7 @@ from compose.query.mongo.op import DictExpression, Pagination, Set, Spec
         "metadata 필드에 추가 필드를 설정하는 경우",
     ),
 )
-def test_pagination_expression(pagination: Pagination, expected: DictExpression):
+def test_pagination_expression(pagination: OffsetPagination, expected: DictExpression):
     assert pagination.expression() == expected
 
 
@@ -53,4 +53,4 @@ def test_cannot_instantiate_mutually_exclusive_pagination(
     per_page: int | None,
 ):
     with pytest.raises(ValueError):
-        Pagination(page=page, per_page=per_page)
+        OffsetPagination(page=page, per_page=per_page)

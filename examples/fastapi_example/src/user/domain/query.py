@@ -10,5 +10,5 @@ class ListUsers(compose.query.MongoFilterQuery):
     def to_query(self) -> list[dict[str, Any]]:
         return op.func.Pipeline(
             op.Match.and_(op.Eq.from_(name=self.name)),
-            op.Pagination(),
+            op.OffsetPagination(),
         )
