@@ -19,6 +19,7 @@ jobs:
     secrets: inherit
     with:
       python-version: ${{ matrix.python-version }}
+      unit: unit
 
   integration-test:
     strategy:
@@ -29,3 +30,4 @@ jobs:
     secrets: inherit
     with:
       python-version: ${{ matrix.python-version }}
+      unit: integration
