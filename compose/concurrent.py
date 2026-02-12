@@ -81,7 +81,7 @@ class ThreadPoolExecutor:
             future_to_key = {}
 
             for job in jobs:
-                future = executor.submit(job.func, *job.args, **job.kwargs)
+                future = executor.submit(functools.partial(job.func, *job.args, **job.kwargs))
                 future_to_key[future] = job.key
 
             for future in concurrent.futures.as_completed(
