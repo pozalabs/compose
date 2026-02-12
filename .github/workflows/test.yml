@@ -15,7 +15,7 @@ jobs:
       matrix:
         python-version: [3.12, 3.13, 3.14]
 
-    uses: ./.github/workflows/run-test.yml
+    uses: ./.github/workflows/run-tests.yml
     secrets: inherit
     with:
       python-version: ${{ matrix.python-version }}
@@ -25,7 +25,7 @@ jobs:
       matrix:
         python-version: [3.12, 3.13, 3.14]
 
-    uses: ./.github/workflows/run-test.yml
+    uses: ./.github/workflows/run-tests.yml
     secrets: inherit
     with:
       python-version: ${{ matrix.python-version }}
