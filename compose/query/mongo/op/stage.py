@@ -295,4 +295,4 @@ class Sample(Stage[DictExpression]):
         self.size = size
 
     def expression(self) -> DictExpression:
-        return Evaluable({"$sample": {"size": self.size}}).expression()
+        return {"$sample": {"size": self.size}}

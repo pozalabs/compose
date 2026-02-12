@@ -1,6 +1,6 @@
 from typing import Any
 
-from ..base import Evaluable, Operator
+from ..base import Operator, evaluate
 from ..types import DictExpression
 
 
@@ -10,4 +10,4 @@ class RegexMatch(Operator):
         self.value = value
 
     def expression(self) -> DictExpression:
-        return Evaluable({"$regexMatch": {"input": self.field, "regex": self.value}}).expression()
+        return {"$regexMatch": {"input": evaluate(self.field), "regex": evaluate(self.value)}}

@@ -1,6 +1,6 @@
 from typing import Any
 
-from ..base import Evaluable, Operator
+from ..base import Operator, evaluate
 from ..types import DictExpression
 
 
@@ -9,7 +9,7 @@ class ToString(Operator):
         self.expr = expr
 
     def expression(self) -> DictExpression:
-        return Evaluable({"$toString": self.expr}).expression()
+        return {"$toString": evaluate(self.expr)}
 
 
 class ToBool(Operator):
@@ -17,7 +17,7 @@ class ToBool(Operator):
         self._expression = expression
 
     def expression(self) -> DictExpression:
-        return Evaluable({"$toBool": self._expression}).expression()
+        return {"$toBool": evaluate(self._expression)}
 
 
 class ToInt(Operator):
@@ -25,4 +25,4 @@ class ToInt(Operator):
         self._expression = expression
 
     def expression(self) -> DictExpression:
-        return Evaluable({"$toInt": self._expression}).expression()
+        return {"$toInt": evaluate(self._expression)}

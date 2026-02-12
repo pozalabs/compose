@@ -1,6 +1,6 @@
 from typing import Any
 
-from .base import Evaluable, Operator
+from .base import Operator, evaluate
 from .types import DictExpression
 
 
@@ -9,4 +9,4 @@ class Expr(Operator):
         self.op = op
 
     def expression(self) -> DictExpression:
-        return Evaluable({"$expr": self.op}).expression()
+        return {"$expr": evaluate(self.op)}

@@ -1,7 +1,7 @@
 from typing import Any
 
 from .. import utils
-from ..base import Evaluable, Operator
+from ..base import Operator, evaluate
 
 AIn = utils.create_general_aggregation_operator(name="AIn", mongo_operator="$in")
 
@@ -12,4 +12,4 @@ class ArrayElemAt(Operator):
         self.index = index
 
     def expression(self) -> Any:
-        return {"$arrayElemAt": [Evaluable(self.array).expression(), self.index]}
+        return {"$arrayElemAt": [evaluate(self.array), self.index]}

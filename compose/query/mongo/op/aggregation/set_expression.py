@@ -1,6 +1,6 @@
 from typing import Any
 
-from ..base import Evaluable, Operator
+from ..base import Operator, evaluate
 from ..types import DictExpression
 
 
@@ -9,4 +9,4 @@ class SetIntersection(Operator):
         self.values = list(values)
 
     def expression(self) -> DictExpression:
-        return Evaluable({"$setIntersection": self.values}).expression()
+        return {"$setIntersection": [evaluate(v) for v in self.values]}
