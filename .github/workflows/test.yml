@@ -15,20 +15,17 @@ jobs:
       matrix:
         python-version: [3.12, 3.13, 3.14]
 
-    uses: ./.github/workflows/unit-test.yml
+    uses: ./.github/workflows/run-test.yml
     secrets: inherit
     with:
       python-version: ${{ matrix.python-version }}
-      uv-version: "0.6.6"
 
   integration-test:
     strategy:
       matrix:
         python-version: [3.12, 3.13, 3.14]
 
-    uses: ./.github/workflows/integration-test.yml
+    uses: ./.github/workflows/run-test.yml
     secrets: inherit
     with:
       python-version: ${{ matrix.python-version }}
-      uv-version: "0.6.6"
-    
