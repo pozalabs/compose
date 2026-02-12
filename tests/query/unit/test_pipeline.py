@@ -2,13 +2,17 @@ import pendulum
 import pytest
 
 from compose.query.mongo.op import (
+    EmptyOnNull,
     Eq,
+    Limit,
     ListExpression,
     Match,
     MatchLookup,
     Pipeline,
     Range,
     Set,
+    Sort,
+    SortBy,
     Spec,
 )
 
@@ -65,3 +69,16 @@ from compose.query.mongo.op import (
 )
 def test_expression(op: Pipeline, expected: ListExpression):
     assert op.expression() == expected
+
+
+def test_skip_empty_stage():
+    op = Pipeline(
+        Match(EmptyOnNull(Eq(field="status", value=None))),
+        Sort(SortBy.asc("created_at")),
+        Limit(10),
+    )
+
+    assert op.expression() == [
+        {"$sort": {"created_at": 1}},
+        {"$limit": 10},
+    ]

@@ -1,6 +1,6 @@
 from typing import Any
 
-from ..base import DictExpression, Evaluable, Operator
+from ..base import DictExpression, Operator, evaluate
 
 
 class First(Operator):
@@ -8,7 +8,7 @@ class First(Operator):
         self._expression = expression
 
     def expression(self) -> DictExpression:
-        return Evaluable({"$first": self._expression}).expression()
+        return {"$first": evaluate(self._expression)}
 
 
 class MergeObjects(Operator):
@@ -16,7 +16,7 @@ class MergeObjects(Operator):
         self._expressions = list(expressions)
 
     def expression(self) -> DictExpression:
-        expressions = [Evaluable(e).expression() for e in self._expressions]
+        expressions = [evaluate(e) for e in self._expressions]
         return {"$mergeObjects": expressions if len(expressions) > 1 else expressions[0]}
 
 
@@ -25,7 +25,7 @@ class AddToSet(Operator):
         self._expression = expression
 
     def expression(self) -> DictExpression:
-        return Evaluable({"$addToSet": self._expression}).expression()
+        return {"$addToSet": evaluate(self._expression)}
 
 
 class Push(Operator):
@@ -33,4 +33,4 @@ class Push(Operator):
         self._expression = expression
 
     def expression(self) -> DictExpression:
-        return Evaluable({"$push": self._expression}).expression()
+        return {"$push": evaluate(self._expression)}

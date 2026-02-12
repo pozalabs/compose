@@ -1,6 +1,6 @@
 from typing import Any, Self, Unpack
 
-from ..base import Evaluable, Merge, Operator
+from ..base import Evaluable, Merge, Operator, evaluate
 from ..sort import SortBy
 from ..types import DictExpression, MongoKeyword, _String
 
@@ -106,4 +106,4 @@ class IndexOfArray(Operator):
             if v is not None:
                 args.append(v)
 
-        return Evaluable({"$indexOfArray": args}).expression()
+        return {"$indexOfArray": [evaluate(a) for a in args]}
