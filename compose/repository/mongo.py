@@ -263,7 +263,7 @@ class MongoRepository[T: Entity](BaseRepository):
         return get_args(orig_base)[0]
 
 
-def setup_indexes(*databases: Database) -> None:
+def setup_indexes(*databases: *tuple[Database, ...]) -> None:
     index_map: dict[str, list[pymongo.IndexModel]] = {}
     for subclass in descendants_of(MongoRepository):
         collection_name = subclass.__collection_name__
