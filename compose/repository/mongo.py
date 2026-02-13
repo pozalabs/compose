@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import functools
-import warnings
-from collections.abc import Iterable
-from typing import Any, ClassVar, Self, Unpack, get_args, get_origin, overload
+from typing import Any, ClassVar, Self, get_args, get_origin, overload
 
 import pendulum
 import pymongo
@@ -279,33 +277,14 @@ class MongoRepository[T: Entity](BaseRepository):
 
 
 def setup_indexes(
-    db_names: Iterable[str],
-    mongo_client: pymongo.MongoClient | None = None,
-    mongo_uri: str | None = None,
+    db_names: list[str],
+    mongo_client: pymongo.MongoClient,
 ) -> None:
     # NOTE: 동일한 이름의 컬렉션이 여러 DB에 존재할 경우, 컬렉션별로 인덱스를 생성할 수 없음
-
-    if mongo_client is None and mongo_uri is None:
-        raise ValueError("Either `mongo_client` or `mongo_uri` must be provided")
-
-    if mongo_uri is not None:
-        warnings.warn(
-            (
-                "`mongo_uri` is deprecated and will be removed in the future. "
-                "Use `mongo_client` instead."
-            ),
-            DeprecationWarning,
-        )
-
-        with pymongo.MongoClient(mongo_uri) as mongo_client:
-            setup_database_indexes(*(mongo_client.get_database(db_name) for db_name in db_names))
-
-        return
-
     setup_database_indexes(*(mongo_client.get_database(db_name) for db_name in db_names))
 
 
-def setup_database_indexes(*databases: Unpack[tuple[Database, ...]]) -> None:
+def setup_database_indexes(*databases: Database) -> None:
     for database in databases:
         collection_names = database.list_collection_names()
         for collection_name, indexes in registry.items():
