@@ -14,9 +14,8 @@ from .. import types
 from ..entity import Entity
 from ..pagination import Pagination
 from ..query.mongo import MongoFilterQuery, MongoQuery
+from ..utils import descendants_of
 from .base import BaseRepository
-
-registry: dict[str, list[pymongo.IndexModel]] = {}
 
 
 class MongoDocument(dict[str, Any]):
@@ -52,18 +51,6 @@ class MongoRepository[T: Entity](BaseRepository):
 
     def __init__(self, collection: Collection):
         self.collection = collection
-
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__()
-        indexes = cls.__indexes__ or []
-        if cls.__collection_name__ not in registry:
-            registry[cls.__collection_name__] = indexes
-            return
-
-        index_documents = [idx.document for idx in registry[cls.__collection_name__]]
-        registry[cls.__collection_name__].extend(
-            [idx for idx in indexes if idx.document not in index_documents]
-        )
 
     @classmethod
     def create(cls, database: Database, **kwargs) -> MongoRepository:
@@ -285,21 +272,23 @@ def setup_indexes(
 
 
 def setup_database_indexes(*databases: Database) -> None:
+    index_map: dict[str, list[pymongo.IndexModel]] = {}
+    for subclass in descendants_of(MongoRepository):
+        collection_name = subclass.__collection_name__
+        indexes = subclass.__indexes__
+        if not collection_name or not indexes:
+            continue
+        if collection_name not in index_map:
+            index_map[collection_name] = list(indexes)
+        else:
+            existing_documents = [idx.document for idx in index_map[collection_name]]
+            index_map[collection_name].extend(
+                idx for idx in indexes if idx.document not in existing_documents
+            )
+
     for database in databases:
         collection_names = database.list_collection_names()
-        for collection_name, indexes in registry.items():
-            if not collection_name or collection_name not in collection_names:
+        for collection_name, indexes in index_map.items():
+            if collection_name not in collection_names:
                 continue
-            collection = database.get_collection(collection_name)
-
-            previous_index_names = {index["name"] for index in collection.list_indexes()}
-            current_index_names = {
-                *(index.document["name"] for index in indexes),
-                "_id_",
-            }
-
-            for index_name in previous_index_names - current_index_names:
-                collection.drop_index(index_name)
-
-            if indexes:
-                collection.create_indexes(indexes)
+            database.get_collection(collection_name).create_indexes(indexes)
