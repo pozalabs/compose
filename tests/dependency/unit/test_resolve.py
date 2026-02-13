@@ -7,7 +7,6 @@ from dependency_injector import containers, providers
 
 from compose.dependency import (
     DEFAULT_RESOLVABLE_PROVIDER_TYPES,
-    ConflictResolution,
     resolve,
     resolve_by_name,
 )
@@ -128,7 +127,6 @@ def test_resolve_from_multiple_candidates(
         type_=type_,
         container=container_cls,
         name=name,
-        conflict_resolution=ConflictResolution.ERROR,
     )
 
     assert resolved().__dict__ == expected.__dict__
@@ -177,7 +175,7 @@ def test_cannot_resolve(type_: type[Any], container_cls: type[containers.Contain
 
 def test_cannot_resolve_without_name_from_multiple_candidates():
     with pytest.raises(ValueError):
-        resolve(RepositoryA, ApplicationContainer, conflict_resolution=ConflictResolution.ERROR)
+        resolve(RepositoryA, ApplicationContainer)
 
 
 def test_cannot_resolve_with_mismatched_name():
