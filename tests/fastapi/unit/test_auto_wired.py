@@ -75,8 +75,7 @@ def retrieve_user(
 
 @pytest.fixture
 def container():
-    wirer = compose.dependency.create_wirer(packages=[])
-    container = ApplicationContainer.wired(wirer=wirer, modules=[__name__])
+    container = ApplicationContainer.wired(modules=[__name__])
     yield container
     container.unwire()
 
