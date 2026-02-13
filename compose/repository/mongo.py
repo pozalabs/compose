@@ -263,15 +263,7 @@ class MongoRepository[T: Entity](BaseRepository):
         return get_args(orig_base)[0]
 
 
-def setup_indexes(
-    db_names: list[str],
-    mongo_client: pymongo.MongoClient,
-) -> None:
-    # NOTE: 동일한 이름의 컬렉션이 여러 DB에 존재할 경우, 컬렉션별로 인덱스를 생성할 수 없음
-    setup_database_indexes(*(mongo_client.get_database(db_name) for db_name in db_names))
-
-
-def setup_database_indexes(*databases: Database) -> None:
+def setup_indexes(*databases: Database) -> None:
     index_map: dict[str, list[pymongo.IndexModel]] = {}
     for subclass in descendants_of(MongoRepository):
         collection_name = subclass.__collection_name__
