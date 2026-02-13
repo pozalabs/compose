@@ -93,12 +93,12 @@ def resolve_by_object_name(
     provider_types: Iterable[type[providers.Provider]],
 ) -> Any:
     candidates: list[providers.Factory] = []
-    for provider in container.traverse([*provider_types]):
-        if not inspect.isclass(provider.cls):
+    for provider in container.traverse([*provider_types]):  # type: ignore[no-matching-overload]
+        if not inspect.isclass(provider.cls):  # type: ignore[missing-attribute]
             continue
 
-        if provider.cls.__name__.split(".")[-1] == name:
-            candidates.append(provider)
+        if provider.cls.__name__.split(".")[-1] == name:  # type: ignore[missing-attribute]
+            candidates.append(provider)  # type: ignore[bad-argument-type]
 
     if not candidates:
         raise ValueError(f"Cannot find {name} from given container")
@@ -114,8 +114,8 @@ class ConflictResolution(str, enum.Enum):
     ERROR = "error"
 
 
-def resolve(
-    type_: type[Any] | str,
+def resolve[T](
+    type_: type[T],
     container: Container,
     provider_types: Iterable[type[providers.Provider]] = DEFAULT_RESOLVABLE_PROVIDER_TYPES,
     *,
@@ -127,29 +127,25 @@ def resolve(
     의존 대상 선언 경로에 깊게 의존하는 것을 방지합니다. `container_cls`는 최상위 컨테이너일수도,
     의존성이 등록된 (하위) 컨테이너일수도 있습니다. 클래스 대상으로만 작동합니다.
     """
-    if not (inspect.isclass(type_) or isinstance(type_, str)):
-        raise ValueError("Only class or string can be resolved")
-
-    if isinstance(type_, str):
-        return resolve_by_name(name=type_, container=container, provider_types=provider_types)
+    if not inspect.isclass(type_):
+        raise ValueError("Only class can be resolved")
 
     candidates = []
-    for provider in container.traverse([*provider_types]):
-        provider_cls = provider.cls
+    for provider in container.traverse([*provider_types]):  # type: ignore[no-matching-overload]
+        provider_cls = provider.cls  # type: ignore[missing-attribute]
         if not (inspect.isclass(provider_cls) or inspect.ismethod(provider_cls)):
             continue
 
         cls = provider_cls.__self__ if inspect.ismethod(provider_cls) else provider_cls
-        if cls.__name__ == type_.__name__:
+        if cls.__name__ == type_.__name__:  # type: ignore[missing-attribute]
             candidates.append(provider)
 
     if not candidates:
         raise ValueError(f"Cannot find {type_.__name__} from given container")
 
     if len(candidates) > 1 and name is None and conflict_resolution == ConflictResolution.ERROR:
-        type_name = type_.__name__ if inspect.isclass(type_) else type_
         raise ValueError(
-            f"Cannot resolve {type_name} since there are multiple candidates. "
+            f"Cannot resolve {type_.__name__} since there are multiple candidates. "
             f"You must specify `name` argument to resolve dependency"
         )
 
@@ -159,7 +155,7 @@ def resolve(
     if name is None and conflict_resolution == ConflictResolution.FIRST:
         return candidates[0]
 
-    return resolve_by_name(name=name, container=container, provider_types=provider_types)
+    return resolve_by_name(name=name, container=container, provider_types=provider_types)  # type: ignore
 
 
 def provide[T](
@@ -184,7 +180,9 @@ def provide[T](
 
 def create_resolver(container: Container) -> Callable[[str], Any]:
     def resolver(name: str) -> Any:
-        return resolve(type_=name, container=container)
+        return resolve_by_name(
+            name=name, container=container, provider_types=DEFAULT_RESOLVABLE_PROVIDER_TYPES
+        )
 
     return resolver
 
