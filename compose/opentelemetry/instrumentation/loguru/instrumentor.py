@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Collection
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import wrapt
 from loguru import logger
@@ -54,8 +54,8 @@ def create_configure_wrapper(
     def wrapped_configure(
         func: Callable[..., list[int]],
         instance: Logger,
-        args: tuple,
-        kwargs: dict,
+        args: tuple[Any],
+        kwargs: dict[str, Any],
     ) -> list[int]:
         original_patcher = kwargs.get("patcher")
         setattr(instance, ORIGINAL_PATCHER_ATTR, original_patcher)
