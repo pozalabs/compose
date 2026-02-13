@@ -268,7 +268,7 @@ def setup_indexes(*databases: Database) -> None:
     for subclass in descendants_of(MongoRepository):
         collection_name = subclass.__collection_name__
         indexes = subclass.__indexes__
-        if not collection_name or not indexes:
+        if not collection_name or indexes is None:
             continue
         collected = index_map.setdefault(collection_name, [])
         collected_documents = [idx.document for idx in collected]
