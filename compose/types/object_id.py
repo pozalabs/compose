@@ -30,5 +30,5 @@ class PyObjectId(bson.ObjectId):
     @classmethod
     def _validate(cls, v: bson.ObjectId | bytes) -> bson.ObjectId:
         if not bson.ObjectId.is_valid(v):
-            raise ValueError("Invalid object id")
+            raise ValueError(f"Invalid ObjectId: {v!r}")
         return bson.ObjectId(v)
