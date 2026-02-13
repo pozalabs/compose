@@ -179,5 +179,5 @@ def test_cannot_resolve_without_name_from_multiple_candidates():
 
 
 def test_cannot_resolve_with_mismatched_name():
-    with pytest.raises(ValueError, match="Cannot find provider named"):
+    with pytest.raises(ValueError, match="No provider named"):
         resolve(RepositoryA, ApplicationContainer, name="repository_b1")

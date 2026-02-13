@@ -124,7 +124,7 @@ def resolve[T](
     candidates = _collect_providers_by_type(type_, container, tuple(provider_types))
 
     if not candidates:
-        raise ValueError(f"Cannot find {type_.__name__} from given container")
+        raise ValueError(f"No provider found for {type_.__name__} in {container}")
 
     if len(candidates) == 1:
         return candidates[0][1]  # type: ignore[return-value]
@@ -140,9 +140,8 @@ def resolve[T](
         if candidate_name == name:
             return provider  # type: ignore[return-value]
 
-    raise ValueError(
-        f"Cannot find provider named '{name}' for {type_.__name__} from given container"
-    )
+    candidate_names = [n for n, _ in candidates]
+    raise ValueError(f"No provider named {name} for {type_.__name__}. Available: {candidate_names}")
 
 
 def provide[T](
