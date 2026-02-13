@@ -9,7 +9,7 @@ from compose.container import BaseModel
 class GunicornSettings(BaseModel):
     wsgi_app: str
     bind: str = "0.0.0.0:80"
-    workers: int = Field(default_factory=lambda: os.cpu_count() + 1)
+    workers: int = Field(default_factory=lambda: (os.cpu_count() or 1) + 1)
     worker_class: str = "uvicorn.UvicornWorker"
     threads: int = 2
     timeout: int = 120
