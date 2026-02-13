@@ -20,6 +20,11 @@ class GunicornSettings(BaseModel):
 def export_settings(
     globals_: dict[str, Any],
     settings: GunicornSettings,
-    **kwargs,
+    *,
+    env: str | None = None,
+    overrides: dict[str, dict[str, Any]] | None = None,
+    **kwargs: Any,
 ) -> None:
+    if env is not None and overrides and env in overrides:
+        settings = settings.model_copy(update=overrides[env])
     globals_ |= settings.model_dump(exclude_none=True) | kwargs
