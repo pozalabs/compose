@@ -3,17 +3,16 @@ from typing import Self
 
 from dependency_injector import containers
 
-from .wiring import Wirer
-
 
 class DeclarativeContainer(containers.DeclarativeContainer):
     @classmethod
     def wired(
         cls,
-        wirer: Wirer,
+        packages: Iterable[str] = (),
         modules: Iterable[str] | None = None,
         from_package: str | None = None,
     ) -> Self:
         container = cls()
-        wirer(container, modules=modules, from_package=from_package)
+        container.check_dependencies()
+        container.wire(modules=modules, packages=packages, from_package=from_package)
         return container

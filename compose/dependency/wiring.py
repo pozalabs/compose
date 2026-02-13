@@ -12,27 +12,6 @@ type Container = type[containers.Container] | containers.Container
 DEFAULT_RESOLVABLE_PROVIDER_TYPES = (providers.Factory, providers.Singleton)
 
 
-class Wirer(Protocol):
-    def __call__(
-        self,
-        container: containers.Container,
-        modules: Iterable[str] | None = None,
-        from_package: str | None = None,
-    ) -> None: ...
-
-
-def create_wirer(packages: Iterable[str]) -> Wirer:
-    def wire_container(
-        container: containers.Container,
-        modules: Iterable[str] | None = None,
-        from_package: str | None = None,
-    ) -> None:
-        container.check_dependencies()
-        container.wire(modules=modules, packages=packages, from_package=from_package)
-
-    return wire_container
-
-
 def resolve_by_name_from_container_provider(
     name: str,
     container: providers.Container,
