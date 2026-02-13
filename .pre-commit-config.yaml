@@ -1,14 +1,14 @@
 default_language_version:
-  python: python3.12
+  python: python3.13
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.0
+    rev: v0.15.1
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.6.6
+    rev: 0.10.2
     hooks:
       - id: uv-lock
   - repo: local
