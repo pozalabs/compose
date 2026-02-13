@@ -64,7 +64,8 @@ def test_inject_trace_context(
             ctx = span.get_span_context()
 
             logger.info("Hello")
-            extra = caplog.records[0].extra  # type: ignore[reportAttributeAccessIssue]
+            extra = caplog.records[0].extra  # type: ignore[missing-attribute]
+
             assert extra == {
                 "otel_service_name": "unknown_service",
                 "otel_span_id": trace.format_span_id(ctx.span_id),
@@ -79,7 +80,8 @@ def test_inject_invalid_trace_context_outside_span(
 ):
     with caplog.at_level(logging.INFO):
         logger.info("Hello")
-        extra = caplog.records[0].extra  # type: ignore[reportAttributeAccessIssue]
+        extra = caplog.records[0].extra  # type: ignore[missing-attribute]
+
         assert extra["otel_trace_id"] == str(trace.INVALID_TRACE_ID)
         assert extra["otel_span_id"] == str(trace.INVALID_SPAN_ID)
         assert extra["otel_trace_sampled"] is False
@@ -94,7 +96,7 @@ def test_uninstrument(
     with tracer.start_as_current_span("span1"):
         with caplog.at_level(logging.INFO):
             logger.info("Hello")
-            assert not caplog.records[0].extra  # type: ignore[reportAttributeAccessIssue]
+            assert not caplog.records[0].extra  # type: ignore[missing-attribute]
 
 
 def test_preserve_user_patcher_after_uninstrument(
@@ -115,7 +117,8 @@ def test_preserve_user_patcher_after_uninstrument(
 
     with caplog.at_level(logging.INFO):
         logger.info("Hello")
-        assert caplog.records[0].extra  # type: ignore[reportAttributeAccessIssue] == marker
+        assert caplog.records[0].extra == marker  # type: ignore[missing-attribute]
+
     logger.configure(patcher=lambda r: None)
 
 
@@ -137,7 +140,8 @@ def test_chain_user_patcher_with_trace_injection(
         with caplog.at_level(logging.INFO):
             ctx = span.get_span_context()
             logger.info("Hello")
-            extra = caplog.records[0].extra  # type: ignore[reportAttributeAccessIssue]
+            extra = caplog.records[0].extra  # type: ignore[missing-attribute]
+
             assert extra["custom"] == "value"
             assert extra["otel_trace_id"] == trace.format_trace_id(ctx.trace_id)
 

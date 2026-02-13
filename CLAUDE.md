@@ -29,10 +29,10 @@
 ## 타입 검사
 
 ```bash
-uv run pyright
+uv run pyrefly check
 ```
 
-- 설정: `pyproject.toml`의 `[tool.pyright]` 섹션
+- 설정: `pyproject.toml`의 `[tool.pyrefly]` 섹션
 
 ## 테스트
 
