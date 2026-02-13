@@ -54,8 +54,8 @@ def create_configure_wrapper(
     def wrapped_configure(
         func: Callable[..., list[int]],
         instance: Logger,
-        *args,
-        **kwargs,
+        args: tuple,
+        kwargs: dict,
     ) -> list[int]:
         original_patcher = kwargs.get("patcher")
         setattr(instance, ORIGINAL_PATCHER_ATTR, original_patcher)
@@ -103,3 +103,5 @@ class LoguruInstrumentor(BaseInstrumentor):
         original_patcher = getattr(logger, ORIGINAL_PATCHER_ATTR, None)
         unwrap(logger, "configure")
         logger.configure(patcher=original_patcher or _default_record_patcher)
+        if hasattr(logger, ORIGINAL_PATCHER_ATTR):
+            delattr(logger, ORIGINAL_PATCHER_ATTR)
