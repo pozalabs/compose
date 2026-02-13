@@ -8,14 +8,22 @@ class SampleSettings(GunicornSettings):
     timeout: int = 60
 
 
+DEFAULT_EXPORTS = {
+    "wsgi_app": "test.app:app",
+    "bind": "0.0.0.0:80",
+    "workers": 1,
+    "worker_class": "uvicorn.UvicornWorker",
+    "threads": 2,
+    "timeout": 60,
+}
+
+
 def test_export_settings():
     globals_ = {}
 
     export_settings(globals_, SampleSettings())
 
-    assert globals_["wsgi_app"] == "test.app:app"
-    assert globals_["workers"] == 1
-    assert globals_["timeout"] == 60
+    assert globals_ == DEFAULT_EXPORTS
 
 
 def test_export_with_kwargs_override():
@@ -23,8 +31,7 @@ def test_export_with_kwargs_override():
 
     export_settings(globals_, SampleSettings(), accesslog="-")
 
-    assert globals_["accesslog"] == "-"
-    assert globals_["wsgi_app"] == "test.app:app"
+    assert globals_ == {**DEFAULT_EXPORTS, "accesslog": "-"}
 
 
 def test_export_with_env_override():
@@ -37,8 +44,7 @@ def test_export_with_env_override():
         overrides={"prd": {"workers": 3}},
     )
 
-    assert globals_["workers"] == 3
-    assert globals_["timeout"] == 60
+    assert globals_ == {**DEFAULT_EXPORTS, "workers": 3}
 
 
 def test_export_with_env_not_in_overrides_use_default():
@@ -51,7 +57,7 @@ def test_export_with_env_not_in_overrides_use_default():
         overrides={"prd": {"workers": 3}},
     )
 
-    assert globals_["workers"] == 1
+    assert globals_ == DEFAULT_EXPORTS
 
 
 def test_export_with_env_none_ignore_overrides():
@@ -64,7 +70,7 @@ def test_export_with_env_none_ignore_overrides():
         overrides={"prd": {"workers": 3}},
     )
 
-    assert globals_["workers"] == 1
+    assert globals_ == DEFAULT_EXPORTS
 
 
 def test_export_with_env_and_kwargs():
@@ -78,5 +84,4 @@ def test_export_with_env_and_kwargs():
         accesslog="-",
     )
 
-    assert globals_["workers"] == 3
-    assert globals_["accesslog"] == "-"
+    assert globals_ == {**DEFAULT_EXPORTS, "workers": 3, "accesslog": "-"}
