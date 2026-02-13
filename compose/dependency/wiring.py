@@ -130,9 +130,10 @@ def resolve[T](
         return candidates[0][1]  # type: ignore[return-value]
 
     if name is None:
+        candidate_names = [n for n, _ in candidates]
         raise ValueError(
-            f"Cannot resolve {type_.__name__} since there are multiple candidates. "
-            f"You must specify `name` argument to resolve dependency"
+            f"Multiple providers found for {type_.__name__}: {candidate_names}. "
+            f"Specify `name` to select one"
         )
 
     for candidate_name, provider in candidates:
