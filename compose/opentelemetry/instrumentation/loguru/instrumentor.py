@@ -110,10 +110,5 @@ class LoguruInstrumentor(BaseInstrumentor):
 
     def _uninstrument(self, **kwargs) -> None:
         original_patcher = getattr(logger, ORIGINAL_PATCHER_ATTR, None)
-        has_original_patcher = original_patcher is not None
-        if has_original_patcher:
-            logger.configure(patcher=original_patcher)
-
         unwrap(logger, "configure")
-        if not has_original_patcher:
-            logger.configure(patcher=default_record_patcher)
+        logger.configure(patcher=original_patcher or default_record_patcher)
