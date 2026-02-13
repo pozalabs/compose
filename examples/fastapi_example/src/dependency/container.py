@@ -25,5 +25,4 @@ class ApplicationContainer(compose.dependency.DeclarativeContainer):
     user = providers.Container(UserContainer, database=database)
 
 
-wirer = compose.dependency.create_wirer(packages=PACKAGES)
 provide = compose.dependency.create_provider(ApplicationContainer)

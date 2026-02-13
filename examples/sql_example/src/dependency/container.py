@@ -17,5 +17,4 @@ class ApplicationContainer(compose.dependency.DeclarativeContainer):
     user = providers.Container(UserContainer, session_factory=session_factory)
 
 
-wirer = compose.dependency.create_wirer(packages=PACKAGES)
 provide = compose.dependency.create_provider(ApplicationContainer)
