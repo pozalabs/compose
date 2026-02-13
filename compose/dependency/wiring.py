@@ -93,6 +93,25 @@ class ConflictResolution(str, enum.Enum):
     ERROR = "error"
 
 
+def _collect_providers_by_type(
+    type_: type,
+    container: Container | providers.Container,
+    provider_types: tuple[type[providers.Provider], ...],
+) -> list[tuple[str, providers.Provider]]:
+    candidates: list[tuple[str, providers.Provider]] = []
+    for provider_name, provider in container.providers.items():  # type: ignore[union-attr]
+        if isinstance(provider, providers.Container):
+            candidates.extend(_collect_providers_by_type(type_, provider, provider_types))
+        elif isinstance(provider, provider_types):
+            provider_cls = provider.cls  # type: ignore[union-attr]
+            if not (inspect.isclass(provider_cls) or inspect.ismethod(provider_cls)):
+                continue
+            cls = provider_cls.__self__ if inspect.ismethod(provider_cls) else provider_cls
+            if cls.__name__ == type_.__name__:  # type: ignore[union-attr]
+                candidates.append((provider_name, provider))
+    return candidates
+
+
 def resolve[T](
     type_: type[T],
     container: Container,
@@ -100,7 +119,7 @@ def resolve[T](
     *,
     name: str | None = None,
     conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
-) -> providers.Provider:
+) -> providers.Provider[T]:
     """
     의존성 전체 등록 경로를 참조하지 않고 의존성을 해결합니다. 다른 패키지의 의존성을 참조하는 경우
     의존 대상 선언 경로에 깊게 의존하는 것을 방지합니다. `container_cls`는 최상위 컨테이너일수도,
@@ -109,15 +128,7 @@ def resolve[T](
     if not inspect.isclass(type_):
         raise ValueError("Only class can be resolved")
 
-    candidates = []
-    for provider in container.traverse([*provider_types]):  # type: ignore[no-matching-overload]
-        provider_cls = provider.cls  # type: ignore[missing-attribute]
-        if not (inspect.isclass(provider_cls) or inspect.ismethod(provider_cls)):
-            continue
-
-        cls = provider_cls.__self__ if inspect.ismethod(provider_cls) else provider_cls
-        if cls.__name__ == type_.__name__:  # type: ignore[missing-attribute]
-            candidates.append(provider)
+    candidates = _collect_providers_by_type(type_, container, tuple(provider_types))
 
     if not candidates:
         raise ValueError(f"Cannot find {type_.__name__} from given container")
@@ -129,12 +140,18 @@ def resolve[T](
         )
 
     if len(candidates) == 1:
-        return candidates[0]
+        return candidates[0][1]  # type: ignore[return-value]
 
     if name is None and conflict_resolution == ConflictResolution.FIRST:
-        return candidates[0]
+        return candidates[0][1]  # type: ignore[return-value]
 
-    return resolve_by_name(name=name, container=container, provider_types=provider_types)  # type: ignore
+    for candidate_name, provider in candidates:
+        if candidate_name == name:
+            return provider  # type: ignore[return-value]
+
+    raise ValueError(
+        f"Cannot find provider named '{name}' for {type_.__name__} from given container"
+    )
 
 
 def provide[T](

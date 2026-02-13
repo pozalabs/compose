@@ -178,3 +178,8 @@ def test_cannot_resolve(type_: type[Any], container_cls: type[containers.Contain
 def test_cannot_resolve_without_name_from_multiple_candidates():
     with pytest.raises(ValueError):
         resolve(RepositoryA, ApplicationContainer, conflict_resolution=ConflictResolution.ERROR)
+
+
+def test_cannot_resolve_with_mismatched_name():
+    with pytest.raises(ValueError, match="Cannot find provider named"):
+        resolve(RepositoryA, ApplicationContainer, name="repository_b1")
