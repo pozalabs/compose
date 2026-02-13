@@ -33,7 +33,7 @@ def get_parameters_from_ssm(
 
     result = {}
     has_next = True
-    next_token = None
+    next_token: str | None = None
     while has_next:
         params = {
             "Path": prefix,
@@ -60,7 +60,7 @@ class AWSParameterStoreSettingsSource(PydanticBaseSettingsSource):
         settings_cls: type[PydanticBaseSettings],
         ssm_client: mypy_boto3_ssm.SSMClient,
         prefix: str,
-        preprocessors: dict[str, Callable[[str], str]] = None,
+        preprocessors: dict[str, Callable[[str], str]] | None = None,
     ):
         super().__init__(settings_cls=settings_cls)
 
@@ -110,7 +110,7 @@ def create_base_settings(
         @classmethod
         def settings_customise_sources(
             cls,
-            settings_cls: type[BaseSettings],
+            settings_cls: type[PydanticBaseSettings],
             init_settings: PydanticBaseSettingsSource,
             env_settings: PydanticBaseSettingsSource,
             dotenv_settings: PydanticBaseSettingsSource,
