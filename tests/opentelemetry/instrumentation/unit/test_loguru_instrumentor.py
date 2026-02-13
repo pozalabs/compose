@@ -5,15 +5,17 @@ import pytest
 from _pytest.logging import LogCaptureFixture
 from loguru import logger
 from opentelemetry import trace
-from opentelemetry.test.test_base import TestBase
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+from opentelemetry.test.globals_test import reset_trace_globals
 
-import compose
+from compose.opentelemetry import LoguruInstrumentor
 
 
 @pytest.fixture
 def caplog(caplog: LogCaptureFixture) -> Generator[LogCaptureFixture, None, None]:
     """
-
     Reference:
         https://loguru.readthedocs.io/en/stable/resources/migration.html#replacing-caplog-fixture-from-pytest-library
     """
@@ -29,99 +31,119 @@ def caplog(caplog: LogCaptureFixture) -> Generator[LogCaptureFixture, None, None
     logger.remove(handler_id)
 
 
-class TestLoguruInstrumentor(TestBase):
-    @pytest.fixture(autouse=True)
-    def inject_fixtures(self, caplog: LogCaptureFixture):
-        self.caplog = caplog
+@pytest.fixture
+def tracer_provider() -> Generator[TracerProvider, None, None]:
+    provider = TracerProvider()
+    provider.add_span_processor(SimpleSpanProcessor(InMemorySpanExporter()))
+    reset_trace_globals()
+    trace.set_tracer_provider(provider)
+    yield provider
+    reset_trace_globals()
 
-    def setUp(self):
-        super().setUp()
-        self.instrumentor = compose.opentelemetry.LoguruInstrumentor()
-        self.instrumentor.instrument()
-        self.tracer = trace.get_tracer(__name__)
 
-    def tearDown(self):
-        super().tearDown()
-        self.instrumentor.uninstrument()
+@pytest.fixture
+def instrumentor(tracer_provider: TracerProvider) -> Generator[LoguruInstrumentor, None, None]:
+    inst = LoguruInstrumentor()
+    inst.instrument(tracer_provider=tracer_provider)
+    yield inst
+    inst.uninstrument()
 
-    def test_trace_context_injection(self):
-        with self.tracer.start_as_current_span("span1") as span:
-            with self.caplog.at_level(logging.INFO):
-                ctx = span.get_span_context()
 
-                logger.info("Hello")
-                record = self.caplog.records[0]
-                extra = record.extra
+@pytest.fixture
+def tracer() -> trace.Tracer:
+    return trace.get_tracer(__name__)
 
-                expected_trace_context = {
-                    "otel_service_name": "unknown_service",
-                    "otel_span_id": trace.format_span_id(ctx.span_id),
-                    "otel_trace_id": trace.format_trace_id(ctx.trace_id),
-                    "otel_trace_sampled": ctx.trace_flags.sampled,
-                }
 
-                assert extra == expected_trace_context
+def test_inject_trace_context(
+    instrumentor: LoguruInstrumentor,
+    tracer: trace.Tracer,
+    caplog: LogCaptureFixture,
+):
+    with tracer.start_as_current_span("span1") as span:
+        with caplog.at_level(logging.INFO):
+            ctx = span.get_span_context()
 
-    def test_inject_invalid_trace_context_outside_span(self):
-        with self.caplog.at_level(logging.INFO):
             logger.info("Hello")
-            record = self.caplog.records[0]
-            extra = record.extra
+            extra = caplog.records[0].extra
 
-            assert extra["otel_trace_id"] == str(trace.INVALID_TRACE_ID)
-            assert extra["otel_span_id"] == str(trace.INVALID_SPAN_ID)
-            assert extra["otel_trace_sampled"] is False
+            assert extra == {
+                "otel_service_name": "unknown_service",
+                "otel_span_id": trace.format_span_id(ctx.span_id),
+                "otel_trace_id": trace.format_trace_id(ctx.trace_id),
+                "otel_trace_sampled": ctx.trace_flags.sampled,
+            }
 
-    def test_uninstrument(self):
-        self.instrumentor.uninstrument()
-        with self.tracer.start_as_current_span("span1"):
-            with self.caplog.at_level(logging.INFO):
-                logger.info("Hello")
 
-                record = self.caplog.records[0]
-                extra = record.extra
+def test_inject_invalid_trace_context_outside_span(
+    instrumentor: LoguruInstrumentor,
+    caplog: LogCaptureFixture,
+):
+    with caplog.at_level(logging.INFO):
+        logger.info("Hello")
+        extra = caplog.records[0].extra
 
-                assert not extra
+        assert extra["otel_trace_id"] == str(trace.INVALID_TRACE_ID)
+        assert extra["otel_span_id"] == str(trace.INVALID_SPAN_ID)
+        assert extra["otel_trace_sampled"] is False
 
-    def test_preserve_user_patcher_after_uninstrument(self):
-        self.instrumentor.uninstrument()
 
-        marker = {"patched": True}
-
-        def user_patcher(record):
-            record["extra"].update(marker)
-
-        logger.configure(patcher=user_patcher)
-        self.instrumentor.instrument()
-        logger.configure(patcher=user_patcher)
-        self.instrumentor.uninstrument()
-
-        with self.caplog.at_level(logging.INFO):
+def test_uninstrument(
+    instrumentor: LoguruInstrumentor,
+    tracer: trace.Tracer,
+    caplog: LogCaptureFixture,
+):
+    instrumentor.uninstrument()
+    with tracer.start_as_current_span("span1"):
+        with caplog.at_level(logging.INFO):
             logger.info("Hello")
-            record = self.caplog.records[0]
+            assert not caplog.records[0].extra
 
-            assert record.extra == marker
 
-        logger.configure(patcher=lambda r: None)
+def test_preserve_user_patcher_after_uninstrument(
+    tracer_provider: TracerProvider,
+    caplog: LogCaptureFixture,
+):
+    marker = {"patched": True}
 
-    def test_chain_user_patcher_with_trace_injection(self):
-        self.instrumentor.uninstrument()
+    def user_patcher(record):
+        record["extra"].update(marker)
 
-        def user_patcher(record):
-            record["extra"]["custom"] = "value"
+    logger.configure(patcher=user_patcher)
 
-        logger.configure(patcher=user_patcher)
-        self.instrumentor.instrument()
-        logger.configure(patcher=user_patcher)
+    instrumentor = LoguruInstrumentor()
+    instrumentor.instrument(tracer_provider=tracer_provider)
+    logger.configure(patcher=user_patcher)
+    instrumentor.uninstrument()
 
-        with self.tracer.start_as_current_span("span1") as span:
-            with self.caplog.at_level(logging.INFO):
-                ctx = span.get_span_context()
-                logger.info("Hello")
-                record = self.caplog.records[0]
-                extra = record.extra
+    with caplog.at_level(logging.INFO):
+        logger.info("Hello")
+        assert caplog.records[0].extra == marker
 
-                assert extra["custom"] == "value"
-                assert extra["otel_trace_id"] == trace.format_trace_id(ctx.trace_id)
+    logger.configure(patcher=lambda r: None)
 
-        logger.configure(patcher=lambda r: None)
+
+def test_chain_user_patcher_with_trace_injection(
+    tracer_provider: TracerProvider,
+    tracer: trace.Tracer,
+    caplog: LogCaptureFixture,
+):
+    def user_patcher(record):
+        record["extra"]["custom"] = "value"
+
+    logger.configure(patcher=user_patcher)
+
+    instrumentor = LoguruInstrumentor()
+    instrumentor.instrument(tracer_provider=tracer_provider)
+    logger.configure(patcher=user_patcher)
+
+    with tracer.start_as_current_span("span1") as span:
+        with caplog.at_level(logging.INFO):
+            ctx = span.get_span_context()
+            logger.info("Hello")
+            extra = caplog.records[0].extra
+
+            assert extra["custom"] == "value"
+            assert extra["otel_trace_id"] == trace.format_trace_id(ctx.trace_id)
+
+    instrumentor.uninstrument()
+    logger.configure(patcher=lambda r: None)
