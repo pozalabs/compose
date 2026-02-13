@@ -2,7 +2,7 @@ import enum
 from collections.abc import Callable
 from typing import Any
 
-from fastapi import Depends, FastAPI, Response
+from fastapi import FastAPI, Response
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.responses import HTMLResponse
 
@@ -23,7 +23,7 @@ class OpenAPIDoc:
     def add_to_app(self, app: FastAPI) -> None:
         raise NotImplementedError
 
-    def get_endpoint(self, app: FastAPI) -> Callable[[], Response]:
+    def get_endpoint(self, app: FastAPI) -> Callable[[], Any]:
         raise NotImplementedError
 
 
@@ -31,7 +31,7 @@ class SwaggerUIHTML(OpenAPIDoc):
     def __init__(
         self,
         path: str = "/docs",
-        dependencies: list[Depends] | None = None,
+        dependencies: list[Any] | None = None,
         openapi_url: str = "/openapi.json",
         **kwargs: Any,
     ):
@@ -50,7 +50,7 @@ class SwaggerUIHTML(OpenAPIDoc):
 
     def get_endpoint(self, app: FastAPI) -> Callable[[], HTMLResponse]:
         def endpoint():
-            default_kwargs = {
+            default_kwargs: dict[str, Any] = {
                 "openapi_url": app.root_path + self.openapi_url,
                 "title": f"{app.title} - Swagger UI",
                 "oauth2_redirect_url": (
@@ -69,7 +69,7 @@ class RedocHTML(OpenAPIDoc):
     def __init__(
         self,
         path: str = "/redoc",
-        dependencies: list[Depends] | None = None,
+        dependencies: list[Any] | None = None,
         openapi_url: str = "/openapi.json",
         **kwargs: Any,
     ):
@@ -88,7 +88,7 @@ class RedocHTML(OpenAPIDoc):
 
     def get_endpoint(self, app: FastAPI) -> Callable[[], Response]:
         def endpoint():
-            default_kwargs = {
+            default_kwargs: dict[str, Any] = {
                 "openapi_url": app.root_path + self.openapi_url,
                 "title": f"{app.title} - ReDoc",
             }
@@ -107,7 +107,7 @@ class OpenAPISchema(OpenAPIDoc):
             include_in_schema=False,
         )(self.get_endpoint(app))
 
-    def get_endpoint(self, app: FastAPI, **kwargs: Any) -> Callable[[], dict[str, Any]]:
+    def get_endpoint(self, app: FastAPI) -> Callable[[], dict[str, Any]]:
         def endpoint() -> dict[str, Any]:
             return app.openapi()
 
