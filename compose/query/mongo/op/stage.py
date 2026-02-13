@@ -48,7 +48,7 @@ class Sort(Stage[DictExpression]):
 
     def expression(self) -> DictExpression:
         if not (merged := Merge.dict(*self.criteria).expression()):
-            raise ValueError("Expression cannot be empty")
+            raise ValueError("Sort requires at least one SortBy criterion")
         return {"$sort": merged}
 
 

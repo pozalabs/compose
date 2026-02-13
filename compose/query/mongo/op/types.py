@@ -14,7 +14,9 @@ Id = "$_id"
 class MongoKeyword(str):
     def __new__(cls, v: str):
         if v != _camelize(v):
-            raise ValueError(f"Cannot interpret {v} as valid mongo keyword")
+            raise ValueError(
+                f"Cannot interpret {v} as valid mongo keyword. Expected camelCase (e.g., localField)"
+            )
 
         return super().__new__(cls, v)
 
