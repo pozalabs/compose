@@ -83,7 +83,7 @@ def test_resolve(
 ):
     resolved = resolve(type_=type_, container=container_cls)
 
-    assert isinstance(resolved.cls(), expected)
+    assert isinstance(resolved(), expected)
 
 
 @pytest.mark.parametrize(
@@ -108,7 +108,7 @@ def test_resolve_by_name(
         name=name, container=container_cls, provider_types=DEFAULT_RESOLVABLE_PROVIDER_TYPES
     )
 
-    assert isinstance(resolved.cls(), expected)
+    assert isinstance(resolved(), expected)
 
 
 @pytest.mark.parametrize(
