@@ -1,6 +1,6 @@
 import inspect
 from collections.abc import Callable
-from typing import Annotated, Any
+from typing import Annotated, Any, Protocol
 
 from dependency_injector.wiring import inject
 from fastapi import Depends
@@ -8,7 +8,13 @@ from fastapi import Depends
 from compose.dependency.wiring import Provider
 
 
-def auto_wired[F: Callable[..., Any]](
+class HasSignature(Protocol):
+    __signature__: inspect.Signature
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any: ...
+
+
+def auto_wired[F: HasSignature](
     provider: Provider,
     *,
     with_injection: bool = False,
@@ -51,7 +57,7 @@ class AutoWired:
         self.provider = provider
         self.injectors = injectors or {}
 
-    def __call__[F: Callable[..., Any]](self) -> Callable[[F], F]:
+    def __call__[F: HasSignature](self) -> Callable[[F], F]:
         def wrapper(f: F) -> F:
             signature = inspect.signature(f)
 
