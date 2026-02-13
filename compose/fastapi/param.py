@@ -92,7 +92,7 @@ def create_model_dependency_resolver[T: BaseModel](
         t: model_type,
         resolved_dependencies: Annotated[dependencies_model, Depends(dependencies_model)],
     ) -> T:
-        return t.copy(update=resolved_dependencies.dict(), deep=True)
+        return t.model_copy(update=resolved_dependencies.dict(), deep=True)
 
     return wrapper
 
