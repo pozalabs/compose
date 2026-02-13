@@ -62,6 +62,16 @@ class TestLoguruInstrumentor(TestBase):
 
                 assert extra == expected_trace_context
 
+    def test_inject_invalid_trace_context_outside_span(self):
+        with self.caplog.at_level(logging.INFO):
+            logger.info("Hello")
+            record = self.caplog.records[0]
+            extra = record.extra
+
+            assert extra["otel_trace_id"] == str(trace.INVALID_TRACE_ID)
+            assert extra["otel_span_id"] == str(trace.INVALID_SPAN_ID)
+            assert extra["otel_trace_sampled"] is False
+
     def test_uninstrument(self):
         self.instrumentor.uninstrument()
         with self.tracer.start_as_current_span("span1"):
@@ -72,3 +82,46 @@ class TestLoguruInstrumentor(TestBase):
                 extra = record.extra
 
                 assert not extra
+
+    def test_preserve_user_patcher_after_uninstrument(self):
+        self.instrumentor.uninstrument()
+
+        marker = {"patched": True}
+
+        def user_patcher(record):
+            record["extra"].update(marker)
+
+        logger.configure(patcher=user_patcher)
+        self.instrumentor.instrument()
+        logger.configure(patcher=user_patcher)
+        self.instrumentor.uninstrument()
+
+        with self.caplog.at_level(logging.INFO):
+            logger.info("Hello")
+            record = self.caplog.records[0]
+
+            assert record.extra == marker
+
+        logger.configure(patcher=lambda r: None)
+
+    def test_chain_user_patcher_with_trace_injection(self):
+        self.instrumentor.uninstrument()
+
+        def user_patcher(record):
+            record["extra"]["custom"] = "value"
+
+        logger.configure(patcher=user_patcher)
+        self.instrumentor.instrument()
+        logger.configure(patcher=user_patcher)
+
+        with self.tracer.start_as_current_span("span1") as span:
+            with self.caplog.at_level(logging.INFO):
+                ctx = span.get_span_context()
+                logger.info("Hello")
+                record = self.caplog.records[0]
+                extra = record.extra
+
+                assert extra["custom"] == "value"
+                assert extra["otel_trace_id"] == trace.format_trace_id(ctx.trace_id)
+
+        logger.configure(patcher=lambda r: None)
