@@ -25,6 +25,9 @@ def export_settings(
     overrides: dict[str, dict[str, Any]] | None = None,
     **kwargs: Any,
 ) -> None:
-    if env is not None and overrides and env in overrides:
-        settings = settings.model_copy(update=overrides[env])
+    overrides = overrides or {}
+
+    if env is not None and (update := overrides.get(env, {})):
+        settings = settings.model_copy(update=update)
+
     globals_ |= settings.model_dump(exclude_none=True) | kwargs
