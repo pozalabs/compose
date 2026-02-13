@@ -8,6 +8,7 @@ from .wiring import (
     get_wiring_packages,
     provide,
     resolve,
+    resolve_by_name,
     resolve_by_object_name,
 )
 
@@ -21,5 +22,6 @@ __all__ = [
     "get_wiring_packages",
     "provide",
     "resolve",
+    "resolve_by_name",
     "resolve_by_object_name",
 ]

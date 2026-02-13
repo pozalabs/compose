@@ -5,11 +5,15 @@ from typing import Any
 import pytest
 from dependency_injector import containers, providers
 
-from compose.dependency import ConflictResolution, resolve
+from compose.dependency import (
+    DEFAULT_RESOLVABLE_PROVIDER_TYPES,
+    ConflictResolution,
+    resolve,
+    resolve_by_name,
+)
 
 
-class Repository:
-    ...
+class Repository: ...
 
 
 class RepositoryWithFactoryMethod:
@@ -36,8 +40,7 @@ class RepositoryB:
         self.name = name
 
 
-class NestedRepository:
-    ...
+class NestedRepository: ...
 
 
 class NestedContainer(containers.DeclarativeContainer):
@@ -64,9 +67,6 @@ class ApplicationContainer(containers.DeclarativeContainer):
         (NestedRepository, ApplicationContainer.nested, NestedRepository),
         (RepositoryWithFactoryMethod, ApplicationContainer, RepositoryWithFactoryMethod),
         (Repository, ApplicationContainer, Repository),
-        ("repository", ApplicationContainer, Repository),
-        ("repository", ApplicationContainer.nested, NestedRepository),
-        ("repository_with_factory_method", ApplicationContainer, RepositoryWithFactoryMethod),
     ],
     ids=(
         "최상위 컨테이너에서 최상위 의존성 해결",
@@ -74,9 +74,6 @@ class ApplicationContainer(containers.DeclarativeContainer):
         "중첩 컨테이너에서 해당 컨테이너에 선언된 의존성 해결",
         "팩토리 메서드로 등록한 의존성 해결",
         "Factory 외의 Provider 의존성 해결",
-        "의존성 등록 이름으로 의존성 해결",
-        "중첩 컨테이너에서 의존성 등록 이름으로 의존성 해결",
-        "의존성 등록 이름으로 팩토리 메서드 의존성 해결",
     ),
 )
 def test_resolve(
@@ -85,6 +82,31 @@ def test_resolve(
     expected: type[Any],
 ):
     resolved = resolve(type_=type_, container=container_cls)
+
+    assert isinstance(resolved.cls(), expected)
+
+
+@pytest.mark.parametrize(
+    "name, container_cls, expected",
+    [
+        ("repository", ApplicationContainer, Repository),
+        ("repository", ApplicationContainer.nested, NestedRepository),
+        ("repository_with_factory_method", ApplicationContainer, RepositoryWithFactoryMethod),
+    ],
+    ids=(
+        "의존성 등록 이름으로 의존성 해결",
+        "중첩 컨테이너에서 의존성 등록 이름으로 의존성 해결",
+        "의존성 등록 이름으로 팩토리 메서드 의존성 해결",
+    ),
+)
+def test_resolve_by_name(
+    name: str,
+    container_cls: type[containers.Container],
+    expected: type[Any],
+):
+    resolved = resolve_by_name(
+        name=name, container=container_cls, provider_types=DEFAULT_RESOLVABLE_PROVIDER_TYPES
+    )
 
     assert isinstance(resolved.cls(), expected)
 
@@ -130,7 +152,9 @@ def test_resolve_func_by_name(
     container_cls: type[containers.Container],
     expected: Any,
 ):
-    resolved = resolve(name, container_cls)  # type: ignore
+    resolved = resolve_by_name(
+        name=name, container=container_cls, provider_types=DEFAULT_RESOLVABLE_PROVIDER_TYPES
+    )
 
     assert resolved() == expected
 
