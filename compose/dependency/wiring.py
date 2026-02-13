@@ -93,12 +93,12 @@ def resolve_by_object_name(
     provider_types: Iterable[type[providers.Provider]],
 ) -> Any:
     candidates: list[providers.Factory] = []
-    for provider in container.traverse([*provider_types]):
-        if not inspect.isclass(provider.cls):
+    for provider in container.traverse([*provider_types]):  # type: ignore[no-matching-overload]
+        if not inspect.isclass(provider.cls):  # type: ignore[missing-attribute]
             continue
 
-        if provider.cls.__name__.split(".")[-1] == name:
-            candidates.append(provider)
+        if provider.cls.__name__.split(".")[-1] == name:  # type: ignore[missing-attribute]
+            candidates.append(provider)  # type: ignore[bad-argument-type]
 
     if not candidates:
         raise ValueError(f"Cannot find {name} from given container")
@@ -131,13 +131,13 @@ def resolve[T](
         raise ValueError("Only class can be resolved")
 
     candidates = []
-    for provider in container.traverse([*provider_types]):
-        provider_cls = provider.cls
+    for provider in container.traverse([*provider_types]):  # type: ignore[no-matching-overload]
+        provider_cls = provider.cls  # type: ignore[missing-attribute]
         if not (inspect.isclass(provider_cls) or inspect.ismethod(provider_cls)):
             continue
 
         cls = provider_cls.__self__ if inspect.ismethod(provider_cls) else provider_cls
-        if cls.__name__ == type_.__name__:
+        if cls.__name__ == type_.__name__:  # type: ignore[missing-attribute]
             candidates.append(provider)
 
     if not candidates:
@@ -155,8 +155,7 @@ def resolve[T](
     if name is None and conflict_resolution == ConflictResolution.FIRST:
         return candidates[0]
 
-    assert name is not None
-    return resolve_by_name(name=name, container=container, provider_types=provider_types)
+    return resolve_by_name(name=name, container=container, provider_types=provider_types)  # type: ignore
 
 
 def provide[T](
