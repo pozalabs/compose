@@ -1,35 +1,37 @@
 from __future__ import annotations
 
 import urllib.parse
-from typing import Any, ClassVar, Self, cast
+from typing import Any, ClassVar, cast
 
 from .primitive import Str
 
 
-class S3ContentUrl(Str):
+class _S3ObjectUrl(Str):
     base_url: ClassVar[str]
 
     def __new__(cls, v: Any):
         if getattr(cls, "base_url", None) is None:
             raise ValueError(
-                f"`base_url` must be set on {cls.__name__}. Use {cls.__name__}.with_base_url()"
+                f"`base_url` must be set on `{cls.__name__}`. "
+                f"Use `create_s3_object_url()` to create a configured type"
             )
 
-        v = urllib.parse.unquote(str(v).strip("/"))
-        if v.startswith(cls.base_url):
-            v = v[len(cls.base_url) :].lstrip("/")
+        key = _extract_key(str(v), base_url=cls.base_url)
+        encoded_path = _encode_path(key)
+        return super().__new__(cls, f"{cls.base_url}/{encoded_path}")
 
-        quoted_parts = [urllib.parse.quote(part, safe="~()*!.'") for part in v.split("/")]
-        url = f"{cls.base_url}/{'/'.join(quoted_parts)}"
-        return super().__new__(cls, url)
 
-    @classmethod
-    def with_base_url(cls, base_url: str) -> type[S3ContentUrl]:
-        return cast(
-            type[Self],
-            type(
-                cls.__name__,
-                (cls,),
-                {"base_url": base_url},
-            ),
-        )
+def create_s3_object_url(base_url: str) -> type[_S3ObjectUrl]:
+    return cast(
+        type[_S3ObjectUrl],
+        type("S3ObjectUrl", (_S3ObjectUrl,), {"base_url": base_url}),
+    )
+
+
+def _extract_key(v: str, *, base_url: str) -> str:
+    v = urllib.parse.unquote(v.strip("/"))
+    return v.removeprefix(base_url).lstrip("/")
+
+
+def _encode_path(key: str) -> str:
+    return "/".join(urllib.parse.quote(part, safe="~()*!.'") for part in key.split("/"))
