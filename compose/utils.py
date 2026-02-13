@@ -1,10 +1,10 @@
 import functools
 import os
+import sys
 import time
 import uuid
 from collections.abc import Callable, Generator
 from typing import Any, get_type_hints
-from uuid import UUID
 
 
 def descendants_of[T](cls: type[T]) -> Generator[type[T], None, None]:
@@ -40,10 +40,17 @@ def uuid4_hex() -> str:
     return uuid.uuid4().hex
 
 
-def uuid7_str() -> str:
-    timestamp_ms = int(time.time() * 1000)
-    rand = int.from_bytes(os.urandom(10))
-    value = (timestamp_ms & 0xFFFF_FFFF_FFFF) << 80 | rand
-    value = (value & ~(0xF << 76)) | (0x7 << 76)
-    value = (value & ~(0x3 << 62)) | (0x2 << 62)
-    return str(UUID(int=value))
+if sys.version_info >= (3, 14):
+
+    def uuid7_str() -> str:
+        return str(uuid.uuid7())
+
+else:
+
+    def uuid7_str() -> str:
+        timestamp_ms = int(time.time() * 1000)
+        rand = int.from_bytes(os.urandom(10))
+        value = (timestamp_ms & 0xFFFF_FFFF_FFFF) << 80 | rand
+        value = (value & ~(0xF << 76)) | (0x7 << 76)
+        value = (value & ~(0x3 << 62)) | (0x2 << 62)
+        return str(uuid.UUID(int=value))
