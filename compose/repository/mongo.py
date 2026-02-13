@@ -278,13 +278,9 @@ def setup_database_indexes(*databases: Database) -> None:
         indexes = subclass.__indexes__
         if not collection_name or not indexes:
             continue
-        if collection_name not in index_map:
-            index_map[collection_name] = list(indexes)
-        else:
-            existing_documents = [idx.document for idx in index_map[collection_name]]
-            index_map[collection_name].extend(
-                idx for idx in indexes if idx.document not in existing_documents
-            )
+        existing = index_map.setdefault(collection_name, [])
+        existing_documents = [idx.document for idx in existing]
+        existing.extend(idx for idx in indexes if idx.document not in existing_documents)
 
     for database in databases:
         collection_names = database.list_collection_names()
