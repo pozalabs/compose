@@ -3,7 +3,7 @@ from collections.abc import Iterable
 import pytest
 from dependency_injector import containers, providers
 
-from compose.dependency import ConflictResolution, provide
+from compose.dependency import provide
 from compose.dependency.wiring import create_provider
 
 
@@ -46,7 +46,6 @@ def test_provide_from_multiple_candidates[T](
         type_,
         container_cls,
         name=name,
-        conflict_resolution=ConflictResolution.ERROR,
     )
 
     assert provided.provider().__dict__ == expected.__dict__
@@ -100,7 +99,6 @@ def test_create_provider[T](
     provided = provider(
         type_,
         name=name,
-        conflict_resolution=ConflictResolution.ERROR,
     )
 
     assert provided.provider().__dict__ == expected.__dict__

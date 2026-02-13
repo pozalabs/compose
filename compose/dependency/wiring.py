@@ -1,4 +1,3 @@
-import enum
 import importlib
 import inspect
 from collections.abc import Callable, Iterable
@@ -88,11 +87,6 @@ def resolve_by_object_name(
     return candidates[0]()
 
 
-class ConflictResolution(str, enum.Enum):
-    FIRST = "first"
-    ERROR = "error"
-
-
 def _collect_providers_by_type(
     type_: type,
     container: Container | providers.Container,
@@ -118,7 +112,6 @@ def resolve[T](
     provider_types: Iterable[type[providers.Provider]] = DEFAULT_RESOLVABLE_PROVIDER_TYPES,
     *,
     name: str | None = None,
-    conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
 ) -> providers.Provider[T]:
     """
     의존성 전체 등록 경로를 참조하지 않고 의존성을 해결합니다. 다른 패키지의 의존성을 참조하는 경우
@@ -131,27 +124,24 @@ def resolve[T](
     candidates = _collect_providers_by_type(type_, container, tuple(provider_types))
 
     if not candidates:
-        raise ValueError(f"Cannot find {type_.__name__} from given container")
-
-    if len(candidates) > 1 and name is None and conflict_resolution == ConflictResolution.ERROR:
-        raise ValueError(
-            f"Cannot resolve {type_.__name__} since there are multiple candidates. "
-            f"You must specify `name` argument to resolve dependency"
-        )
+        raise ValueError(f"No provider found for {type_.__name__} in {container}")
 
     if len(candidates) == 1:
         return candidates[0][1]  # type: ignore[return-value]
 
-    if name is None and conflict_resolution == ConflictResolution.FIRST:
-        return candidates[0][1]  # type: ignore[return-value]
+    if name is None:
+        candidate_names = [n for n, _ in candidates]
+        raise ValueError(
+            f"Multiple providers found for {type_.__name__}: {candidate_names}. "
+            f"Specify `name` to select one"
+        )
 
     for candidate_name, provider in candidates:
         if candidate_name == name:
             return provider  # type: ignore[return-value]
 
-    raise ValueError(
-        f"Cannot find provider named '{name}' for {type_.__name__} from given container"
-    )
+    candidate_names = [n for n, _ in candidates]
+    raise ValueError(f"No provider named {name} for {type_.__name__}. Available: {candidate_names}")
 
 
 def provide[T](
@@ -161,7 +151,6 @@ def provide[T](
     *,
     provider_types: Iterable[type[providers.Provider]] = DEFAULT_RESOLVABLE_PROVIDER_TYPES,
     name: str | None = None,
-    conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
 ) -> Provide[T]:
     return Provide[
         resolve(
@@ -169,7 +158,6 @@ def provide[T](
             container=from_,
             provider_types=provider_types,
             name=name,
-            conflict_resolution=conflict_resolution,
         )
     ]
 
@@ -209,7 +197,6 @@ class Provider[T](Protocol):
         t: type[T],
         /,
         name: str | None = None,
-        conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
     ) -> Provide[T]: ...
 
 
@@ -221,14 +208,12 @@ def create_provider[T](
         type_: type[T],
         /,
         name: str | None = None,
-        conflict_resolution: ConflictResolution = ConflictResolution.FIRST,
     ) -> Provide[T]:
         return provide(
             type_,
             container,
             provider_types=provider_types,
             name=name,
-            conflict_resolution=conflict_resolution,
         )
 
     return provider
