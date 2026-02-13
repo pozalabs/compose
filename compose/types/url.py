@@ -11,7 +11,9 @@ class S3ContentUrl(Str):
 
     def __new__(cls, v: Any):
         if getattr(cls, "base_url", None) is None:
-            raise ValueError("`base_url` must be set")
+            raise ValueError(
+                f"`base_url` must be set on {cls.__name__}. Use {cls.__name__}.with_base_url()"
+            )
 
         v = urllib.parse.unquote(str(v).strip("/"))
         if v.startswith(cls.base_url):

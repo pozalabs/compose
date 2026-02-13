@@ -62,7 +62,7 @@ def resolve_by_name(
             if result is not None:
                 return result
 
-    raise ValueError(f"Cannot find {name} from given container")
+    raise ValueError(f"No provider named {name} in {container}")
 
 
 def resolve_by_object_name(
@@ -79,10 +79,11 @@ def resolve_by_object_name(
             candidates.append(provider)  # type: ignore[bad-argument-type]
 
     if not candidates:
-        raise ValueError(f"Cannot find {name} from given container")
+        raise ValueError(f"No object named {name} in {container}")
 
     if len(candidates) > 1:
-        raise ValueError(f"Cannot resolve {name} since there are multiple candidates")
+        candidate_names = [p.cls.__name__ for p in candidates]  # type: ignore[union-attr]
+        raise ValueError(f"Multiple objects named {name} in {container}: {candidate_names}")
 
     return candidates[0]()
 
@@ -177,7 +178,7 @@ def create_lazy_resolver(container_path: str) -> Callable[[str], Any]:
         try:
             container = importlib.import_module(module_path)
         except ImportError:
-            raise ImportError(f"Cannot not import module {module_path}")
+            raise ImportError(f"Cannot import module {module_path}")
 
         if (container_cls := getattr(container, container_name, None)) is None:
             raise ValueError(f"Cannot find container {container_name} in {module_path}")

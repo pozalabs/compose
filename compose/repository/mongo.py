@@ -271,7 +271,9 @@ class MongoRepository[T: Entity](BaseRepository):
             None,
         )
         if orig_base is None:
-            raise ValueError("No origin base found")
+            raise ValueError(
+                f"{self.__class__.__name__} must inherit MongoRepository[T] with explicit type parameter"
+            )
 
         return get_args(orig_base)[0]
 

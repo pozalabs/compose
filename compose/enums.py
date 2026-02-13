@@ -28,6 +28,8 @@ class AppEnv(enum.StrEnum):
     @classmethod
     def current(cls, env_getter: Callable[[], str | None] = default_env_getter) -> Self:
         if (env := env_getter()) is None or env not in set(enum_values(cls)):
-            raise ValueError(f"Invalid value for {cls.__name__}: {env}")
+            raise ValueError(
+                f"Invalid value for {cls.__name__}: {env}. Valid values: {enum_values(cls)}"
+            )
 
         return cls(env)

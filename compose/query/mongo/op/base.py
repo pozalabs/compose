@@ -30,7 +30,9 @@ class ComparisonOperator(Operator):
     @classmethod
     def from_(cls, **kwargs: Any) -> Self:
         if (kv := next(iter(kwargs.items()), None)) is None:
-            raise ValueError("key-value pair is required")
+            raise ValueError(
+                f"{cls.__name__}.from_() requires exactly one keyword argument (e.g., field=value)"
+            )
 
         return cls(**dict(zip(("field", "value"), kv)))
 
