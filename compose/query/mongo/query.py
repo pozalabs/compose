@@ -1,7 +1,8 @@
 import abc
 from typing import Any
 
-from ...pagination import CursorPaginationResult, OffsetPaginationResult
+from compose.pagination import CursorPaginationResult, OffsetPaginationResult
+
 from ..base import OffsetPaginationQuery, Query
 
 
