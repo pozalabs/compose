@@ -4,7 +4,7 @@ from typing import Any, Protocol, Self, get_args
 from pydantic import ConfigDict
 
 from .. import container
-from ..pagination import Pagination
+from ..pagination import CursorPaginationResult, OffsetPaginationResult
 from .extra import schema_by_field_name
 
 
@@ -24,34 +24,65 @@ class ListSchema[T](Schema):
     items: list[T]
 
     @classmethod
-    def from_pagination(
+    def from_result(
         cls,
-        pagination: Pagination,
+        result: OffsetPaginationResult,
         parser_name: str = "model_validate",
         **parser_kwargs: Any,
     ) -> Self:
-        if not pagination.items:
-            return cls(**pagination.model_dump())
+        if not result.items:
+            return cls(**result.model_dump())
 
         annotation = cls.model_fields["items"].annotation
         item_type = get_args(annotation)[0]
 
         if not issubclass(item_type, container.BaseModel):
-            data = pagination.model_dump(exclude={"extra"}) | pagination.extra
+            data = result.model_dump(exclude={"extra"}) | result.extra
             return cls(**data)
 
         if (parser := getattr(item_type, parser_name, None)) is None:
             raise AttributeError(f"{item_type.__name__} has no attribute: {parser_name}")
 
         return cls(
-            **pagination.model_dump(exclude={"items", "extra"}),
-            **pagination.extra,
-            items=[parser(item, **parser_kwargs) for item in pagination.items],
+            **result.model_dump(exclude={"items", "extra"}),
+            **result.extra,
+            items=[parser(item, **parser_kwargs) for item in result.items],
         )
 
     @classmethod
     def from_items(cls, items: list[Any]) -> Self:
         return cls(total=len(items), items=items)
+
+
+class CursorListSchema[T](Schema):
+    items: list[T]
+    next_cursor: str | None = None
+    has_next: bool = False
+
+    @classmethod
+    def from_result(
+        cls,
+        result: CursorPaginationResult,
+        parser_name: str = "model_validate",
+        **parser_kwargs: Any,
+    ) -> Self:
+        if not result.items:
+            return cls(items=[])
+
+        annotation = cls.model_fields["items"].annotation
+        item_type = get_args(annotation)[0]
+
+        if not issubclass(item_type, container.BaseModel):
+            return cls(**result.model_dump())
+
+        if (parser := getattr(item_type, parser_name, None)) is None:
+            raise AttributeError(f"{item_type.__name__} has no attribute: {parser_name}")
+
+        return cls(
+            items=[parser(item, **parser_kwargs) for item in result.items],
+            next_cursor=result.next_cursor,
+            has_next=result.has_next,
+        )
 
 
 class InvalidParam(container.BaseModel):

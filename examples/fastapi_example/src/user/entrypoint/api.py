@@ -62,8 +62,8 @@ def list_users(
 ):
     """`auto_wired` 데코레이터를 사용해 의존성 자동 주입"""
 
-    pagination = user_repository.filter(qry)
-    return compose.schema.ListSchema[schema.User].from_pagination(pagination)
+    result = user_repository.paginate(qry)
+    return compose.schema.ListSchema[schema.User].from_result(result)
 
 
 @router.post(

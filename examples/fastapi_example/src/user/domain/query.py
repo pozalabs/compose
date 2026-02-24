@@ -4,7 +4,7 @@ import compose
 from compose.query.mongo import op
 
 
-class ListUsers(compose.query.MongoFilterQuery):
+class ListUsers(compose.query.MongoOffsetPaginationQuery):
     name: str
 
     def to_query(self) -> list[dict[str, Any]]:

@@ -3,9 +3,9 @@ from typing import Any
 
 import pytest
 
-from compose.pagination import Pagination
+from compose.pagination import CursorPaginationResult, OffsetPaginationResult
 
-PaginationFactory = Callable[..., Pagination]
+PaginationFactory = Callable[..., OffsetPaginationResult]
 
 
 @pytest.fixture
@@ -14,8 +14,8 @@ def pagination_factory() -> PaginationFactory:
         num_items: int = 5,
         page: int | None = None,
         per_page: int | None = None,
-    ) -> Pagination:
-        return Pagination(
+    ) -> OffsetPaginationResult:
+        return OffsetPaginationResult(
             total=num_items,
             items=list(range(num_items)),
             page=page,
@@ -148,13 +148,19 @@ def test_next_page(
 @pytest.mark.parametrize(
     "pagination, expected",
     [
-        (Pagination(total=0, items=[]), True),
-        (Pagination(total=1, items=["item"]), False),
+        (OffsetPaginationResult(total=0, items=[]), True),
+        (OffsetPaginationResult(total=1, items=["item"]), False),
     ],
     ids=(
         "페이지네이션 목록이 비어 있으면 `True`를 리턴한다.",
         "페이지네이션 목록이 비어 있지 않으면 `False`를 리턴한다.",
     ),
 )
-def test_is_empty(pagination: Pagination, expected: bool):
+def test_is_empty(pagination: OffsetPaginationResult, expected: bool):
     assert pagination.is_empty is expected
+
+
+def test_cursor_pagination_result_empty():
+    result = CursorPaginationResult.empty()
+
+    assert result == CursorPaginationResult(items=[], next_cursor=None, has_next=False)

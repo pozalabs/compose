@@ -1,3 +1,13 @@
-from .query import MongoFilterQuery, MongoQuery
+from .query import (
+    MongoCursorPaginationQuery,
+    MongoOffsetPaginationQuery,
+    MongoPaginationQuery,
+    MongoQuery,
+)
 
-__all__ = ["MongoQuery", "MongoFilterQuery"]
+__all__ = [
+    "MongoCursorPaginationQuery",
+    "MongoOffsetPaginationQuery",
+    "MongoPaginationQuery",
+    "MongoQuery",
+]
