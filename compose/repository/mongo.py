@@ -231,7 +231,7 @@ class MongoRepository[T: Entity](BaseRepository):
     ) -> Pagination:
         query_result = self.collection.aggregate(qry.to_query(), session=session, **kwargs)
         if (unwrapped := next(query_result, None)) is None:
-            raise ValueError(f"{qry.__class__.__name__} returned nothing")
+            return Pagination.empty(page=qry.page, per_page=qry.per_page)
 
         return Pagination(
             total=(unwrapped["metadata"][0]["total"] if unwrapped["metadata"] else 0),
