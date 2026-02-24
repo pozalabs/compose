@@ -224,17 +224,6 @@ class MongoRepository[T: Entity](BaseRepository):
     ) -> None:
         self.collection.delete_one({"_id": entity_id}, session=session, **kwargs)
 
-    def execute_raw(
-        self,
-        operation: str,
-        session: ClientSession | None = None,
-        **operation_kwargs,
-    ) -> Any:
-        op = getattr(self.collection, operation, None)
-        if op is None:
-            raise ValueError(f"Unknown operation on collection: {operation}")
-        return op(session=session, **operation_kwargs)
-
     def filter(
         self, qry: MongoFilterQuery, session: ClientSession | None = None, **kwargs
     ) -> Pagination:
