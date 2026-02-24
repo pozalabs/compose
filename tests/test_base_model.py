@@ -1,5 +1,3 @@
-from collections.abc import Callable
-
 import pytest
 from pydantic import ValidationError
 
@@ -14,25 +12,11 @@ class SchemaModel(compose.schema.Schema):
     name: str
 
 
-@pytest.mark.parametrize(
-    "copy_model",
-    [
-        lambda model: model.copy(
-            update={"name": [1, 2, 3]},
-            validate=True,
-        ),
-        lambda model: model.model_copy(
-            update={"name": [1, 2, 3]},
-            validate=True,
-        ),
-    ],
-    ids=("copy", "model_copy"),
-)
-def test_validate_on_copy(copy_model: Callable[[Model], Model]):
+def test_validated_copy_raise_validation_error_for_invalid_update():
     model = Model(name="test")
 
     with pytest.raises(ValidationError):
-        copy_model(model)
+        model.validated_copy(update={"name": [1, 2, 3]})
 
 
 def test_from_model():
