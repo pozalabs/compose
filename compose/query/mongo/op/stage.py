@@ -1,8 +1,6 @@
 from collections.abc import Iterable
 from typing import Any, Self
 
-from compose.deprecation import deprecated_alias
-
 from .base import Evaluable, Merge, Operator, Stage
 from .evaulation import Expr
 from .logical import And, Nor, Or
@@ -298,7 +296,3 @@ class Sample(Stage[DictExpression]):
 
     def expression(self) -> DictExpression:
         return {"$sample": {"size": self.size}}
-
-
-MatchLookup = deprecated_alias("MatchLookup", EqualityLookup)
-Pagination = deprecated_alias("Pagination", OffsetPagination)
