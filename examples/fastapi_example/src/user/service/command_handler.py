@@ -15,4 +15,4 @@ class AddUserHandler:
         user = model.User(name=cmd.name, email=cmd.email)
         self.user_repository.add(user)
 
-        return schema.User.model_validate(user.encode())
+        return schema.User.model_validate(user.model_dump(mode="json"))

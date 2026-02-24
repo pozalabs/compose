@@ -12,7 +12,7 @@ class CommandUpdater[T: BaseModel, U]:
         self.to_field = to_field
 
     def __call__(self, cmd: T, user: U) -> T:
-        return cmd.copy(update={self.to_field: getattr(user, self.from_field)}, deep=True)
+        return cmd.model_copy(update={self.to_field: getattr(user, self.from_field)}, deep=True)
 
 
 class UserInjector[T: BaseModel, U]:

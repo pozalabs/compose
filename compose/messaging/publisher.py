@@ -15,4 +15,4 @@ class EventPublisher:
         self.message_queue.push(EventMessage(body=evt))
 
         logger.info(f"Published event: {evt.__class__.__name__}")
-        logger.debug(f"Event: {evt.encode()}")
+        logger.debug(f"Event: {evt.model_dump(mode='json')}")
