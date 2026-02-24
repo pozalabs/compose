@@ -21,9 +21,11 @@ from .base import BaseRepository
 class MongoDocument(dict[str, Any]):
     @classmethod
     def from_entity(cls, entity: Entity, **kwargs: Any) -> Self:
-        return entity.model_dump(
-            by_alias=True,
-            **{key: value for key, value in kwargs.items() if key not in {"by_alias"}},
+        return cls(
+            entity.model_dump(
+                by_alias=True,
+                **{key: value for key, value in kwargs.items() if key not in {"by_alias"}},
+            )
         )
 
 
@@ -241,7 +243,7 @@ class MongoRepository[T: Entity](BaseRepository):
     @functools.cached_property
     def _entity_type(self) -> T:
         orig_base = next(
-            (base for base in self.__class__.__orig_bases__ if get_origin(base) is MongoRepository),
+            (base for base in self.__class__.__orig_bases__ if get_origin(base) is MongoRepository),  # type: ignore[missing-attribute]
             None,
         )
         if orig_base is None:
