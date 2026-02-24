@@ -24,8 +24,8 @@ def default_hook(_) -> None: ...
 
 def log_event_message(log_message: str, message: EventMessage) -> None:
     logger.info(
-        f"{log_message}: {json.dumps(message.encode())}",
-        extra={"event_message": message.encode()},
+        f"{log_message}: {json.dumps(message.model_dump(mode='json'))}",
+        extra={"event_message": message.model_dump(mode="json")},
     )
 
 

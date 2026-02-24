@@ -28,7 +28,7 @@ def retrieve_user(
     if (user := user_repository.find_by_name(name)) is None:
         raise compose.exceptions.DoesNotExistError()
 
-    return schema.User.model_validate(user.encode())
+    return schema.User.model_validate(user.model_dump(mode="json"))
 
 
 @router.get(
@@ -45,7 +45,7 @@ def retrieve_user_by_email(
     if (user := user_repository.find_by(op.func.Q(op.Eq(email=email)))) is None:
         raise compose.exceptions.DoesNotExistError()
 
-    return schema.User.model_validate(user.encode())
+    return schema.User.model_validate(user.model_dump(mode="json"))
 
 
 @router.get(
