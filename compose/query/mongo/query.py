@@ -41,19 +41,10 @@ class MongoOffsetPaginationQuery(
 
 
 class MongoCursorPaginationQuery(MongoPaginationQuery[CursorPaginationResult], abc.ABC):
-    """Cursor-based pagination query for MongoDB.
-
-    Subclass contract:
-        - ``to_query()`` must request ``per_page + 1`` items so that ``to_result()``
-          can determine ``has_next``.  For example, use ``Limit(per_page + 1)`` in the
-          pipeline instead of ``Limit(per_page)``.
-        - Implement ``_derive_cursor()`` to extract a cursor string from the last item.
-    """
-
     per_page: int | None = None
 
     @abc.abstractmethod
-    def _derive_cursor(self, last_item: dict[str, Any]) -> str:
+    def derive_cursor(self, last_item: dict[str, Any]) -> str:
         raise NotImplementedError
 
     def to_result(self, raw: dict[str, Any] | None) -> CursorPaginationResult:
@@ -66,7 +57,7 @@ class MongoCursorPaginationQuery(MongoPaginationQuery[CursorPaginationResult], a
         if has_next:
             items = items[: self.per_page]
 
-        next_cursor = self._derive_cursor(items[-1]) if items else None
+        next_cursor = self.derive_cursor(items[-1]) if items else None
 
         return CursorPaginationResult(
             items=items,
