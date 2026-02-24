@@ -28,8 +28,8 @@ class ItemWithCustomParser(compose.schema.Schema):
 
 
 @pytest.fixture
-def pagination_without_extra() -> compose.pagination.Pagination:
-    return compose.pagination.Pagination(
+def pagination_without_extra() -> compose.pagination.OffsetPaginationResult:
+    return compose.pagination.OffsetPaginationResult(
         total=2,
         items=[
             dict(id=compose.types.PyObjectId(b"test-id-0001")),
@@ -39,8 +39,8 @@ def pagination_without_extra() -> compose.pagination.Pagination:
 
 
 @pytest.fixture
-def pagination_with_extra() -> compose.pagination.Pagination:
-    return compose.pagination.Pagination(
+def pagination_with_extra() -> compose.pagination.OffsetPaginationResult:
+    return compose.pagination.OffsetPaginationResult(
         total=2,
         items=[
             dict(id=compose.types.PyObjectId(b"test-id-0001")),
@@ -51,8 +51,8 @@ def pagination_with_extra() -> compose.pagination.Pagination:
 
 
 @pytest.fixture
-def pagination_with_custom_parser() -> compose.pagination.Pagination:
-    return compose.pagination.Pagination(
+def pagination_with_custom_parser() -> compose.pagination.OffsetPaginationResult:
+    return compose.pagination.OffsetPaginationResult(
         total=2,
         items=[
             dict(id=compose.types.PyObjectId(b"test-id-0001"), version="v1"),
@@ -100,7 +100,7 @@ def expected_with_custom_parser() -> compose.schema.ListSchema[ItemWithCustomPar
 
 
 @pytest.mark.parametrize(
-    "schema_type, from_pagination_kwargs, pagination, expected",
+    "schema_type, from_result_kwargs, pagination, expected",
     [
         (
             compose.schema.ListSchema[Item],
@@ -127,17 +127,17 @@ def expected_with_custom_parser() -> compose.schema.ListSchema[ItemWithCustomPar
         "별도로 정의한 파서 메서드명을 입력하면 스키마의 해당 메서드를 사용해 파싱",
     ),
 )
-def test_from_pagination(
+def test_from_result(
     schema_type: type[compose.schema.ListSchema[Item]],
-    from_pagination_kwargs: dict[str, Any],
+    from_result_kwargs: dict[str, Any],
     pagination: str,
     expected: str,
     request: pytest.FixtureRequest,
 ):
-    pagination: compose.pagination.Pagination = request.getfixturevalue(pagination)
+    pagination: compose.pagination.OffsetPaginationResult = request.getfixturevalue(pagination)
     expected: compose.schema.ListSchema[Item] = request.getfixturevalue(expected)
 
-    actual = schema_type.from_pagination(pagination, **from_pagination_kwargs)
+    actual = schema_type.from_result(pagination, **from_result_kwargs)
 
     assert actual == expected
 
@@ -153,16 +153,43 @@ def test_from_pagination(
     ],
     ids=("스키마에 정의되어 있지 않은 파서를 입력하면 오류가 발생",),
 )
-def test_from_pagination_with_undefined_parser(
+def test_from_result_with_undefined_parser(
     schema_type: type[compose.schema.ListSchema[Item]],
     parser_name: str,
     pagination: str,
     request: pytest.FixtureRequest,
 ):
-    pagination: compose.pagination.Pagination = request.getfixturevalue(pagination)
+    pagination: compose.pagination.OffsetPaginationResult = request.getfixturevalue(pagination)
 
     with pytest.raises(AttributeError):
-        schema_type.from_pagination(
-            pagination=pagination,
+        schema_type.from_result(
+            result=pagination,
             parser_name=parser_name,
         )
+
+
+def test_cursor_list_schema_from_result():
+    result = compose.pagination.CursorPaginationResult(
+        items=[
+            dict(id=compose.types.PyObjectId(b"test-id-0001")),
+            dict(id=compose.types.PyObjectId(b"test-id-0002")),
+        ],
+        next_cursor="abc",
+        has_next=True,
+    )
+
+    actual = compose.schema.CursorListSchema[Item].from_result(result)
+
+    assert len(actual.items) == 2
+    assert actual.next_cursor == "abc"
+    assert actual.has_next is True
+
+
+def test_cursor_list_schema_from_empty_result():
+    result = compose.pagination.CursorPaginationResult.empty()
+
+    actual = compose.schema.CursorListSchema[Item].from_result(result)
+
+    assert actual.items == []
+    assert actual.next_cursor is None
+    assert actual.has_next is False
