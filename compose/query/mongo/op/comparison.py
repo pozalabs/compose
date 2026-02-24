@@ -6,7 +6,6 @@ from typing import Any, Self
 import pendulum
 
 from compose import types
-from compose.deprecation import deprecated_alias
 
 from . import utils
 from .base import ComparisonOperator, EqualityOperator, Operator
@@ -79,6 +78,3 @@ class Range(Operator):
     def day_of(cls, field: str, dt: pendulum.DateTime) -> Self:
         date_range = types.DateRange.day_of(dt)
         return cls.date(field=field, start=date_range.start, end=date_range.end)
-
-
-EmptyOnNull = deprecated_alias("EmptyOnNull", SkipNull)

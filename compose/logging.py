@@ -6,9 +6,7 @@ import logging
 import os
 import sys
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Any, Protocol, Self, Unpack
-
-from typing_extensions import deprecated
+from typing import TYPE_CHECKING, Protocol, Self, Unpack
 
 try:
     from loguru import logger
@@ -59,31 +57,6 @@ def intercept(
     intercept_logging(intercept_handler=intercept_handler, log_level=logging.INFO)
     for name in log_names:
         logging.getLogger(name).handlers = [intercept_handler]
-
-
-def get_default_logging_config(serialize_log: bool) -> dict[str, Any]:
-    non_serialized_format = (
-        "{time:YYYY-MM-DD HH:mm:ss.SSS} | <level>{level: <8}</level> | <level>{message}</level>"
-    )
-    return {
-        "sink": sys.stdout,
-        "diagnose": False,
-        "format": "{message}" if serialize_log else non_serialized_format,
-        "serialize": serialize_log,
-    }
-
-
-@deprecated("'get_default_logger' is deprecated. Use 'create_logger' instead")
-def get_default_logger(
-    log_level: int,
-    serialize_log: bool,
-    **config: Unpack[BasicHandlerConfig],
-) -> Logger:
-    intercept_handler = InterceptHandler()
-    logging.basicConfig(handlers=[intercept_handler], level=log_level, force=True)
-    intercept(intercept_handler=intercept_handler)
-    logger.configure(handlers=[get_default_logging_config(serialize_log) | config])
-    return logger
 
 
 class LogFilterOp(Protocol):
