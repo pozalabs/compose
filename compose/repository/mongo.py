@@ -12,8 +12,7 @@ from pymongo.results import UpdateResult
 
 from .. import types
 from ..entity import Entity
-from ..pagination import Pagination
-from ..query.mongo import MongoFilterQuery, MongoQuery
+from ..query.mongo import MongoPaginationQuery, MongoQuery
 from ..utils import descendants_of
 from .base import BaseRepository
 
@@ -226,19 +225,11 @@ class MongoRepository[T: Entity](BaseRepository):
     ) -> None:
         self.collection.delete_one({"_id": entity_id}, session=session, **kwargs)
 
-    def filter(
-        self, qry: MongoFilterQuery, session: ClientSession | None = None, **kwargs
-    ) -> Pagination:
+    def paginate[R](
+        self, qry: MongoPaginationQuery[R], session: ClientSession | None = None, **kwargs
+    ) -> R:
         query_result = self.collection.aggregate(qry.to_query(), session=session, **kwargs)
-        if (unwrapped := next(query_result, None)) is None:
-            return Pagination.empty(page=qry.page, per_page=qry.per_page)
-
-        return Pagination(
-            total=(unwrapped["metadata"][0]["total"] if unwrapped["metadata"] else 0),
-            items=unwrapped["items"],
-            page=qry.page,
-            per_page=qry.per_page,
-        )
+        return qry.to_result(next(query_result, None))
 
     @functools.cached_property
     def _entity_type(self) -> T:
