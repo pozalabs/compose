@@ -3,8 +3,18 @@ from .base import OffsetPaginationQuery, Query
 __all__ = ["OffsetPaginationQuery", "Query"]
 
 try:
-    from .mongo.query import MongoFilterQuery, MongoOffsetFilterQuery, MongoQuery
+    from .mongo.query import (
+        MongoCursorPaginationQuery,
+        MongoOffsetPaginationQuery,
+        MongoPaginationQuery,
+        MongoQuery,
+    )
 
-    __all__ += ["MongoFilterQuery", "MongoOffsetFilterQuery", "MongoQuery"]
+    __all__ += [
+        "MongoCursorPaginationQuery",
+        "MongoOffsetPaginationQuery",
+        "MongoPaginationQuery",
+        "MongoQuery",
+    ]
 except ImportError:
     pass
