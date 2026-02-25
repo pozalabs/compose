@@ -79,18 +79,17 @@ class CursorPagination(Stage[ListExpression]):
         self,
         sort: Sort,
         cursor: Cursor | None = None,
-        per_page: int | None = None,
+        per_page: int = 10,
     ):
         self.sort = sort
         self.cursor = cursor
         self.per_page = per_page
 
     def expression(self) -> ListExpression:
-        limit = Limit(self.per_page + 1) if self.per_page is not None else EmptyStage()
         return Pipeline(
             CursorQuery(sort=self.sort, cursor=self.cursor),
             self.sort,
-            limit,
+            Limit(self.per_page + 1),
             Group.by_null(Spec(field="items", spec=Push("$$ROOT"))),
             Project(
                 Spec.exclude("_id"),

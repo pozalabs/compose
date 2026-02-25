@@ -42,7 +42,7 @@ class MongoOffsetPaginationQuery(
 
 
 class MongoCursorPaginationQuery(MongoPaginationQuery[CursorPaginationResult], abc.ABC):
-    per_page: int | None = None
+    per_page: int = 10
 
     @abc.abstractmethod
     def derive_cursor(self, last_item: dict[str, Any]) -> str:
@@ -54,7 +54,7 @@ class MongoCursorPaginationQuery(MongoPaginationQuery[CursorPaginationResult], a
 
         items: list[Any] = raw["items"]
 
-        has_next = self.per_page is not None and len(items) > self.per_page
+        has_next = len(items) > self.per_page
         if has_next:
             items = items[: self.per_page]
 
