@@ -6,7 +6,7 @@ import logging
 import os
 import sys
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Protocol, Self, Unpack
+from typing import TYPE_CHECKING, Protocol, Self, Unpack, cast
 
 try:
     from loguru import logger
@@ -111,24 +111,29 @@ class LogDisplayConfig:
         )
 
 
-def create_logger(level: int = logging.INFO, **config: Unpack[BasicHandlerConfig]) -> Logger:
+def create_logger(**config: Unpack[BasicHandlerConfig]) -> Logger:
+    level = config.get("level", logging.INFO)
+
     intercept_handler = InterceptHandler()
     logging.basicConfig(handlers=[intercept_handler], level=level, force=True)
     route_to_loguru(intercept_handler=intercept_handler)
 
     logger.configure(
         handlers=[
-            {
-                "sink": sys.stdout,
-                "level": level,
-                "diagnose": False,
-                "filter": LogFilter(
-                    LogFilterNotContains("/health-check"),
-                    LogFilterNotContains("/metrics"),
-                ),
-                **dataclasses.asdict(LogDisplayConfig.non_serialized()),
-            }
-            | config
+            cast(
+                BasicHandlerConfig,
+                {
+                    "sink": sys.stdout,
+                    "level": level,
+                    "diagnose": False,
+                    "filter": LogFilter(
+                        LogFilterNotContains("/health-check"),
+                        LogFilterNotContains("/metrics"),
+                    ),
+                    **dataclasses.asdict(LogDisplayConfig.non_serialized()),
+                }
+                | config,
+            )
         ]
     )
 
