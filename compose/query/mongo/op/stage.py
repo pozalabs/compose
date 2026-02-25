@@ -5,7 +5,7 @@ from .evaulation import Expr
 from .logical import And, Nor, Or
 from .pipeline import Pipeline
 from .sort import SortBy
-from .types import DictExpression, MongoKeyword, _FieldPath
+from .types import DictExpression, MongoKeyword, _FieldPath, _NonNegativeInt, _PositiveInt
 
 
 class EmptyStage(Stage[DictExpression]):
@@ -181,7 +181,7 @@ class Facet(Stage[DictExpression]):
 
 class Skip(Stage[DictExpression]):
     def __init__(self, skip: int):
-        self.skip = skip
+        self.skip = _NonNegativeInt(skip)
 
     def expression(self) -> DictExpression:
         return {"$skip": self.skip}
@@ -189,7 +189,7 @@ class Skip(Stage[DictExpression]):
 
 class Limit(Stage[DictExpression]):
     def __init__(self, limit: int):
-        self.limit = limit
+        self.limit = _PositiveInt(limit)
 
     def expression(self) -> DictExpression:
         return {"$limit": self.limit}
@@ -220,8 +220,8 @@ class OffsetPagination(Stage[DictExpression]):
         per_page: int,
         metadata_ops: list[Operator] | None = None,
     ):
-        self.page = page
-        self.per_page = per_page
+        self.page = _PositiveInt(page)
+        self.per_page = _PositiveInt(per_page)
         self.metadata_ops = metadata_ops or []
 
     def expression(self) -> DictExpression:
@@ -264,7 +264,7 @@ class Group(Stage[DictExpression]):
 
 class Sample(Stage[DictExpression]):
     def __init__(self, size: int):
-        self.size = size
+        self.size = _NonNegativeInt(size)
 
     def expression(self) -> DictExpression:
         return {"$sample": {"size": self.size}}

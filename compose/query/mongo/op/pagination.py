@@ -10,7 +10,7 @@ from .comparison import Eq, Gt, Lt
 from .logical import And
 from .pipeline import Pipeline
 from .stage import EmptyStage, Group, Limit, Match, Project, Sort, Spec, Stage
-from .types import DictExpression, ListExpression
+from .types import DictExpression, ListExpression, _PositiveInt
 
 
 class Cursor(BaseModel):
@@ -83,7 +83,7 @@ class CursorPagination(Stage[ListExpression]):
     ):
         self.sort = sort
         self.cursor = cursor
-        self.per_page = per_page
+        self.per_page = _PositiveInt(per_page)
 
     def expression(self) -> ListExpression:
         return Pipeline(

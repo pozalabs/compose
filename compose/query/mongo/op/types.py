@@ -43,3 +43,17 @@ class _String(str):
             raise ValueError("string must not be prefixed with $")
 
         return super().__new__(cls, v)
+
+
+class _NonNegativeInt(int):
+    def __new__(cls, v: int):
+        if v < 0:
+            raise ValueError(f"Expected non-negative integer, got {v}")
+        return super().__new__(cls, v)
+
+
+class _PositiveInt(int):
+    def __new__(cls, v: int):
+        if v <= 0:
+            raise ValueError(f"Expected positive integer, got {v}")
+        return super().__new__(cls, v)
