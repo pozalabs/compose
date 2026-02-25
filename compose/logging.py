@@ -37,7 +37,7 @@ class InterceptHandler(logging.Handler):
 
         frame: FrameType | None = logging.currentframe()
         depth = 0
-        while frame and (depth == 0 or frame.f_code.co_filename == logging.__file__):
+        while frame is not None and (depth == 0 or frame.f_code.co_filename == logging.__file__):
             frame = frame.f_back
             depth += 1
 
