@@ -36,9 +36,6 @@ class InterceptHandler(logging.Handler):
 
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
-    def filter(self, record: logging.LogRecord) -> bool:
-        return "/health-check" not in record.getMessage()
-
 
 def intercept_logging(intercept_handler: InterceptHandler, log_level: int) -> None:
     """Python 내장 logging 모듈을 loguru로 대체합니다. (해당 함수를 호출하려면 `loguru`를 설치해야 합니다.)"""
@@ -56,7 +53,9 @@ def intercept(
 ) -> None:
     intercept_logging(intercept_handler=intercept_handler, log_level=logging.INFO)
     for name in log_names:
-        logging.getLogger(name).handlers = [intercept_handler]
+        lg = logging.getLogger(name)
+        lg.handlers = [intercept_handler]
+        lg.propagate = False
 
 
 class LogFilterOp(Protocol):
