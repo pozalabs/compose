@@ -34,8 +34,10 @@ class MessageBus:
             handler = self.dependency_resolver(handler_name)
             await handler.handle(evt)
 
-    def register(self, event_cls: type[Event]) -> Callable[[EventHandler], EventHandler]:
-        def wrapper(handler_cls: EventHandler) -> EventHandler:
+    def register(
+        self, event_cls: type[Event]
+    ) -> Callable[[type[EventHandler]], type[EventHandler]]:
+        def wrapper(handler_cls: type[EventHandler]) -> type[EventHandler]:
             event_name = event_cls.__name__
             handler_name = handler_cls.__name__
 
