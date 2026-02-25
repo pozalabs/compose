@@ -1,6 +1,4 @@
-import asyncio
 import collections
-import functools
 import re
 from collections.abc import Callable
 from typing import Protocol, Self
@@ -10,8 +8,7 @@ from compose.event import Event
 
 
 class EventHandler(Protocol):
-    def handle(self, evt: Event) -> None:
-        ...
+    async def handle(self, evt: Event) -> None: ...
 
 
 class MessageBus:
@@ -33,10 +30,9 @@ class MessageBus:
 
     async def handle_event(self, evt: Event) -> None:
         handler_names = self._event_handlers.get(evt.__class__.__name__, set())
-        event_loop = asyncio.get_running_loop()
         for handler_name in handler_names:
             handler = self.dependency_resolver(handler_name)
-            await event_loop.run_in_executor(None, functools.partial(handler.handle, evt))
+            await handler.handle(evt)
 
     def register(self, event_cls: type[Event]) -> Callable[[EventHandler], EventHandler]:
         def wrapper(handler_cls: EventHandler) -> EventHandler:
