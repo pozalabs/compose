@@ -55,6 +55,7 @@ uv run pytest tests
 ### 구조
 
 - 모듈 레벨 함수로 작성 (클래스로 그룹핑하지 않음)
+- 퍼블릭 계약만 테스트 (비공개 클래스/메서드는 직접 테스트하지 않음)
 - 생성 실패 테스트 이름: `test_cannot_xxx` (e.g., `test_cannot_create_skip_with_negative`)
 
 ### 검증 방식
