@@ -23,7 +23,7 @@ class SortBy(Operator):
         return cls(field=field, direction=pymongo.DESCENDING)
 
     @classmethod
-    def from_(cls, key: str) -> Self:
+    def parse(cls, key: str) -> Self:
         if key.startswith("-"):
             return cls.desc(field=key[1:])
         return cls.asc(field=key)

@@ -22,5 +22,5 @@ def test_desc_expression():
         "정렬 키에 `-` 접두사가 있으면 내림차순을 적용한다.",
     ),
 )
-def test_from_expression(key: str, expected: dict[str, int]):
-    assert SortBy.from_(key).expression() == expected
+def test_parse_expression(key: str, expected: dict[str, int]):
+    assert SortBy.parse(key).expression() == expected

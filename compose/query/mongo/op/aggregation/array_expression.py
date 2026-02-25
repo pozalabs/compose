@@ -60,11 +60,11 @@ class Reduce(Operator):
         }
 
     @classmethod
-    def list(cls, input_: Any, in_: Any) -> Self:
+    def into_list(cls, input_: Any, in_: Any) -> Self:
         return cls(input_=input_, initial_value=[], in_=in_)
 
     @classmethod
-    def int(cls, input_: Any, in_: Any) -> Self:
+    def into_int(cls, input_: Any, in_: Any) -> Self:
         return cls(input_=input_, initial_value=0, in_=in_)
 
 

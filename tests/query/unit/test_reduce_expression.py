@@ -21,7 +21,7 @@ from compose.query.mongo.op import DictExpression, Reduce
             },
         ),
         (
-            Reduce.list(
+            Reduce.into_list(
                 input_="$field",
                 in_={"$setUnion": ["$$value", "$$this.song_forms"]},
             ),
@@ -48,7 +48,7 @@ from compose.query.mongo.op import DictExpression, Reduce
             },
         ),
         (
-            Reduce.int(
+            Reduce.into_int(
                 input_="$field",
                 in_={"$add": ["$$value", "$$this.total"]},
             ),

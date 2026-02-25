@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from compose.query.mongo.op import ComparisonOperator, Eq, Ne, SkipNull
+from compose.query.mongo.op import ComparisonOperator, SkipNull
 
 
 class CustomOp(ComparisonOperator):
@@ -28,14 +28,3 @@ def test_empty_on_null(op: ComparisonOperator, expected: dict[str, Any]):
     expression = SkipNull(op).expression()
 
     assert expression == expected
-
-
-@pytest.mark.parametrize(
-    "op, expected",
-    [
-        (Eq.from_(name="test"), {"name": {"$eq": "test"}}),
-        (Ne.from_(age=30), {"age": {"$ne": 30}}),
-    ],
-)
-def test_instantiate_using_from_(op: ComparisonOperator, expected: dict[str, Any]):
-    assert op.expression() == expected

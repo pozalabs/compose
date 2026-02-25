@@ -27,15 +27,6 @@ class ComparisonOperator(Operator):
     def expression(self) -> dict[str, Any]:
         raise NotImplementedError
 
-    @classmethod
-    def from_(cls, **kwargs: Any) -> Self:
-        if (kv := next(iter(kwargs.items()), None)) is None:
-            raise ValueError(
-                f"{cls.__name__}.from_() requires exactly one keyword argument (e.g., field=value)"
-            )
-
-        return cls(**dict(zip(("field", "value"), kv)))
-
 
 class EqualityOperator(ComparisonOperator):
     @abc.abstractmethod
