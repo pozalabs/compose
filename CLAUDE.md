@@ -52,6 +52,12 @@ uv run pytest tests
 | unit        | 단위 테스트 |
 | integration | 통합 테스트 |
 
+### 구조
+
+- 모듈 레벨 함수로 작성 (클래스로 그룹핑하지 않음)
+- 퍼블릭 계약만 테스트 (비공개 클래스/메서드는 직접 테스트하지 않음)
+- 생성 실패 테스트 이름: `test_cannot_xxx` (e.g., `test_cannot_create_skip_with_negative`)
+
 ### 검증 방식
 
 - 결과 검증 시 필드를 개별 비교하지 않고, 기대 객체를 생성하여 직접 비교
