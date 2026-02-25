@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 from typing import Any, Self
 
 from .base import Evaluable, Merge, Operator, Stage
@@ -67,7 +66,7 @@ class Spec(Operator):
         return cls(field=field, spec=0)
 
     @classmethod
-    def ref(cls, field: str, spec: str) -> Self:
+    def alias(cls, field: str, spec: str) -> Self:
         return cls(field=field, spec=_FieldPath(spec))
 
 
@@ -79,24 +78,8 @@ class Project(Stage[DictExpression]):
         return {"$project": Merge.dict(*self.specs).expression()}
 
     @classmethod
-    def from_attrs(cls, **attrs: Any) -> Self:
+    def of(cls, **attrs: Any) -> Self:
         return cls(*(Spec(field, spec) for field, spec in attrs.items()))
-
-    @classmethod
-    def from_(
-        cls,
-        include: Iterable[str] | None = None,
-        exclude: Iterable[str] | None = None,
-        ref: dict[str, Any] | None = None,
-    ) -> Self:
-        if include is None and exclude is None and ref is None:
-            raise ValueError("At least one of `include`, `exclude`, or `ref` must be provided")
-
-        return cls(
-            *(Spec.include(field) for field in (include or {})),
-            *(Spec.exclude(field) for field in (exclude or {})),
-            *(Spec(field, spec) for field, spec in (ref or {}).items()),
-        )
 
 
 class Lookup(Stage[DictExpression]):
@@ -275,7 +258,7 @@ class Group(Stage[DictExpression]):
         }
 
     @classmethod
-    def by_null(cls, *ops: Operator) -> Self:
+    def without_key(cls, *ops: Operator) -> Self:
         return cls(*ops, key=None)
 
 

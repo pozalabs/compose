@@ -90,7 +90,7 @@ class CursorPagination(Stage[ListExpression]):
             CursorQuery(sort=self.sort, cursor=self.cursor),
             self.sort,
             Limit(self.per_page + 1),
-            Group.by_null(Spec(field="items", spec=Push("$$ROOT"))),
+            Group.without_key(Spec(field="items", spec=Push("$$ROOT"))),
             Project(
                 Spec.exclude("_id"),
                 Spec.include("items"),
