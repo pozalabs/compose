@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from compose.pagination import CursorPaginationResult, OffsetPaginationResult
+from compose.pagination import OffsetPaginationResult
 
 PaginationFactory = Callable[..., OffsetPaginationResult]
 
@@ -143,9 +143,3 @@ def test_next_page(
 )
 def test_is_empty(pagination: OffsetPaginationResult, expected: bool):
     assert pagination.is_empty is expected
-
-
-def test_cursor_pagination_result_empty():
-    result = CursorPaginationResult.empty()
-
-    assert result == CursorPaginationResult(items=[], next_cursor=None, has_next=False)

@@ -45,7 +45,6 @@ class OffsetPaginationResult(container.BaseModel):
 class CursorPaginationResult(container.BaseModel):
     items: list[Any]
     next_cursor: str | None = None
-    has_next: bool = False
 
     @classmethod
     def empty(cls) -> Self:
