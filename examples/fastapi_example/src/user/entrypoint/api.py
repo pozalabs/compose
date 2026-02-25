@@ -66,6 +66,22 @@ def list_users(
     return compose.schema.ListSchema[schema.User].from_result(result)
 
 
+@router.get(
+    "/v1/users/recent",
+    response_model=compose.schema.CursorListSchema[schema.User],
+    tags=[constants.OpenApiTag.USER],
+    summary="최근 유저 목록 조회 (커서 페이지네이션)",
+)
+@inject
+@compose.fastapi.auto_wired(provide)
+def list_recent_users(
+    qry: Annotated[query.ListRecentUsers, Query()],
+    user_repository: UserRepository,
+):
+    result = user_repository.paginate(qry)
+    return compose.schema.CursorListSchema[schema.User].from_result(result)
+
+
 @router.post(
     "/v1/users",
     response_model=schema.User,
