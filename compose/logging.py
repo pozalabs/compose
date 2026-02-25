@@ -12,10 +12,7 @@ from typing import TYPE_CHECKING, Protocol, Self, Unpack, cast
 try:
     from loguru import logger
 except ImportError:
-    raise ImportError(
-        "The `loguru` extra must be installed to use the `compose.logging` module. "
-        "Install `compose` with `loguru` extra (`compose[loguru]`)"
-    )
+    raise ImportError("Install `loguru` extra to use logging features") from None
 
 if TYPE_CHECKING:
     from loguru import BasicHandlerConfig, Logger, Record
