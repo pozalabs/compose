@@ -45,7 +45,7 @@ class InterceptHandler(logging.Handler):
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-def intercept(
+def route_to_loguru(
     intercept_handler: InterceptHandler,
     logger_names: Iterable[str] = (
         "gunicorn.error",
@@ -114,7 +114,7 @@ class LogDisplayConfig:
 def create_logger(level: int = logging.INFO, **config: Unpack[BasicHandlerConfig]) -> Logger:
     intercept_handler = InterceptHandler()
     logging.basicConfig(handlers=[intercept_handler], level=level, force=True)
-    intercept(intercept_handler=intercept_handler)
+    route_to_loguru(intercept_handler=intercept_handler)
 
     logger.configure(
         handlers=[
