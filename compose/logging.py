@@ -44,7 +44,7 @@ def intercept_logging(intercept_handler: InterceptHandler, log_level: int) -> No
 
 def intercept(
     intercept_handler: InterceptHandler,
-    log_names: Iterable[str] = (
+    logger_names: Iterable[str] = (
         "gunicorn.error",
         "gunicorn.access",
         "uvicorn.error",
@@ -52,7 +52,7 @@ def intercept(
     ),
 ) -> None:
     intercept_logging(intercept_handler=intercept_handler, log_level=logging.INFO)
-    for name in log_names:
+    for name in logger_names:
         lg = logging.getLogger(name)
         lg.handlers = [intercept_handler]
         lg.propagate = False
