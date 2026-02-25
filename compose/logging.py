@@ -45,11 +45,6 @@ class InterceptHandler(logging.Handler):
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-def intercept_logging(intercept_handler: InterceptHandler, log_level: int) -> None:
-    """Python 내장 logging 모듈을 loguru로 대체합니다. (해당 함수를 호출하려면 `loguru`를 설치해야 합니다.)"""
-    logging.basicConfig(handlers=[intercept_handler], level=log_level, force=True)
-
-
 def intercept(
     intercept_handler: InterceptHandler,
     logger_names: Iterable[str] = (
@@ -59,7 +54,7 @@ def intercept(
         "uvicorn.access",
     ),
 ) -> None:
-    intercept_logging(intercept_handler=intercept_handler, log_level=logging.INFO)
+    logging.basicConfig(handlers=[intercept_handler], level=logging.INFO, force=True)
     for name in logger_names:
         lg = logging.getLogger(name)
         lg.handlers = [intercept_handler]
