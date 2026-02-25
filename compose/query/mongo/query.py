@@ -1,9 +1,11 @@
 import abc
 from typing import Any
 
+from pydantic import Field
+
 from compose.pagination import CursorPaginationResult, OffsetPaginationResult
 
-from ..base import OffsetPaginationQuery, Query
+from ..base import Query
 
 
 class MongoQuery(Query, abc.ABC):
@@ -22,9 +24,10 @@ class MongoPaginationQuery[R](MongoQuery):
         raise NotImplementedError
 
 
-class MongoOffsetPaginationQuery(
-    OffsetPaginationQuery, MongoPaginationQuery[OffsetPaginationResult]
-):
+class MongoOffsetPaginationQuery(MongoPaginationQuery[OffsetPaginationResult]):
+    page: int = Field(1, ge=1)
+    per_page: int = Field(10, ge=1)
+
     @abc.abstractmethod
     def to_query(self) -> list[dict[str, Any]]:
         raise NotImplementedError
