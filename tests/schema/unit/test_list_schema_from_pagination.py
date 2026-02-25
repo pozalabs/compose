@@ -35,6 +35,8 @@ def pagination_without_extra() -> compose.pagination.OffsetPaginationResult:
             dict(id=compose.types.PyObjectId(b"test-id-0001")),
             dict(id=compose.types.PyObjectId(b"test-id-0002")),
         ],
+        page=1,
+        per_page=10,
     )
 
 
@@ -46,6 +48,8 @@ def pagination_with_extra() -> compose.pagination.OffsetPaginationResult:
             dict(id=compose.types.PyObjectId(b"test-id-0001")),
             dict(id=compose.types.PyObjectId(b"test-id-0002")),
         ],
+        page=1,
+        per_page=10,
         extra=dict(extra_field="extra_value"),
     )
 
@@ -58,6 +62,8 @@ def pagination_with_custom_parser() -> compose.pagination.OffsetPaginationResult
             dict(id=compose.types.PyObjectId(b"test-id-0001"), version="v1"),
             dict(id=compose.types.PyObjectId(b"test-id-0002"), version="v2"),
         ],
+        page=1,
+        per_page=10,
     )
 
 
