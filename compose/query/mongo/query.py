@@ -58,10 +58,9 @@ class MongoCursorPaginationQuery(MongoPaginationQuery[CursorPaginationResult], a
         if has_next:
             items = items[: self.per_page]
 
-        next_cursor = self.derive_cursor(items[-1]) if items else None
+        next_cursor = self.derive_cursor(items[-1]) if has_next else None
 
         return CursorPaginationResult(
             items=items,
             next_cursor=next_cursor,
-            has_next=has_next,
         )

@@ -181,7 +181,6 @@ def test_cursor_list_schema_from_result():
             dict(id=compose.types.PyObjectId(b"test-id-0002")),
         ],
         next_cursor="abc",
-        has_next=True,
     )
 
     actual = compose.schema.CursorListSchema[Item].from_result(result)
@@ -192,7 +191,6 @@ def test_cursor_list_schema_from_result():
             Item(id=compose.types.PyObjectId(b"test-id-0002")),
         ],
         next_cursor="abc",
-        has_next=True,
     )
 
 
@@ -201,6 +199,4 @@ def test_cursor_list_schema_from_empty_result():
 
     actual = compose.schema.CursorListSchema[Item].from_result(result)
 
-    assert actual == compose.schema.CursorListSchema[Item](
-        items=[], next_cursor=None, has_next=False
-    )
+    assert actual == compose.schema.CursorListSchema[Item](items=[], next_cursor=None)

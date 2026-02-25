@@ -57,7 +57,6 @@ class ListSchema[T](Schema):
 class CursorListSchema[T](Schema):
     items: list[T]
     next_cursor: str | None = None
-    has_next: bool = False
 
     @classmethod
     def from_result(
@@ -81,7 +80,6 @@ class CursorListSchema[T](Schema):
         return cls(
             items=[parser(item, **parser_kwargs) for item in result.items],
             next_cursor=result.next_cursor,
-            has_next=result.has_next,
         )
 
 

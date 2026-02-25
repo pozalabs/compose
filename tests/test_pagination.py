@@ -148,4 +148,4 @@ def test_is_empty(pagination: OffsetPaginationResult, expected: bool):
 def test_cursor_pagination_result_empty():
     result = CursorPaginationResult.empty()
 
-    assert result == CursorPaginationResult(items=[], next_cursor=None, has_next=False)
+    assert result == CursorPaginationResult(items=[], next_cursor=None)
