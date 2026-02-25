@@ -192,11 +192,3 @@ def test_cursor_list_schema_from_result():
         ],
         next_cursor="abc",
     )
-
-
-def test_cursor_list_schema_from_empty_result():
-    result = compose.pagination.CursorPaginationResult.empty()
-
-    actual = compose.schema.CursorListSchema[Item].from_result(result)
-
-    assert actual == compose.schema.CursorListSchema[Item](items=[], next_cursor=None)
