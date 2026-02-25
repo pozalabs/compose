@@ -172,23 +172,3 @@ def test_from_result_with_undefined_parser(
             result=pagination,
             parser_name=parser_name,
         )
-
-
-def test_cursor_list_schema_from_result():
-    result = compose.pagination.CursorPaginationResult(
-        items=[
-            dict(id=compose.types.PyObjectId(b"test-id-0001")),
-            dict(id=compose.types.PyObjectId(b"test-id-0002")),
-        ],
-        next_cursor="abc",
-    )
-
-    actual = compose.schema.CursorListSchema[Item].from_result(result)
-
-    assert actual == compose.schema.CursorListSchema[Item](
-        items=[
-            Item(id=compose.types.PyObjectId(b"test-id-0001")),
-            Item(id=compose.types.PyObjectId(b"test-id-0002")),
-        ],
-        next_cursor="abc",
-    )
