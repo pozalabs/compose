@@ -23,7 +23,7 @@ class OrderPlaced(compose.event.Event[compose.types.PyObjectId]):
 
 @messagebus.register(OrderPlaced)
 class OrderPlacedHandler:
-    def handle(self, evt: OrderPlaced) -> None: ...
+    async def handle(self, evt: OrderPlaced) -> None: ...
 
 
 class PlaceOrder(compose.command.Command):

@@ -9,7 +9,7 @@ class SomethingHappened(compose.event.Event[compose.types.PyObjectId]):
 
 
 class SomethingHappenedHandler:
-    def handle(self, evt: SomethingHappened) -> None: ...
+    async def handle(self, evt: SomethingHappened) -> None: ...
 
 
 class ApplicationContainer(containers.DeclarativeContainer):
