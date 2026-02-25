@@ -21,9 +21,17 @@ if TYPE_CHECKING:
 
 
 class InterceptHandler(logging.Handler):
-    """https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging"""
+    """표준 logging으로 발생한 로그를 loguru로 전달하는 브릿지 핸들러.
+
+    gunicorn, uvicorn처럼 자체 핸들러를 등록하는 라이브러리는 root 로거의 loguru 설정이
+    덮어써지므로, 해당 로거의 핸들러를 직접 교체하여 loguru 파이프라인으로 통합함.
+
+    https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging
+    """
 
     def emit(self, record: logging.LogRecord) -> None:
+        # 콜스택을 역추적하여 실제 로그 호출 지점의 depth를 계산함.
+        # loguru가 InterceptHandler 내부가 아닌 원래 로그 발생 위치를 기록하기 위함.
         try:
             level = logger.level(record.levelname).name
         except ValueError:
