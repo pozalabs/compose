@@ -57,13 +57,26 @@ POZAlabs 백엔드 서비스의 공통 컴포넌트 라이브러리.
 ## 시작하기
 
 ```bash
-pip install pozalabs-compose
-
-# SQL 지원이 필요한 경우
-pip install pozalabs-compose[sql]
+uv add pozalabs-compose
 ```
 
 도메인 모델링은 `compose.entity`와 `compose.repository`부터 시작하면 된다. 사용 예시는 `examples/`를 참고.
+
+## 선택적 의존성
+
+extras 패키지는 관리하지 않는다. 아래 기능이 필요하면 해당 패키지를 직접 설치해야 한다.
+
+- `pymongo` — MongoDB 지원 (`repository.mongo`, `query.mongo`, `uow.mongo`, `entity.MongoEntity`, `types.PyObjectId`, `lock.mongo`)
+- `sqlalchemy` — SQL 지원 (`repository.sql`, `uow.sql`, `entity.SQLEntity`)
+- `fastapi` — FastAPI 통합 (`fastapi`)
+- `sentry-sdk` — Sentry 연동 (`fastapi` 내 Sentry 헬퍼)
+- `loguru` — 구조화 로깅 (`logging`)
+- `boto3` — AWS 서비스 (`aws`, `messaging.SqsMessageQueue`, `settings.AWSParameterStoreSettingsSource`)
+- `httpx` — HTTP 클라이언트 확장 (`httpx`)
+- `bcrypt` — 비밀번호 해싱 (`auth.HashedPassword`)
+- `opentelemetry-distro[otlp]` — OpenTelemetry 계측 (`opentelemetry`)
+- `pytest` — 테스트 유틸리티 (`testing`)
+- `testcontainers[mongodb]` — 테스트용 MongoDB 컨테이너 (`testcontainers`)
 
 ## 개발
 
