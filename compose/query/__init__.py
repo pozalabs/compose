@@ -1,6 +1,6 @@
-from .base import OffsetPaginationQuery, Query
+from .base import Query
 
-__all__ = ["OffsetPaginationQuery", "Query"]
+__all__ = ["Query"]
 
 try:
     from .mongo.query import (
