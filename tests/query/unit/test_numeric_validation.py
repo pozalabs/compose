@@ -4,39 +4,35 @@ from compose.query.mongo.op import CursorPagination, Limit, OffsetPagination, Sa
 from compose.query.mongo.op.sort import SortBy
 
 
-class TestSkipRejectNegative:
-    def test_reject_negative(self):
-        with pytest.raises(ValueError):
-            Skip(-1)
+def test_cannot_create_skip_with_negative():
+    with pytest.raises(ValueError):
+        Skip(-1)
 
 
-class TestLimitRejectNonPositive:
-    @pytest.mark.parametrize("value", [0, -1])
-    def test_reject_non_positive(self, value: int):
-        with pytest.raises(ValueError):
-            Limit(value)
+@pytest.mark.parametrize("value", [0, -1])
+def test_cannot_create_limit_with_non_positive(value: int):
+    with pytest.raises(ValueError):
+        Limit(value)
 
 
-class TestSampleRejectNegative:
-    def test_reject_negative(self):
-        with pytest.raises(ValueError):
-            Sample(-1)
+def test_cannot_create_sample_with_negative():
+    with pytest.raises(ValueError):
+        Sample(-1)
 
 
-class TestOffsetPaginationRejectInvalid:
-    def test_reject_non_positive_page(self):
-        with pytest.raises(ValueError):
-            OffsetPagination(page=0, per_page=10)
-
-    def test_reject_non_positive_per_page(self):
-        with pytest.raises(ValueError):
-            OffsetPagination(page=1, per_page=0)
+def test_cannot_create_offset_pagination_with_non_positive_page():
+    with pytest.raises(ValueError):
+        OffsetPagination(page=0, per_page=10)
 
 
-class TestCursorPaginationRejectInvalid:
-    def test_reject_non_positive_per_page(self):
-        with pytest.raises(ValueError):
-            CursorPagination(
-                sort=Sort(SortBy.desc("_id")),
-                per_page=0,
-            )
+def test_cannot_create_offset_pagination_with_non_positive_per_page():
+    with pytest.raises(ValueError):
+        OffsetPagination(page=1, per_page=0)
+
+
+def test_cannot_create_cursor_pagination_with_non_positive_per_page():
+    with pytest.raises(ValueError):
+        CursorPagination(
+            sort=Sort(SortBy.desc("_id")),
+            per_page=0,
+        )
