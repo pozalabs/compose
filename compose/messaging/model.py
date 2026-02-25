@@ -1,13 +1,13 @@
-from typing import TypeVar
+from typing import Any
+
+from pydantic import SerializeAsAny, SkipValidation
 
 from compose import container
 from compose.event import Event
 
-MessageBody = TypeVar("MessageBody", bound=Event)
-
 
 class EventMessage(container.BaseModel):
-    body: MessageBody
+    body: SerializeAsAny[SkipValidation[Event[Any]]]
 
 
 class SqsEventMessage(EventMessage):
