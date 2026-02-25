@@ -12,8 +12,8 @@ PaginationFactory = Callable[..., OffsetPaginationResult]
 def pagination_factory() -> PaginationFactory:
     def inner(
         num_items: int = 5,
-        page: int | None = None,
-        per_page: int | None = None,
+        page: int = 1,
+        per_page: int = 10,
     ) -> OffsetPaginationResult:
         return OffsetPaginationResult(
             total=num_items,
@@ -28,10 +28,6 @@ def pagination_factory() -> PaginationFactory:
 @pytest.mark.parametrize(
     "pagination_params, expected",
     [
-        (
-            dict(num_items=4),
-            1,
-        ),
         (
             dict(
                 num_items=4,
@@ -50,7 +46,6 @@ def pagination_factory() -> PaginationFactory:
         ),
     ],
     ids=(
-        "page, per_page를 None으로 입력하는 경우",
         "목록 개수가 per_page로 나누어 떨어지는 경우",
         "목록 개수가 per_page로 나누어 떨어지지 않는 경우",
     ),
@@ -69,10 +64,6 @@ def test_pages(
     "pagination_params, expected",
     [
         (
-            dict(num_items=4),
-            None,
-        ),
-        (
             dict(
                 num_items=4,
                 page=1,
@@ -90,7 +81,6 @@ def test_pages(
         ),
     ],
     ids=(
-        "page, per_page를 None으로 입력하는 경우",
         "현재 page가 첫번째 page인 경우",
         "현재 page가 첫번째 page가 아닌 경우",
     ),
@@ -109,10 +99,6 @@ def test_prev_page(
     "pagination_params, expected",
     [
         (
-            dict(num_items=4),
-            None,
-        ),
-        (
             dict(
                 num_items=4,
                 page=2,
@@ -130,7 +116,6 @@ def test_prev_page(
         ),
     ],
     ids=(
-        "page, per_page를 None으로 입력하는 경우",
         "현재 page가 마지막 page인 경우",
         "현재 page가 마지막 page가 아닌 경우",
     ),
@@ -148,8 +133,8 @@ def test_next_page(
 @pytest.mark.parametrize(
     "pagination, expected",
     [
-        (OffsetPaginationResult(total=0, items=[]), True),
-        (OffsetPaginationResult(total=1, items=["item"]), False),
+        (OffsetPaginationResult(total=0, items=[], page=1, per_page=10), True),
+        (OffsetPaginationResult(total=1, items=["item"], page=1, per_page=10), False),
     ],
     ids=(
         "페이지네이션 목록이 비어 있으면 `True`를 리턴한다.",
