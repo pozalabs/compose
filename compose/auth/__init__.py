@@ -1,17 +1,20 @@
-from .authorization_server import AuthorizationServer
 from .resource_server import ResourceServer
-from .token_decoder import JWTDecoder
-from .token_issuer import JWTIssuer
 from .vo import AuthorizationGrant, UserResource
 
 __all__ = [
-    "AuthorizationServer",
     "AuthorizationGrant",
     "ResourceServer",
     "UserResource",
-    "JWTDecoder",
-    "JWTIssuer",
 ]
+
+try:
+    from .authorization_server import AuthorizationServer
+    from .token_decoder import JWTDecoder
+    from .token_issuer import JWTIssuer
+
+    __all__ += ["AuthorizationServer", "JWTDecoder", "JWTIssuer"]
+except ImportError:
+    pass
 
 try:
     from .password import HashedPassword  # noqa: F401
