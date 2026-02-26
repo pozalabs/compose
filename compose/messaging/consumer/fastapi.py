@@ -17,12 +17,12 @@ class MessageConsumerASGIMiddleware:
     def __init__(
         self,
         app: ASGIApp,
-        messagebus: EventBus,
+        event_bus: EventBus,
         message_queue: LocalMessageQueue,
         hooks: dict[HookEventType, list[Hook]] | None = None,
     ) -> None:
         self.app = app
-        self.messagebus = messagebus
+        self.event_bus = event_bus
         self.message_queue = message_queue
         self.hooks = DEFAULT_HOOKS | (hooks or {})
 
@@ -56,7 +56,7 @@ class MessageConsumerASGIMiddleware:
     async def consume(self, message: EventMessage) -> None:
         self._execute_hook("on_receive", message)
         try:
-            await self.messagebus.handle_event(message.body)
+            await self.event_bus.handle_event(message.body)
             self.message_queue.delete(message)
         except Exception as exc:
             self._execute_hook("on_consume_error", exc)

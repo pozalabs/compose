@@ -17,7 +17,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
 
 def test_with_container():
-    def init_messagebus() -> EventBus | None:
+    def init_event_bus() -> EventBus | None:
         try:
             return EventBus.with_container(
                 "tests.messaging.unit.test_messagebus_with_container:ApplicationContainer"
@@ -25,4 +25,4 @@ def test_with_container():
         except ValueError:
             return None
 
-    assert init_messagebus() is not None
+    assert init_event_bus() is not None
