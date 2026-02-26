@@ -74,7 +74,6 @@ def _make_consumer(
 
 
 @pytest.mark.asyncio
-@pytest.mark.unit
 async def test_backoff_on_consecutive_peek_failures():
     consumer = _make_consumer(
         results=[RuntimeError(), RuntimeError(), RuntimeError()],
@@ -93,7 +92,6 @@ async def test_backoff_on_consecutive_peek_failures():
 
 
 @pytest.mark.asyncio
-@pytest.mark.unit
 async def test_backoff_reset_on_successful_peek():
     consumer = _make_consumer(
         results=[RuntimeError(), None, RuntimeError(), None],
@@ -112,7 +110,6 @@ async def test_backoff_reset_on_successful_peek():
 
 
 @pytest.mark.asyncio
-@pytest.mark.unit
 async def test_backoff_respect_signal_handler():
     signal_handler = DefaultSignalHandler()
     queue = FakeMessageQueue([RuntimeError()])
@@ -135,7 +132,6 @@ async def test_backoff_respect_signal_handler():
 
 
 @pytest.mark.asyncio
-@pytest.mark.unit
 async def test_backoff_capped_at_max():
     max_backoff = 10.0
     consumer = _make_consumer(

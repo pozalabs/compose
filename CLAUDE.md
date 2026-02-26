@@ -52,6 +52,9 @@ uv run pytest tests
 | unit        | 단위 테스트 |
 | integration | 통합 테스트 |
 
+- 디렉토리 경로 기반으로 자동 부여되므로 `@pytest.mark.unit`/`@pytest.mark.integration`을 직접 붙이지 않음
+- 자동 부여 로직: `compose.testing.plugin.test_type_marker`
+
 ### 구조
 
 - 모듈 레벨 함수로 작성 (클래스로 그룹핑하지 않음)
