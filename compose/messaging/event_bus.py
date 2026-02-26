@@ -11,7 +11,7 @@ class EventHandler(Protocol):
     async def handle(self, evt: Event) -> None: ...
 
 
-class MessageBus:
+class EventBus:
     def __init__(self, dependency_resolver: Callable[[str], EventHandler]):
         self.dependency_resolver = dependency_resolver
 

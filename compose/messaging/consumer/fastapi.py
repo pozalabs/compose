@@ -2,7 +2,7 @@ import asyncio
 import collections
 import contextlib
 
-from ..messagebus import MessageBus
+from ..event_bus import EventBus
 from ..model import EventMessage
 from ..queue.local import LocalMessageQueue, event_store
 from .hook import DEFAULT_HOOKS, Hook, HookArgType, HookEventType, default_hook
@@ -17,7 +17,7 @@ class MessageConsumerASGIMiddleware:
     def __init__(
         self,
         app: ASGIApp,
-        messagebus: MessageBus,
+        messagebus: EventBus,
         message_queue: LocalMessageQueue,
         hooks: dict[HookEventType, list[Hook]] | None = None,
     ) -> None:

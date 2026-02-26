@@ -1,6 +1,6 @@
 from .consumer import MessageConsumer
 from .consumer_runner import FastAPIMessageConsumerRunner, ThreadMessageConsumerRunner
-from .messagebus import MessageBus
+from .event_bus import EventBus
 from .model import EventMessage, SqsEventMessage
 from .publisher import EventPublisher
 from .queue.base import MessageQueue
@@ -9,11 +9,11 @@ from .signal_handler import DefaultSignalHandler, SignalHandler, ThreadSignalHan
 
 __all__ = [
     "DefaultSignalHandler",
+    "EventBus",
     "EventMessage",
     "EventPublisher",
     "FastAPIMessageConsumerRunner",
     "LocalMessageQueue",
-    "MessageBus",
     "MessageConsumer",
     "MessageQueue",
     "SignalHandler",
