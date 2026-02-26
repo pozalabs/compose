@@ -11,7 +11,7 @@ def mongo_client(request: pytest.FixtureRequest) -> pymongo.MongoClient:
     mongodb.start()
     request.addfinalizer(mongodb.stop)
 
-    return pymongo.MongoClient(mongodb.get_connection_url())
+    yield pymongo.MongoClient(mongodb.get_connection_url())
 
 
 def test_transaction_commit(mongo_client: pymongo.MongoClient):
