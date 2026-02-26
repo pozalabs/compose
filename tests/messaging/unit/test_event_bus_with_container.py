@@ -1,7 +1,7 @@
 from dependency_injector import containers, providers
 
 import compose
-from compose.messaging.messagebus import MessageBus
+from compose.messaging.event_bus import EventBus
 
 
 class SomethingHappened(compose.event.Event[compose.types.PyObjectId]):
@@ -17,12 +17,12 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
 
 def test_with_container():
-    def init_messagebus() -> MessageBus | None:
+    def init_event_bus() -> EventBus | None:
         try:
-            return MessageBus.with_container(
-                "tests.messaging.unit.test_messagebus_with_container:ApplicationContainer"
+            return EventBus.with_container(
+                "tests.messaging.unit.test_event_bus_with_container:ApplicationContainer"
             )
         except ValueError:
             return None
 
-    assert init_messagebus() is not None
+    assert init_event_bus() is not None

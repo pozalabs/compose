@@ -4,7 +4,7 @@ import logging
 from compose import types
 
 from .. import model
-from ..messagebus import MessageBus
+from ..event_bus import EventBus
 from ..queue.base import MessageQueue
 from ..signal_handler import DefaultSignalHandler, SignalHandler
 from .hook import DEFAULT_HOOKS, Hook, HookArgType, HookEventType, default_hook
@@ -15,13 +15,13 @@ logger = logging.getLogger("compose")
 class MessageConsumer:
     def __init__(
         self,
-        messagebus: MessageBus,
+        event_bus: EventBus,
         message_queue: MessageQueue,
         hooks: dict[HookEventType, list[Hook]] | None = None,
         signal_handler: SignalHandler | None = None,
         max_receive_backoff: types.Seconds = types.Seconds(60),
     ):
-        self.messagebus = messagebus
+        self.event_bus = event_bus
         self.message_queue = message_queue
         self.hooks = DEFAULT_HOOKS | (hooks or {})
         self.signal_handler = signal_handler or DefaultSignalHandler()
@@ -56,7 +56,7 @@ class MessageConsumer:
             self._execute_hook("on_consume", message)
 
     async def consume(self, message: model.EventMessage) -> None:
-        await self.messagebus.handle_event(message.body)
+        await self.event_bus.handle_event(message.body)
         self.message_queue.delete(message)
 
     async def _backoff_wait(self, delay: float) -> None:

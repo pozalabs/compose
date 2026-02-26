@@ -65,7 +65,7 @@ def _make_consumer(
         "on_shutdown": [default_hook],
     }
     return MessageConsumer(
-        messagebus=AsyncMock(),
+        event_bus=AsyncMock(),
         message_queue=queue,
         hooks=hooks,
         signal_handler=signal_handler,
@@ -115,7 +115,7 @@ async def test_backoff_respect_signal_handler():
     queue = FakeMessageQueue([RuntimeError()])
 
     consumer = MessageConsumer(
-        messagebus=AsyncMock(),
+        event_bus=AsyncMock(),
         message_queue=queue,
         hooks={"on_start": [default_hook], "on_receive_error": [default_hook]},
         signal_handler=signal_handler,

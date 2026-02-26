@@ -5,14 +5,14 @@ from fastapi import FastAPI
 from starlette.testclient import TestClient
 
 import compose
-from compose.messaging.messagebus import EventHandler
+from compose.messaging.event_bus import EventHandler
 
 
 def event_handler_dependency_resolver(handler_name: str) -> EventHandler:
     return globals()[handler_name]()
 
 
-messagebus = compose.messaging.MessageBus(event_handler_dependency_resolver)
+event_bus = compose.messaging.EventBus(event_handler_dependency_resolver)
 message_queue = compose.messaging.LocalMessageQueue()
 
 
@@ -21,7 +21,7 @@ class OrderPlaced(compose.event.Event[compose.types.PyObjectId]):
     sku: str
 
 
-@messagebus.register(OrderPlaced)
+@event_bus.register(OrderPlaced)
 class OrderPlacedHandler:
     async def handle(self, evt: OrderPlaced) -> None: ...
 
@@ -43,7 +43,7 @@ def app() -> FastAPI:
     _app = FastAPI()
     _app.add_middleware(
         compose.messaging.MessageConsumerASGIMiddleware,
-        messagebus=messagebus,
+        event_bus=event_bus,
         message_queue=message_queue,
     )
 
