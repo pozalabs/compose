@@ -1,7 +1,7 @@
 import inspect
 from collections.abc import Callable
 from dataclasses import asdict
-from typing import Annotated, Any, get_args
+from typing import Annotated, Any, cast, get_args
 
 import pydantic_core
 from fastapi import Depends, Path, Query, params
@@ -86,7 +86,7 @@ def create_model_dependency_resolver[T: BaseModel](
     def wrapper(t, **kwargs) -> T:
         return t.model_copy(update={name: kwargs[name] for name in dep_names}, deep=True)
 
-    wrapper.__signature__ = inspect.Signature(
+    cast(Any, wrapper).__signature__ = inspect.Signature(
         parameters=[
             inspect.Parameter("t", inspect.Parameter.POSITIONAL_OR_KEYWORD, annotation=model_type),
             *(
