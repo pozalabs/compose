@@ -1,43 +1,29 @@
 from collections.abc import Callable
-from typing import Annotated, Any
+from typing import Any
 
 from fastapi import Depends
 
 from compose.container import BaseModel
 
 
-class CommandUpdater[T: BaseModel, U]:
+class CommandUpdater:
     def __init__(self, from_field: str, to_field: str):
         self.from_field = from_field
         self.to_field = to_field
 
-    def __call__(self, cmd: T, user: U) -> T:
+    def __call__[T: BaseModel](self, cmd: T, user: Any) -> T:
         return cmd.model_copy(update={self.to_field: getattr(user, self.from_field)}, deep=True)
 
 
-class UserInjector[T: BaseModel, U]:
-    def __init__(
-        self,
-        user_getter: Callable[[], U],
-        command_updater: Callable[[T, U], T],
-    ):
-        self.user_getter = user_getter
-        self.command_updater = command_updater
+def create_with_user[U](
+    user_getter: Callable[[], U],
+    command_updater: Callable[..., Any],
+) -> Callable[..., Any]:
+    def with_user[T: BaseModel](cmd_type: type[T]) -> Any:
+        def inject(cmd, user: U = Depends(user_getter)) -> T:
+            return command_updater(cmd, user)
 
-    def injector(self) -> Callable[..., Any]:
-        return self._injector
-
-    def _injector(self, t: T, /) -> Callable[..., Any]:
-        def inject_user(cmd: t, user: U = Depends(self.user_getter)) -> T:
-            return self.command_updater(cmd, user)
-
-        return inject_user
-
-
-def create_with_user[T: BaseModel](
-    user_injector: Callable[..., Any],
-) -> Callable[[type[T]], type[T]]:
-    def with_user(cmd: type[T]) -> type[T]:
-        return Annotated[cmd, Depends(user_injector(cmd))]
+        inject.__annotations__["cmd"] = cmd_type
+        return Depends(inject)
 
     return with_user

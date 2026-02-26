@@ -88,12 +88,13 @@ def create_model_dependency_resolver[T: BaseModel](
         },
     )
 
-    def wrapper(
-        t: model_type,
-        resolved_dependencies: Annotated[dependencies_model, Depends(dependencies_model)],
-    ) -> T:
+    def wrapper(t, resolved_dependencies) -> T:
         return t.model_copy(update=resolved_dependencies.model_dump(), deep=True)
 
+    wrapper.__annotations__["t"] = model_type
+    wrapper.__annotations__["resolved_dependencies"] = Annotated[
+        dependencies_model, Depends(dependencies_model)
+    ]
     return wrapper
 
 

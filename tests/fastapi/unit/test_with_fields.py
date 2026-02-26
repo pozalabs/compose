@@ -30,11 +30,10 @@ class UpdateItemWithUser(compose.command.Command):
     )
 
 
-user_injector = compose.fastapi.UserInjector(
+with_user = compose.fastapi.create_with_user(
     user_getter=lambda: User(id="user_1"),
     command_updater=compose.fastapi.CommandUpdater(from_field="id", to_field="user_id"),
-).injector()
-with_user = compose.fastapi.create_with_user(user_injector)
+)
 
 
 @pytest.fixture
@@ -58,7 +57,7 @@ def app() -> FastAPI:
         cmd: Annotated[
             UpdateItemWithUser,
             compose.fastapi.with_fields(
-                with_user(UpdateItemWithUser),
+                Annotated[UpdateItemWithUser, with_user(UpdateItemWithUser)],
                 item_id=(int, Path(...)),
             ),
         ],
