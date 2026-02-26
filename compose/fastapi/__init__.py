@@ -1,5 +1,5 @@
 try:
-    from .depends import CommandUpdater, UserInjector, create_with_user
+    from .depends import CommandUpdater, create_with_user
     from .endpoint import SpecialEndpoint, add_health_check_endpoint, health_check
     from .exception_handler import (
         ExceptionHandler,
@@ -43,7 +43,6 @@ __all__ = [
     "RedocHTML",
     "SpecialEndpoint",
     "SwaggerUIHTML",
-    "UserInjector",
     "ZipStreamingResponse",
     "add_doc_routes",
     "add_health_check_endpoint",
