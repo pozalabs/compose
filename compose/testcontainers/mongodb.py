@@ -1,7 +1,5 @@
 import socket
-import subprocess
 import time
-from pathlib import Path
 from typing import ClassVar, Self
 
 from testcontainers.mongodb import MongoDbContainer as _MongoDbContainer
@@ -10,7 +8,6 @@ from testcontainers.mongodb import MongoDbContainer as _MongoDbContainer
 class MongoDbContainer(_MongoDbContainer):
     replica_set_name: ClassVar[str] = "rs"
     key_file_path: ClassVar[str] = "/tmp/mongodb-keyfile"
-    init_key_file_path: ClassVar[str] = "/docker-entrypoint-initdb.d/01-init-keyfile.sh"
 
     def __init__(
         self,
@@ -40,18 +37,19 @@ class MongoDbContainer(_MongoDbContainer):
         )
 
     def with_replica_set(self) -> Self:
-        output = subprocess.run("openssl rand -base64 32".split(), capture_output=True)
-        Path(self.key_file_path).write_bytes(output.stdout)
-        output = subprocess.run(["chmod", "600", self.key_file_path], capture_output=True)
-        if output.returncode:
-            raise RuntimeError(output.stderr)
-
         self.port = self._get_available_port()
         self.with_bind_ports(container=self.port, host=self.port)
-        self.with_volume_mapping(host=self.key_file_path, container=self.key_file_path, mode="rw")
-        self.with_command(
-            f"--keyFile {self.key_file_path} --replSet {self.replica_set_name} --port {self.port}"
-        )
+        self._command = [
+            "bash",
+            "-c",
+            f"openssl rand -base64 756 > {self.key_file_path} && "
+            f"chmod 400 {self.key_file_path} && "
+            f"chown mongodb:mongodb {self.key_file_path} && "
+            f"exec docker-entrypoint.sh mongod"
+            f" --keyFile {self.key_file_path}"
+            f" --replSet {self.replica_set_name}"
+            f" --port {self.port}",
+        ]
         self._with_replica_set = True
 
         return self
@@ -83,6 +81,6 @@ class MongoDbContainer(_MongoDbContainer):
 
     @staticmethod
     def _get_available_port() -> int:
-        sock = socket.socket()
-        sock.bind(("", 0))
-        return sock.getsockname()[1]
+        with socket.socket() as sock:
+            sock.bind(("", 0))
+            return sock.getsockname()[1]
