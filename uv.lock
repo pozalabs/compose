@@ -877,7 +877,6 @@ name = "pozalabs-compose"
 version = "1.39.0"
 source = { editable = "." }
 dependencies = [
-    { name = "authlib" },
     { name = "dependency-injector" },
     { name = "pendulum" },
     { name = "pydantic" },
@@ -885,12 +884,16 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+auth = [
+    { name = "authlib" },
+]
 sql = [
     { name = "sqlalchemy" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "authlib" },
     { name = "bcrypt" },
     { name = "boto3" },
     { name = "boto3-stubs-lite", extra = ["essential", "ssm"] },
@@ -913,17 +916,18 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "authlib", specifier = ">=1.3.1,<2.0.0" },
+    { name = "authlib", marker = "extra == 'auth'", specifier = ">=1.3.1,<2.0.0" },
     { name = "dependency-injector", specifier = ">=4.47.0,<5.0.0" },
     { name = "pendulum", specifier = ">=3.1.0,<4.0.0" },
     { name = "pydantic", specifier = ">=2.7.4,<3.0.0" },
     { name = "pydantic-settings", specifier = ">=2.12.0" },
     { name = "sqlalchemy", marker = "extra == 'sql'", specifier = ">=2.0.0,<3.0.0" },
 ]
-provides-extras = ["sql"]
+provides-extras = ["auth", "sql"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "authlib", specifier = ">=1.3.1,<2.0.0" },
     { name = "bcrypt", specifier = ">=4.2.0,<5.0.0" },
     { name = "boto3", specifier = ">=1.28.73,<2.0.0" },
     { name = "boto3-stubs-lite", extras = ["essential", "ssm"], specifier = ">=1.34.79,<2.0.0" },
