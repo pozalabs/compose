@@ -101,13 +101,13 @@ def with_fields[T: BaseModel](model_type: type[T], **kwargs: Any) -> Any:
     return Depends(create_model_dependency_resolver(model_type, kwargs))
 
 
-class WithPath:
+class FromPath:
     @classmethod
     def object_id(
         cls, path: params.Path | None = None
     ) -> "tuple[type[types.PyObjectId], params.Path]":
         if not hasattr(types, "PyObjectId"):
-            raise ImportError("WithPath.object_id requires `bson`. Install `pymongo`")
+            raise ImportError("FromPath.object_id requires `bson`. Install `pymongo`")
         return types.PyObjectId, path or Path(...)
 
     @classmethod
