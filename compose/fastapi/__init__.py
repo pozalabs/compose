@@ -21,14 +21,13 @@ try:
     from .response import NoContentResponse, ZipStreamingResponse
     from .routing import APIRouter, create_auto_wired_route
     from .security import APIKeyHeader, CookieAuth, HTTPBasic, HTTPBearer, unauthorized_error
-    from .wiring import AutoWired, auto_wired
+    from .wiring import auto_wired
 except ImportError:
     raise ImportError("Install `fastapi` to use `compose.fastapi` package") from None
 
 __all__ = [
     "APIKeyHeader",
     "APIRouter",
-    "AutoWired",
     "CommandUpdater",
     "CookieAuth",
     "ExceptionHandler",

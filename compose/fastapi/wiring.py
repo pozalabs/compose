@@ -50,35 +50,3 @@ def auto_wired[F: HasSignature](
         return f
 
     return wrapper
-
-
-class AutoWired:
-    def __init__(self, provider: Provider, injectors: dict[str, Callable[..., Any]] | None = None):
-        self.provider = provider
-        self.injectors = injectors or {}
-
-    def __call__[F: HasSignature](self) -> Callable[[F], F]:
-        def wrapper(f: F) -> F:
-            signature = inspect.signature(f)
-
-            updated_params = []
-            for name, param in signature.parameters.items():
-                updated_param = param
-
-                if (injector := self.injectors.get(name)) is not None:
-                    updated_param = updated_param.replace(default=Depends(injector))
-                else:
-                    try:
-                        provided = self.provider(param.annotation)
-                        updated_param = updated_param.replace(default=Depends(provided))
-                    except ValueError:
-                        pass
-
-                updated_params.append(updated_param)
-
-            f.__signature__ = signature.replace(parameters=updated_params)
-            f = inject(f)
-
-            return f
-
-        return wrapper
