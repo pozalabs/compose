@@ -17,23 +17,30 @@ class MessageConsumer:
         message_queue: MessageQueue,
         hooks: dict[HookEventType, list[Hook]] | None = None,
         signal_handler: SignalHandler | None = None,
+        max_receive_backoff: float = 60.0,
     ):
         self.messagebus = messagebus
         self.message_queue = message_queue
         self.hooks = DEFAULT_HOOKS | (hooks or {})
         self.signal_handler = signal_handler or DefaultSignalHandler()
+        self._max_receive_backoff = max_receive_backoff
 
         self._default_hook = default_hook
 
     async def run(self) -> None:
         self._execute_hook("on_start", "MessageConsumer started")
+        consecutive_failures = 0
 
         while not self.signal_handler.received_signal:
             try:
                 message = self.message_queue.peek()
             except Exception as exc:
+                consecutive_failures += 1
                 self._execute_hook("on_receive_error", exc)
+                await self._backoff_wait(min(2**consecutive_failures, self._max_receive_backoff))
                 continue
+
+            consecutive_failures = 0
 
             if message is None:
                 continue
@@ -49,6 +56,12 @@ class MessageConsumer:
     async def consume(self, message: model.EventMessage) -> None:
         await self.messagebus.handle_event(message.body)
         self.message_queue.delete(message)
+
+    async def _backoff_wait(self, delay: float) -> None:
+        remaining = delay
+        while remaining > 0 and not self.signal_handler.received_signal:
+            await asyncio.sleep(min(remaining, 0.5))
+            remaining -= 0.5
 
     def _execute_hook(self, hook_event_type: HookEventType, arg: HookArgType, /) -> None:
         for hook in self.hooks.get(hook_event_type, [self._default_hook]):
