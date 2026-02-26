@@ -20,7 +20,7 @@ def test_with_container():
     def init_event_bus() -> EventBus | None:
         try:
             return EventBus.with_container(
-                "tests.messaging.unit.test_messagebus_with_container:ApplicationContainer"
+                "tests.messaging.unit.test_event_bus_with_container:ApplicationContainer"
             )
         except ValueError:
             return None
