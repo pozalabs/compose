@@ -1,6 +1,8 @@
 import asyncio
 import logging
 
+from compose import types
+
 from .. import model
 from ..messagebus import MessageBus
 from ..queue.base import MessageQueue
@@ -17,7 +19,7 @@ class MessageConsumer:
         message_queue: MessageQueue,
         hooks: dict[HookEventType, list[Hook]] | None = None,
         signal_handler: SignalHandler | None = None,
-        max_receive_backoff: float = 60.0,
+        max_receive_backoff: types.Seconds = types.Seconds(60),
     ):
         self.messagebus = messagebus
         self.message_queue = message_queue
