@@ -1,5 +1,4 @@
 try:
-    from .depends import CommandUpdater, create_with_user
     from .endpoint import SpecialEndpoint, add_health_check_endpoint, health_check
     from .exception_handler import (
         ExceptionHandler,
@@ -17,7 +16,7 @@ try:
         openapi_tags,
     )
     from .otel import NonInstrumentedUrls
-    from .param import FromPath, OffsetPaginationParams, as_query, to_query, with_fields
+    from .param import FromAuth, FromPath, OffsetPaginationParams, as_query, to_query, with_fields
     from .response import NoContentResponse, ZipStreamingResponse
     from .routing import APIRouter, create_auto_wired_route
     from .security import APIKeyHeader, CookieAuth, HTTPBasic, HTTPBearer, unauthorized_error
@@ -28,10 +27,10 @@ except ImportError:
 __all__ = [
     "APIKeyHeader",
     "APIRouter",
-    "CommandUpdater",
     "CookieAuth",
     "ExceptionHandler",
     "ExceptionHandlerInfo",
+    "FromAuth",
     "FromPath",
     "HTTPBasic",
     "HTTPBearer",
@@ -51,7 +50,6 @@ __all__ = [
     "auto_wired",
     "create_auto_wired_route",
     "create_exception_handler",
-    "create_with_user",
     "default_exception_handlers",
     "health_check",
     "openapi_tags",

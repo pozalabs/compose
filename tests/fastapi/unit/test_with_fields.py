@@ -2,7 +2,7 @@ import http
 from typing import Annotated, Any
 
 import pytest
-from fastapi import FastAPI, Path
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import ConfigDict
 
@@ -30,10 +30,7 @@ class UpdateItemWithUser(compose.command.Command):
     )
 
 
-with_user = compose.fastapi.create_with_user(
-    user_getter=lambda: User(id="user_1"),
-    command_updater=compose.fastapi.CommandUpdater(from_field="id", to_field="user_id"),
-)
+auth = compose.fastapi.FromAuth(lambda: User(id="user_1"))
 
 
 @pytest.fixture
@@ -57,8 +54,9 @@ def app() -> FastAPI:
         cmd: Annotated[
             UpdateItemWithUser,
             compose.fastapi.with_fields(
-                Annotated[UpdateItemWithUser, with_user(UpdateItemWithUser)],
-                item_id=(int, Path(...)),
+                UpdateItemWithUser,
+                item_id=compose.fastapi.FromPath.int(),
+                user_id=auth.field("id", str),
             ),
         ],
     ):

@@ -1,6 +1,7 @@
+import inspect
 from collections.abc import Callable
 from dataclasses import asdict
-from typing import Annotated, Any, get_args
+from typing import Annotated, Any, cast, get_args
 
 import pydantic_core
 from fastapi import Depends, Path, Query, params
@@ -80,21 +81,22 @@ def create_model_dependency_resolver[T: BaseModel](
     model_type: type[T],
     dependencies: dict[str, tuple[type, Any]],
 ) -> Callable[..., Any]:
-    dependencies_model = create_model(
-        f"{model_type.__name__}fields",
-        **{
-            name: (field_type, Field(field_value))
-            for name, (field_type, field_value) in dependencies.items()
-        },
+    dep_names = list(dependencies.keys())
+
+    def wrapper(t, **kwargs) -> T:
+        return t.model_copy(update={name: kwargs[name] for name in dep_names}, deep=True)
+
+    cast(Any, wrapper).__signature__ = inspect.Signature(
+        parameters=[
+            inspect.Parameter("t", inspect.Parameter.POSITIONAL_OR_KEYWORD, annotation=model_type),
+            *(
+                inspect.Parameter(
+                    name, inspect.Parameter.KEYWORD_ONLY, default=default, annotation=type_
+                )
+                for name, (type_, default) in dependencies.items()
+            ),
+        ],
     )
-
-    def wrapper(t, resolved_dependencies) -> T:
-        return t.model_copy(update=resolved_dependencies.model_dump(), deep=True)
-
-    wrapper.__annotations__["t"] = model_type
-    wrapper.__annotations__["resolved_dependencies"] = Annotated[
-        dependencies_model, Depends(dependencies_model)
-    ]
     return wrapper
 
 
@@ -118,6 +120,19 @@ class FromPath:
     @classmethod
     def str(cls, path: params.Path | None = None) -> tuple[type[str], params.Path]:
         return str, path or Path(...)
+
+
+class FromAuth[U]:
+    def __init__(self, user_getter: Callable[..., U]) -> None:
+        self._user_getter = user_getter
+
+    def field(self, attr: str, field_type: type) -> tuple[type, params.Depends]:
+        user_getter = self._user_getter
+
+        def get_field(user: U = Depends(user_getter)):
+            return getattr(user, attr)
+
+        return field_type, Depends(get_field)
 
 
 class _OffsetPaginationParams(query.Query):

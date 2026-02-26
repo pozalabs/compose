@@ -20,10 +20,7 @@ class CreateItem(compose.command.Command):
     model_config = ConfigDict(json_schema_extra=compose.schema.schema_excludes("user_id"))
 
 
-with_user = compose.fastapi.create_with_user(
-    user_getter=lambda: User(id="user_1"),
-    command_updater=compose.fastapi.CommandUpdater(from_field="id", to_field="user_id"),
-)
+auth = compose.fastapi.FromAuth(lambda: User(id="user_1"))
 
 
 @pytest.fixture
@@ -31,7 +28,15 @@ def app() -> FastAPI:
     _app = FastAPI()
 
     @_app.post("/items")
-    def create_item(cmd: Annotated[CreateItem, with_user(CreateItem)]):
+    def create_item(
+        cmd: Annotated[
+            CreateItem,
+            compose.fastapi.with_fields(
+                CreateItem,
+                user_id=auth.field("id", str),
+            ),
+        ],
+    ):
         return {"item_name": cmd.name, "user_id": cmd.user_id}
 
     return _app
