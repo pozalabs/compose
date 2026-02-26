@@ -17,7 +17,7 @@ try:
         openapi_tags,
     )
     from .otel import NonInstrumentedUrls
-    from .param import OffsetPaginationParams, WithPath, as_query, to_query, with_fields
+    from .param import FromPath, OffsetPaginationParams, as_query, to_query, with_fields
     from .response import NoContentResponse, ZipStreamingResponse
     from .routing import APIRouter, create_auto_wired_route
     from .security import APIKeyHeader, CookieAuth, HTTPBasic, HTTPBearer, unauthorized_error
@@ -32,6 +32,7 @@ __all__ = [
     "CookieAuth",
     "ExceptionHandler",
     "ExceptionHandlerInfo",
+    "FromPath",
     "HTTPBasic",
     "HTTPBearer",
     "NoContentResponse",
@@ -43,7 +44,6 @@ __all__ = [
     "SpecialEndpoint",
     "SwaggerUIHTML",
     "UserInjector",
-    "WithPath",
     "ZipStreamingResponse",
     "add_doc_routes",
     "add_health_check_endpoint",

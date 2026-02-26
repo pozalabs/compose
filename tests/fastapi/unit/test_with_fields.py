@@ -47,7 +47,7 @@ def app() -> FastAPI:
             UpdateItem,
             compose.fastapi.with_fields(
                 UpdateItem,
-                item_id=compose.fastapi.WithPath.int(),
+                item_id=compose.fastapi.FromPath.int(),
             ),
         ],
     ):
