@@ -26,7 +26,6 @@ class Bank:
 
 def test_lock(mongo_client: pymongo.MongoClient):
     db = mongo_client.get_database("test")
-
     bank = Bank(lock_factory=compose.lock.MongoLock.acquirer(db=db))
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -34,7 +33,6 @@ def test_lock(mongo_client: pymongo.MongoClient):
         for money in [100] * 10:
             f = executor.submit(bank.deposit, amount=money)
             futures.append(f)
-
         for f in futures:
             f.result()
 
@@ -44,9 +42,9 @@ def test_lock(mongo_client: pymongo.MongoClient):
 def test_cannot_acquire_lock_after_timeout(mongo_client: pymongo.MongoClient):
     db = mongo_client.get_database("test")
     acquirer = compose.lock.MongoLock.acquirer(db=db)
-
     holder = acquirer(key="timeout_test")
     holder.acquire()
+
     try:
         with pytest.raises(LockAcquisitionFailedError):
             with acquirer(
@@ -62,7 +60,6 @@ def test_cannot_acquire_lock_after_timeout(mongo_client: pymongo.MongoClient):
 def test_lock_reacquired_after_auto_release(mongo_client: pymongo.MongoClient):
     db = mongo_client.get_database("test")
     acquirer = compose.lock.MongoLock.acquirer(db=db)
-
     lock = acquirer(key="auto_release_test", auto_release_after=compose.types.Seconds(0.5))
     assert lock.acquire()
 
@@ -76,6 +73,7 @@ def test_lock_reacquired_after_auto_release(mongo_client: pymongo.MongoClient):
 def test_ttl_index_created_on_expires_at(mongo_client: pymongo.MongoClient):
     db = mongo_client.get_database("test")
     collection_name = "test_ttl_index"
+
     compose.lock.MongoLock.acquirer(db=db, collection_name=collection_name)
 
     indexes = db[collection_name].index_information()
@@ -87,9 +85,9 @@ def test_ttl_index_created_on_expires_at(mongo_client: pymongo.MongoClient):
 def test_ttl_index_creation_is_idempotent(mongo_client: pymongo.MongoClient):
     db = mongo_client.get_database("test")
     collection_name = "test_ttl_idempotent"
+
     compose.lock.MongoLock.acquirer(db=db, collection_name=collection_name)
     compose.lock.MongoLock.acquirer(db=db, collection_name=collection_name)
 
-    index_name = compose.lock.MongoLock.index_name
     indexes = db[collection_name].index_information()
-    assert index_name in indexes
+    assert compose.lock.MongoLock.index_name in indexes
