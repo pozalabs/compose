@@ -34,7 +34,7 @@ Pozalabs 백엔드 서비스의 공통 컴포넌트 라이브러리
 
 도메인 이벤트의 발행과 소비
 
-- `messaging`: MessageBus, EventPublisher, MessageConsumer, 큐 추상화
+- `messaging`: EventBus, EventPublisher, MessageConsumer, 큐 추상화
 
 ### 인프라
 
