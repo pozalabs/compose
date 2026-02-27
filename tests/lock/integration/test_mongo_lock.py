@@ -6,7 +6,6 @@ import pytest
 
 import compose
 from compose.lock import LockAcquisitionFailedError
-from compose.lock.mongo import Seconds
 
 
 class Bank:
@@ -52,8 +51,8 @@ def test_cannot_acquire_lock_after_timeout(mongo_client: pymongo.MongoClient):
         with pytest.raises(LockAcquisitionFailedError):
             with acquirer(
                 key="timeout_test",
-                timeout=Seconds(0.3),
-                lock_acquisition_interval=Seconds(0.05),
+                timeout=compose.types.Seconds(0.3),
+                lock_acquisition_interval=compose.types.Seconds(0.05),
             ):
                 pass
     finally:
@@ -64,12 +63,12 @@ def test_lock_reacquired_after_auto_release(mongo_client: pymongo.MongoClient):
     db = mongo_client.get_database("test")
     acquirer = compose.lock.MongoLock.acquirer(db=db)
 
-    lock = acquirer(key="auto_release_test", auto_release_after=Seconds(0.5))
+    lock = acquirer(key="auto_release_test", auto_release_after=compose.types.Seconds(0.5))
     assert lock.acquire()
 
     time.sleep(0.6)
 
-    reacquired = acquirer(key="auto_release_test", timeout=Seconds(1))
+    reacquired = acquirer(key="auto_release_test", timeout=compose.types.Seconds(1))
     assert reacquired.acquire()
     reacquired.release()
 

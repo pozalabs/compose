@@ -2,7 +2,7 @@ import functools
 import time
 import types
 from collections.abc import Callable
-from typing import ClassVar, NewType, Self
+from typing import ClassVar, Self
 
 import pendulum
 import pymongo
@@ -10,10 +10,10 @@ from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.errors import DuplicateKeyError
 
+from ..types import Seconds
 from .exceptions import LockAcquisitionFailedError
 
-Seconds = NewType("Seconds", float)
-MongoLockAcquirer = Callable[..., "MongoLock"]
+type MongoLockAcquirer = Callable[..., "MongoLock"]
 
 
 class MongoLock:
