@@ -1,7 +1,12 @@
+from typing import Self
+
 import pendulum
-from authlib.jose import JWTClaims, errors, jwt
+from authlib.jose import errors, jwt
 
 from .. import exceptions
+from . import vo
+
+_STANDARD_CLAIM_KEYS = frozenset({"sub", "iss", "jti", "iat", "exp"})
 
 
 class JWTDecoder:
@@ -9,7 +14,11 @@ class JWTDecoder:
         self.secret_key = secret_key
         self.clock = clock
 
-    def decode(self, token: str) -> JWTClaims:
+    @classmethod
+    def default(cls, secret_key: str) -> Self:
+        return cls(secret_key=secret_key, clock=pendulum.DateTime)
+
+    def decode(self, token: str) -> vo.TokenClaims:
         try:
             decoded = jwt.decode(token.encode(), key=self.secret_key)
         except (errors.DecodeError, errors.BadSignatureError):
@@ -17,7 +26,17 @@ class JWTDecoder:
 
         try:
             decoded.validate(now=int(self.clock.utcnow().timestamp()))
-        except (errors.ExpiredTokenError, errors.InvalidClaimError):
-            raise exceptions.AuthorizationError("Expired or incorrect format")
+        except errors.ExpiredTokenError:
+            raise exceptions.AuthorizationError("Token has expired")
+        except errors.InvalidClaimError:
+            raise exceptions.AuthorizationError("Invalid token claims")
 
-        return decoded
+        extra = {k: v for k, v in decoded.items() if k not in _STANDARD_CLAIM_KEYS}
+        return vo.TokenClaims(
+            sub=decoded["sub"],
+            iss=decoded["iss"],
+            jti=decoded["jti"],
+            iat=decoded["iat"],
+            exp=decoded["exp"],
+            extra=extra,
+        )

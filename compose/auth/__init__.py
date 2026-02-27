@@ -1,9 +1,10 @@
 from .resource_server import ResourceServer
-from .vo import AuthorizationGrant, UserResource
+from .vo import AuthorizationGrant, TokenClaims, UserResource
 
 __all__ = [
     "AuthorizationGrant",
     "ResourceServer",
+    "TokenClaims",
     "UserResource",
 ]
 
