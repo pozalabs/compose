@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import functools
 import time
 import types
@@ -13,7 +15,7 @@ from pymongo.errors import DuplicateKeyError
 from ..types import Seconds
 from .exceptions import LockAcquisitionFailedError
 
-type MongoLockAcquirer = Callable[..., "MongoLock"]
+type MongoLockAcquirer = Callable[..., MongoLock]
 
 
 class MongoLock:
