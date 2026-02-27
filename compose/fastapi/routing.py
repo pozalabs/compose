@@ -56,7 +56,7 @@ def create_auto_wired_route(provider: Provider) -> type[APIRoute]:
         def __init__(self, path: str, endpoint: Callable[..., Any], **kwargs: Any):
             super().__init__(
                 path=path,
-                endpoint=auto_wired(provider, with_injection=True)(endpoint),
+                endpoint=auto_wired(provider)(endpoint),
                 **kwargs,
             )
 
