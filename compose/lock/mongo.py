@@ -1,6 +1,7 @@
 import functools
 import time
 import types
+from collections.abc import Callable
 from typing import ClassVar, NewType, Protocol, Self
 
 import pendulum
@@ -35,12 +36,14 @@ class MongoLock:
         auto_release_after: Seconds = Seconds(60),
         timeout: Seconds = Seconds(60),
         lock_acquisition_interval: Seconds = Seconds(0.1),
+        clock: Callable[[], pendulum.DateTime] = pendulum.DateTime.utcnow,
     ):
         self.key = key
         self.collection = collection
         self.auto_release_after = auto_release_after
         self.timeout = timeout
         self.lock_acquisition_interval = lock_acquisition_interval
+        self.clock = clock
 
     @classmethod
     def _ensure_ttl_index(cls, collection: Collection) -> None:
@@ -53,11 +56,16 @@ class MongoLock:
             )
 
     @classmethod
-    def acquirer(cls, db: Database, collection_name: str | None = None) -> MongoLockAcquirer:
+    def acquirer(
+        cls,
+        db: Database,
+        collection_name: str | None = None,
+        clock: Callable[[], pendulum.DateTime] = pendulum.DateTime.utcnow,
+    ) -> MongoLockAcquirer:
         collection_name = collection_name or cls.default_collection_name
         collection = db[collection_name]
         cls._ensure_ttl_index(collection)
-        return functools.partial(cls, collection=collection)
+        return functools.partial(cls, collection=collection, clock=clock)
 
     def __enter__(self) -> Self:
         if self.acquire():
@@ -74,16 +82,16 @@ class MongoLock:
         self.release()
 
     def acquire(self) -> bool:
-        start_time = pendulum.DateTime.utcnow()
-        try_until = start_time.add(seconds=self.timeout)
+        try_until = self.clock().add(seconds=self.timeout)
 
         while True:
-            expires_at = pendulum.DateTime.utcnow().add(seconds=self.auto_release_after)
+            now = self.clock()
+            expires_at = now.add(seconds=self.auto_release_after)
             try:
                 lock = self.collection.find_one_and_update(
                     {
                         "_id": self.key,
-                        "expires_at": {"$lt": pendulum.DateTime.utcnow()},
+                        "expires_at": {"$lt": now},
                     },
                     {"$set": {"expires_at": expires_at}},
                     upsert=True,
@@ -96,7 +104,7 @@ class MongoLock:
             except DuplicateKeyError:
                 pass
 
-            if pendulum.DateTime.utcnow() > try_until:
+            if self.clock() > try_until:
                 return False
 
             time.sleep(self.lock_acquisition_interval)
