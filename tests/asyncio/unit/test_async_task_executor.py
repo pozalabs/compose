@@ -21,7 +21,7 @@ async def slow_task(delay: float = 0.1) -> str:
 
 
 @pytest.mark.asyncio
-async def test_execute_without_group():
+async def test_execute():
     executor = compose.asyncio.AsyncTaskExecutor(concurrency=2)
     actual = await executor.execute(
         [
@@ -33,37 +33,9 @@ async def test_execute_without_group():
             )
             for i in range(2)
         ],
-        group=False,
     )
 
-    expected = [
-        compose.asyncio.Result(key="task-0", value=1),
-        compose.asyncio.Result(key="task-1", value=3),
-    ]
-
-    assert sorted(actual, key=lambda x: x.key) == expected
-
-
-@pytest.mark.asyncio
-async def test_execute_with_group():
-    executor = compose.asyncio.AsyncTaskExecutor(concurrency=2)
-    actual = await executor.execute(
-        [
-            compose.asyncio.AsyncJob(
-                f"task-{i}",
-                func=add_async,
-                a=i,
-                b=i + 1,
-            )
-            for i in range(2)
-        ],
-        group=True,
-    )
-
-    expected = {
-        "task-0": compose.asyncio.Result(key="task-0", value=1),
-        "task-1": compose.asyncio.Result(key="task-1", value=3),
-    }
+    expected = {"task-0": 1, "task-1": 3}
 
     assert actual == expected
 
@@ -78,7 +50,6 @@ async def test_execute_with_concurrency_limit():
         jobs=[
             compose.asyncio.AsyncJob(key=f"task-{i}", func=slow_task, delay=0.05) for i in range(3)
         ],
-        group=False,
     )
 
     end_time = asyncio.get_event_loop().time()
@@ -98,7 +69,6 @@ async def test_execute_fail_fast():
                 compose.asyncio.AsyncJob(key="failure", func=failing_task),
                 compose.asyncio.AsyncJob(key="slow", func=slow_task, delay=0.2),
             ],
-            group=False,
         )
 
 
@@ -112,7 +82,6 @@ async def test_execute_with_timeout():
                 compose.asyncio.AsyncJob(key=f"task-{i}", func=slow_task, delay=0.1)
                 for i in range(2)
             ],
-            group=False,
         )
 
 
@@ -124,12 +93,11 @@ async def test_execute_with_override_timeout():
         jobs=[
             compose.asyncio.AsyncJob(key=f"task-{i}", func=slow_task, delay=0.02) for i in range(2)
         ],
-        group=False,
         timeout=1,
     )
 
     assert len(actual) == 2
-    assert all(result.value == "completed" for result in actual)
+    assert all(value == "completed" for value in actual.values())
 
 
 @pytest.mark.asyncio
@@ -140,7 +108,6 @@ async def test_execute_with_override_concurrency():
 
     await executor.execute(
         jobs=[compose.asyncio.AsyncJob(f"task-{i}", slow_task, 0.05) for i in range(3)],
-        group=False,
         concurrency=3,
     )
 
@@ -156,10 +123,9 @@ async def test_single_job():
 
     actual = await executor.execute(
         jobs=[compose.asyncio.AsyncJob("task-0", add_async, a=5, b=3)],
-        group=True,
     )
 
-    expected = {"task-0": compose.asyncio.Result(key="task-0", value=8)}
+    expected = {"task-0": 8}
 
     assert actual == expected
 
@@ -170,7 +136,6 @@ async def test_no_timeout():
 
     actual = await executor.execute(
         jobs=[compose.asyncio.AsyncJob(key="task-0", func=slow_task, delay=0.02)],
-        group=False,
     )
 
-    assert actual == [compose.asyncio.Result(key="task-0", value="completed")]
+    assert actual == {"task-0": "completed"}

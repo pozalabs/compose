@@ -1,9 +1,6 @@
 import concurrent.futures
 import functools
 from collections.abc import Callable, Hashable
-from typing import Literal, overload
-
-from pydantic.dataclasses import dataclass
 
 
 def execute_in_pool[K, T](
@@ -38,47 +35,22 @@ class ThreadPoolJob[K: Hashable, **P, T]:
         self.kwargs = kwargs
 
 
-@dataclass
-class Result[K: Hashable, T]:
-    key: K
-    value: T
-
-
 class ThreadPoolExecutor:
     def __init__(self, max_workers: int, timeout: int | None = None):
         self.max_workers = max_workers
         self.timeout = timeout
 
-    @overload
     def execute[K, **P, T](
         self,
         jobs: list[ThreadPoolJob[K, P, T]],
-        group: Literal[True] = True,
         max_workers: int | None = None,
         timeout: int | None = None,
-    ) -> dict[K, Result[K, T]]: ...
-
-    @overload
-    def execute[K, **P, T](
-        self,
-        jobs: list[ThreadPoolJob[K, P, T]],
-        group: Literal[False] = False,
-        max_workers: int | None = None,
-        timeout: int | None = None,
-    ) -> list[Result[K, T]]: ...
-
-    def execute[K, **P, T](
-        self,
-        jobs: list[ThreadPoolJob[K, P, T]],
-        group: bool = False,
-        max_workers: int | None = None,
-        timeout: int | None = None,
-    ) -> list[Result[K, T]] | dict[K, Result[K, T]]:
-        result = []
+    ) -> dict[K, T]:
+        result: dict[K, T] = {}
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=max_workers or self.max_workers
         ) as executor:
-            future_to_key = {}
+            future_to_key: dict[concurrent.futures.Future[T], K] = {}
 
             for job in jobs:
                 future = executor.submit(functools.partial(job.func, *job.args, **job.kwargs))
@@ -87,6 +59,6 @@ class ThreadPoolExecutor:
             for future in concurrent.futures.as_completed(
                 future_to_key, timeout=timeout or self.timeout
             ):
-                result.append(Result(key=future_to_key[future], value=future.result()))
+                result[future_to_key[future]] = future.result()
 
-        return {result.key: result for result in result} if group else result
+        return result
