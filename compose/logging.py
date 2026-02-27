@@ -7,17 +7,15 @@ import os
 import sys
 from collections.abc import Iterable
 from types import FrameType
-from typing import TYPE_CHECKING, Protocol, Self, Unpack, cast
+from typing import TYPE_CHECKING, Protocol, Self, Unpack
 
 try:
     from loguru import logger
 except ImportError:
     raise ImportError("Install `loguru` extra to use logging features") from None
 
-from loguru import BasicHandlerConfig
-
 if TYPE_CHECKING:
-    from loguru import Logger, Record
+    from loguru import BasicHandlerConfig, Logger, Record
 
 
 class InterceptHandler(logging.Handler):
@@ -121,20 +119,17 @@ def create_logger(**config: Unpack[BasicHandlerConfig]) -> Logger:
 
     logger.configure(
         handlers=[
-            cast(
-                BasicHandlerConfig,
-                {
-                    "sink": sys.stdout,
-                    "level": level,
-                    "diagnose": False,
-                    "filter": LogFilter(
-                        LogFilterNotContains("/health-check"),
-                        LogFilterNotContains("/metrics"),
-                    ),
-                    **dataclasses.asdict(LogDisplayConfig.non_serialized()),
-                }
-                | config,
-            )
+            {
+                "sink": sys.stdout,
+                "level": level,
+                "diagnose": False,
+                "filter": LogFilter(
+                    LogFilterNotContains("/health-check"),
+                    LogFilterNotContains("/metrics"),
+                ),
+                **dataclasses.asdict(LogDisplayConfig.non_serialized()),
+            }
+            | config
         ]
     )
 
