@@ -7,7 +7,7 @@ from pydantic import Field
 from . import types
 
 
-class _IdField:
+class _PyObjectIdField:
     def __call__(self, **kwargs) -> Any:
         default_kwargs = {"alias": "_id"}
         return Field(**(default_kwargs | kwargs))  # type: ignore
@@ -19,5 +19,5 @@ class _DatetimeField:
         return Field(**(default_kwargs | kwargs))  # type: ignore
 
 
-IdField: Callable[..., Any] = _IdField()
+PyObjectIdField: Callable[..., Any] = _PyObjectIdField()
 DateTimeField: Callable[..., types.DateTime] = _DatetimeField()

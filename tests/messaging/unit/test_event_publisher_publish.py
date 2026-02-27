@@ -20,7 +20,9 @@ class InMemoryMessageQueue(compose.messaging.MessageQueue):
 
 
 class SomeEvent(compose.event.Event[compose.types.PyObjectId]):
-    id: compose.types.PyObjectId = compose.field.IdField(default_factory=compose.types.PyObjectId)
+    id: compose.types.PyObjectId = compose.field.PyObjectIdField(
+        default_factory=compose.types.PyObjectId
+    )
 
 
 def test_publish():

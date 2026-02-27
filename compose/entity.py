@@ -31,7 +31,7 @@ try:
     from .types import PyObjectId
 
     class MongoEntity(Entity[PyObjectId]):
-        id: PyObjectId = field.IdField(default_factory=PyObjectId)
+        id: PyObjectId = field.PyObjectIdField(default_factory=PyObjectId)
 
 except ImportError:
     pass
