@@ -16,7 +16,7 @@ try:
         openapi_tags,
     )
     from .otel import NonInstrumentedUrls
-    from .param import FromAuth, FromPath, OffsetPaginationParams, as_query, to_query, with_fields
+    from .param import FromAuth, FromPath, OffsetPaginationParams, as_query, with_fields
     from .response import NoContentResponse, ZipStreamingResponse
     from .routing import APIRouter, create_auto_wired_route
     from .security import APIKeyHeader, CookieAuth, HTTPBasic, HTTPBearer, unauthorized_error
@@ -53,7 +53,6 @@ __all__ = [
     "default_exception_handlers",
     "health_check",
     "openapi_tags",
-    "to_query",
     "unauthorized_error",
     "with_fields",
 ]

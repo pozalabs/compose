@@ -33,6 +33,7 @@ uv run pyrefly check
 ```
 
 - 설정: `pyproject.toml`의 `[tool.pyrefly]` 섹션
+- 타입 에러 무시 시 `# type: ignore[error-code]` 사용
 
 ## 테스트
 

@@ -5,7 +5,7 @@ from typing import Annotated, Any, cast, get_args
 
 import pydantic_core
 from fastapi import Depends, Path, Query, params
-from pydantic import BaseModel, Field, Json, create_model, field_validator
+from pydantic import BaseModel, Field, Json
 
 from compose import query, types
 
@@ -24,57 +24,42 @@ TYPE_VALIDATORS = {
 }
 
 
-def to_query[Q: BaseModel](q: type[Q], /) -> type[Q]:
-    field_args = (
-        "title",
-        "alias",
-        "default",
-        "default_factory",
-        "description",
-    )
+_QUERY_FIELD_ARGS = ("title", "alias", "default", "default_factory", "description")
 
-    validators = {}
-    field_args = (*field_args, "annotation")
-    field_definitions = {}
-    for field_name, field_info in q.model_fields.items():
-        annotation = field_info.annotation
 
-        metadata = {}
-        for item in field_info.metadata:
-            metadata |= asdict(item)
+def _build_query_resolver[Q: BaseModel](q: type[Q], /) -> Callable[..., Q]:
+    pre_validators: dict[str, list[Callable[..., Any]]] = {}
+    for field_name, field_info in q.model_fields.items():  # type: ignore[arg-type]
+        for arg in get_args(field_info.annotation):
+            for validator in TYPE_VALIDATORS.get(arg, []):
+                pre_validators.setdefault(field_name, []).append(validator)
 
-        field_definitions[field_name] = (
-            annotation,
-            Field(
-                Query(
-                    **{arg: getattr(field_info, arg, None) for arg in field_args},
-                    **metadata,
-                )
-            ),
-        )
-        if not (args := get_args(annotation)):
-            continue
+    def factory(**kwargs: Any) -> Q:
+        for key, validators in pre_validators.items():
+            if key in kwargs:
+                for validate in validators:
+                    kwargs[key] = validate(kwargs[key])
+        return q(**kwargs)
 
-        if (arg := next((arg for arg in args if arg is not None), None)) is None:
-            continue
-
-        validators |= {
-            f"{field_name}_{validator.__name__}": field_validator(field_name, mode="before")(
-                validator
+    cast(Any, factory).__signature__ = inspect.Signature(
+        parameters=[
+            inspect.Parameter(
+                field_name,
+                inspect.Parameter.KEYWORD_ONLY,
+                default=Query(
+                    **{arg: getattr(field_info, arg, None) for arg in _QUERY_FIELD_ARGS},  # type: ignore[arg-type]
+                    **{k: v for item in field_info.metadata for k, v in asdict(item).items()},
+                ),
+                annotation=field_info.annotation,
             )
-            for validator in TYPE_VALIDATORS.get(arg, [])
-        }
-
-    return create_model(
-        f"{q.__name__}Query",
-        **field_definitions,
-        __validators__=validators,
-        __base__=q,
+            for field_name, field_info in q.model_fields.items()  # type: ignore[arg-type]
+        ],
     )
+    return factory
 
 
 def as_query[Q: BaseModel](q: type[Q], /) -> Any:
-    return Depends(to_query(q))
+    return Depends(_build_query_resolver(q))
 
 
 def create_model_dependency_resolver[T: BaseModel](
