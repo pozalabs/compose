@@ -15,7 +15,7 @@ from .router import router
     tags=[constants.OpenApiTag.USER],
     summary="유저 조회",
 )
-@compose.fastapi.auto_wired(provide, with_injection=True)
+@compose.fastapi.auto_wired(provide)
 def retrieve_user(
     user_id: int,
     user_repository: UserRepository,
@@ -34,7 +34,7 @@ def retrieve_user(
     tags=[constants.OpenApiTag.USER],
     summary="유저 목록 조회",
 )
-@compose.fastapi.auto_wired(provide, with_injection=True)
+@compose.fastapi.auto_wired(provide)
 def list_users(
     user_repository: UserRepository,
     session_factory: sessionmaker,
@@ -55,7 +55,7 @@ def list_users(
     tags=[constants.OpenApiTag.USER],
     summary="유저 추가",
 )
-@compose.fastapi.auto_wired(provide, with_injection=True)
+@compose.fastapi.auto_wired(provide)
 def add_user(
     cmd: service.command.AddUser,
     handler: service.AddUserHandler,
