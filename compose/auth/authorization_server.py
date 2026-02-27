@@ -13,23 +13,18 @@ class AuthorizationServer:
         self,
         auth_client_factory: Callable[..., AsyncOAuth2Client],
         access_token_url: str,
-        revoke_token_url: str,
     ):
         self.auth_client_factory = auth_client_factory
         self.access_token_url = access_token_url
-        self.revoke_token_url = revoke_token_url
 
     @classmethod
-    def default(
-        cls, client_id: str, client_secret: str, access_token_url: str, revoke_token_url: str
-    ) -> Self:
+    def default(cls, client_id: str, client_secret: str, access_token_url: str) -> Self:
         return cls(
             auth_client_factory=lambda: AsyncOAuth2Client(
                 client_id=client_id,
                 client_secret=client_secret,
             ),
             access_token_url=access_token_url,
-            revoke_token_url=revoke_token_url,
         )
 
     async def grant_authorization(self, redirect_uri: str, code: str) -> vo.AuthorizationGrant:
@@ -56,9 +51,3 @@ class AuthorizationServer:
                 refresh_token=token,
             )
         return vo.AuthorizationGrant.model_validate(response)
-
-    async def create_authorization_url(self, redirect_uri: str) -> str:
-        raise NotImplementedError
-
-    async def revoke_token(self, token: str) -> None:
-        raise NotImplementedError
