@@ -84,9 +84,9 @@ except ImportError:
     pass
 
 try:
-    from . import opentelemetry  # noqa: F401
+    from . import otel  # noqa: F401
 
-    __all__.append("opentelemetry")
+    __all__.append("otel")
 except ImportError:
     pass
 
