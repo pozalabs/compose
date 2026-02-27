@@ -89,3 +89,7 @@ def test_ttl_index_creation_is_idempotent(mongo_client: pymongo.MongoClient):
     collection_name = "test_ttl_idempotent"
     compose.lock.MongoLock.acquirer(db=db, collection_name=collection_name)
     compose.lock.MongoLock.acquirer(db=db, collection_name=collection_name)
+
+    index_name = compose.lock.MongoLock.index_name
+    indexes = db[collection_name].index_information()
+    assert index_name in indexes
