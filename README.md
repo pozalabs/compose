@@ -54,6 +54,10 @@ POZAlabs 백엔드 서비스의 공통 컴포넌트 라이브러리
 - `opentelemetry`: 계측 확장
 - `testcontainers`: 테스트용 Docker 컨테이너
 
+## 마이그레이션
+
+- [v2 마이그레이션 가이드](docs/v2-migration-guide.md)
+
 ## 시작하기
 
 ```bash
