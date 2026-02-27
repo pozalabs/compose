@@ -307,8 +307,7 @@ create_logger(level=logging.DEBUG)  # 동일하게 kwargs로 전달
 `AuthorizationServer`, `JWTDecoder`, `JWTIssuer` 사용 시 authlib 설치 필요
 
 ```bash
-pip install authlib
-# 또는 pyproject.toml의 extras에 추가
+uv add authlib
 ```
 
 미설치 상태에서 import하면 `ImportError` 발생
