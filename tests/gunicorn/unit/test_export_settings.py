@@ -4,7 +4,6 @@ from compose.gunicorn.settings import GunicornSettings, export_settings
 class SampleSettings(GunicornSettings):
     wsgi_app: str = "test.app:app"
     workers: int = 1
-    threads: int = 2
     timeout: int = 60
 
 
@@ -12,8 +11,7 @@ DEFAULT_EXPORTS = {
     "wsgi_app": "test.app:app",
     "bind": "0.0.0.0:80",
     "workers": 1,
-    "worker_class": "uvicorn.UvicornWorker",
-    "threads": 2,
+    "worker_class": "uvicorn_worker.UvicornWorker",
     "timeout": 60,
 }
 
