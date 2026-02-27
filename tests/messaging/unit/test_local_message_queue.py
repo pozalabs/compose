@@ -13,7 +13,9 @@ def local_message_queue() -> compose.messaging.LocalMessageQueue:
 
 
 class SomeEvent(compose.event.Event[compose.types.PyObjectId]):
-    id: compose.types.PyObjectId = compose.field.IdField(default_factory=compose.types.PyObjectId)
+    id: compose.types.PyObjectId = compose.field.PyObjectIdField(
+        default_factory=compose.types.PyObjectId
+    )
     name: str
 
 

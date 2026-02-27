@@ -2,5 +2,5 @@ import compose
 
 
 class User(compose.schema.TimeStampedSchema):
-    id: compose.types.PyObjectId = compose.field.IdField()
+    id: compose.types.PyObjectId = compose.field.PyObjectIdField()
     name: str

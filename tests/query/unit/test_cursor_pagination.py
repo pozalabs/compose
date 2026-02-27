@@ -15,7 +15,7 @@ from compose.query.mongo.op import (
 
 class TCursor(Cursor):
     created_at: compose.types.DateTime
-    id: compose.types.PyObjectId = compose.field.IdField()
+    id: compose.types.PyObjectId = compose.field.PyObjectIdField()
 
 
 def test_cursor_encode_decode():
