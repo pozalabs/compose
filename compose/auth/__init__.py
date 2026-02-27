@@ -1,18 +1,14 @@
-from .resource_server import ResourceServer
-from .vo import AuthorizationGrant, UserResource
+from .vo import TokenClaims
 
 __all__ = [
-    "AuthorizationGrant",
-    "ResourceServer",
-    "UserResource",
+    "TokenClaims",
 ]
 
 try:
-    from .authorization_server import AuthorizationServer
     from .token_decoder import JWTDecoder
     from .token_issuer import JWTIssuer
 
-    __all__ += ["AuthorizationServer", "JWTDecoder", "JWTIssuer"]
+    __all__ += ["JWTDecoder", "JWTIssuer"]
 except ImportError:
     pass
 
