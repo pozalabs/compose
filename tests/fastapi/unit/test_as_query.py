@@ -27,7 +27,7 @@ client = TestClient(app)
 
 
 @pytest.mark.parametrize(
-    "params, expected_status_code, expected_response",
+    "params, expected_response",
     [
         pytest.param(
             {
@@ -35,7 +35,6 @@ client = TestClient(app)
                 "page": 1,
                 "per_page": 10,
             },
-            http.HTTPStatus.OK,
             {
                 "types": ["foo", "bar"],
                 "filter": None,
@@ -50,7 +49,6 @@ client = TestClient(app)
                 "page": 1,
                 "per_page": 10,
             },
-            http.HTTPStatus.OK,
             {
                 "types": ["foo", "bar"],
                 "filter": {"foo": "bar"},
@@ -62,7 +60,6 @@ client = TestClient(app)
 )
 def test_as_query(
     params: dict[str, Any],
-    expected_status_code: int,
     expected_response: dict[str, Any],
 ):
     response = client.get(
