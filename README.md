@@ -1,6 +1,6 @@
 # compose
 
-POZAlabs 백엔드 서비스의 공통 컴포넌트 라이브러리
+Pozalabs 백엔드 서비스의 공통 컴포넌트 라이브러리
 
 도메인 모델링부터 영속성, 메시징, API 통합까지, 서비스 구현에 반복되는 전술적 패턴을 제공
 
@@ -53,6 +53,10 @@ POZAlabs 백엔드 서비스의 공통 컴포넌트 라이브러리
 - `aws`: S3 URL 생성
 - `opentelemetry`: 계측 확장
 - `testcontainers`: 테스트용 Docker 컨테이너
+
+## 마이그레이션
+
+- [v2 마이그레이션 가이드](docs/v2-migration-guide.md)
 
 ## 시작하기
 
