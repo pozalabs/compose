@@ -6,6 +6,12 @@ compose v1에서 v2로 업그레이드하기 위한 가이드
 
 검색/치환으로 해결 가능한 변경 사항
 
+### 패키지 리네임
+
+| v1 | v2 |
+|---|---|
+| `compose.opentelemetry` | `compose.otel` |
+
 ### deprecated alias
 
 | v1 | v2 |

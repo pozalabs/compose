@@ -10,7 +10,7 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from opentelemetry.test.globals_test import reset_trace_globals
 
-from compose.opentelemetry import LoguruInstrumentor
+from compose.otel import LoguruInstrumentor
 
 
 @pytest.fixture

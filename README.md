@@ -51,7 +51,7 @@ Pozalabs 백엔드 서비스의 공통 컴포넌트 라이브러리
 
 - `fastapi`: 라우터, 예외 핸들러, 인증 스킴, Sentry
 - `aws`: S3 URL 생성
-- `opentelemetry`: 계측 확장
+- `otel`: 계측 확장
 - `testcontainers`: 테스트용 Docker 컨테이너
 
 ## 마이그레이션
@@ -78,7 +78,7 @@ extras 패키지는 관리하지 않으며, 아래 기능이 필요하면 해당
 - `boto3`: AWS 서비스 (`aws`, `messaging.SqsMessageQueue`, `settings.AWSParameterStoreSettingsSource`)
 - `httpx`: HTTP 클라이언트 확장 (`httpx`)
 - `bcrypt`: 비밀번호 해싱 (`auth.HashedPassword`)
-- `opentelemetry-distro[otlp]`: OpenTelemetry 계측 (`opentelemetry`)
+- `opentelemetry-distro[otlp]`: OpenTelemetry 계측 (`otel`)
 - `pytest`: 테스트 유틸리티 (`testing`)
 - `testcontainers[mongodb]`: 테스트용 MongoDB 컨테이너 (`testcontainers`)
 
