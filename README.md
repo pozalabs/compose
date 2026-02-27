@@ -41,7 +41,7 @@ Pozalabs 백엔드 서비스의 공통 컴포넌트 라이브러리
 서비스 운영에 필요한 횡단 관심사
 
 - `dependency`: 의존성 주입 컨테이너
-- `auth`: JWT 발급/검증, OAuth 2.0
+- `auth`: JWT 발급/검증, OAuth 2.0 클라이언트 ([인증 가이드](docs/auth-guide.md))
 - `schema`: API 응답 모델, 페이지네이션
 - `settings`: AWS Parameter Store 기반 설정
 
