@@ -42,19 +42,22 @@ class MongoLock:
         self.timeout = timeout
         self.lock_acquisition_interval = lock_acquisition_interval
 
-    def _ensure_ttl_index(self) -> None:
-        current_index = self.collection.index_information()
-        if self.index_name not in current_index:
-            self.collection.create_index(
-                [(self.index_name, pymongo.ASCENDING)],
-                name=self.index_name,
+    @classmethod
+    def _ensure_ttl_index(cls, collection: Collection) -> None:
+        current_index = collection.index_information()
+        if cls.index_name not in current_index:
+            collection.create_index(
+                [("expires_at", pymongo.ASCENDING)],
+                name=cls.index_name,
                 expireAfterSeconds=0,
             )
 
     @classmethod
     def acquirer(cls, db: Database, collection_name: str | None = None) -> MongoLockAcquirer:
         collection_name = collection_name or cls.default_collection_name
-        return functools.partial(cls, collection=db[collection_name])
+        collection = db[collection_name]
+        cls._ensure_ttl_index(collection)
+        return functools.partial(cls, collection=collection)
 
     def __enter__(self) -> Self:
         if self.acquire():
@@ -73,9 +76,9 @@ class MongoLock:
     def acquire(self) -> bool:
         start_time = pendulum.DateTime.utcnow()
         try_until = start_time.add(seconds=self.timeout)
-        expires_at = pendulum.DateTime.utcnow().add(seconds=self.auto_release_after)
 
         while True:
+            expires_at = pendulum.DateTime.utcnow().add(seconds=self.auto_release_after)
             try:
                 lock = self.collection.find_one_and_update(
                     {
