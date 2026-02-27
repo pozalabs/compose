@@ -29,7 +29,7 @@ _QUERY_FIELD_ARGS = ("title", "alias", "default", "default_factory", "descriptio
 
 def _build_query_resolver[Q: BaseModel](q: type[Q], /) -> Callable[..., Q]:
     pre_validators: dict[str, list[Callable[..., Any]]] = {}
-    for field_name, field_info in q.model_fields.items():
+    for field_name, field_info in q.model_fields.items():  # type: ignore[arg-type]
         for arg in get_args(field_info.annotation):
             for validator in TYPE_VALIDATORS.get(arg, []):
                 pre_validators.setdefault(field_name, []).append(validator)
@@ -47,12 +47,12 @@ def _build_query_resolver[Q: BaseModel](q: type[Q], /) -> Callable[..., Q]:
                 field_name,
                 inspect.Parameter.KEYWORD_ONLY,
                 default=Query(
-                    **{arg: getattr(field_info, arg, None) for arg in _QUERY_FIELD_ARGS},
+                    **{arg: getattr(field_info, arg, None) for arg in _QUERY_FIELD_ARGS},  # type: ignore[arg-type]
                     **{k: v for item in field_info.metadata for k, v in asdict(item).items()},
                 ),
                 annotation=field_info.annotation,
             )
-            for field_name, field_info in q.model_fields.items()
+            for field_name, field_info in q.model_fields.items()  # type: ignore[arg-type]
         ],
     )
     return factory
