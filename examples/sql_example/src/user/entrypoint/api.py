@@ -1,5 +1,3 @@
-from dependency_injector.wiring import inject
-from fastapi import Depends
 from sqlalchemy.orm import sessionmaker
 from src import constants
 from src.dependency import provide
@@ -17,11 +15,11 @@ from .router import router
     tags=[constants.OpenApiTag.USER],
     summary="유저 조회",
 )
-@inject
+@compose.fastapi.auto_wired(provide, with_injection=True)
 def retrieve_user(
     user_id: int,
-    user_repository: UserRepository = Depends(provide(UserRepository)),
-    session_factory: sessionmaker = Depends(provide(sessionmaker)),
+    user_repository: UserRepository,
+    session_factory: sessionmaker,
 ):
     with session_factory() as session:
         if (user := user_repository.find_by_id(user_id, session)) is None:
@@ -36,11 +34,11 @@ def retrieve_user(
     tags=[constants.OpenApiTag.USER],
     summary="유저 목록 조회",
 )
-@inject
+@compose.fastapi.auto_wired(provide, with_injection=True)
 def list_users(
+    user_repository: UserRepository,
+    session_factory: sessionmaker,
     name: str | None = None,
-    user_repository: UserRepository = Depends(provide(UserRepository)),
-    session_factory: sessionmaker = Depends(provide(sessionmaker)),
 ):
     filter_ = {}
     if name is not None:
@@ -57,9 +55,9 @@ def list_users(
     tags=[constants.OpenApiTag.USER],
     summary="유저 추가",
 )
-@inject
+@compose.fastapi.auto_wired(provide, with_injection=True)
 def add_user(
     cmd: service.command.AddUser,
-    handler: service.AddUserHandler = Depends(provide(service.AddUserHandler)),
+    handler: service.AddUserHandler,
 ):
     return handler.handle(cmd)
