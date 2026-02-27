@@ -1,3 +1,3 @@
-from .container import ApplicationContainer, provide, wirer
+from .container import ApplicationContainer, provide
 
-__all__ = ["ApplicationContainer", "wirer", "provide"]
+__all__ = ["ApplicationContainer", "provide"]
