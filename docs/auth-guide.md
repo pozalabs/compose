@@ -89,8 +89,7 @@ jwt_decoder = compose.auth.JWTDecoder.default(secret_key="your-secret-key")
 
 def get_current_user(token: str) -> User:
     claims = jwt_decoder.decode(token)
-    user = user_repository.find_by_id(claims.sub)
-    if user is None:
+    if (user := user_repository.find_by_id(claims.sub)) is None:
         raise compose.exceptions.AuthorizationError()
     return user
 ```
