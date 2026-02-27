@@ -2,7 +2,7 @@ import functools
 import time
 import types
 from collections.abc import Callable
-from typing import ClassVar, NewType, Protocol, Self
+from typing import ClassVar, NewType, Self
 
 import pendulum
 import pymongo
@@ -13,16 +13,7 @@ from pymongo.errors import DuplicateKeyError
 from .exceptions import LockAcquisitionFailedError
 
 Seconds = NewType("Seconds", float)
-
-
-class MongoLockAcquirer(Protocol):
-    def __call__(
-        self,
-        key: str,
-        auto_release_after: Seconds = Seconds(60),
-        timeout: Seconds = Seconds(60),
-        lock_acquisition_interval: Seconds = Seconds(0.1),
-    ) -> Self: ...
+MongoLockAcquirer = Callable[..., "MongoLock"]
 
 
 class MongoLock:
@@ -61,7 +52,7 @@ class MongoLock:
         db: Database,
         collection_name: str | None = None,
         clock: Callable[[], pendulum.DateTime] = pendulum.DateTime.utcnow,
-    ) -> MongoLockAcquirer:
+    ) -> Callable[..., Self]:
         collection_name = collection_name or cls.default_collection_name
         collection = db[collection_name]
         cls._ensure_ttl_index(collection)
