@@ -5,7 +5,6 @@ from typing import Annotated, Any
 
 import pytest
 from dependency_injector import providers
-from dependency_injector.wiring import inject
 from fastapi import APIRouter, FastAPI, Query
 from pydantic import Field
 from starlette.testclient import TestClient
@@ -55,7 +54,6 @@ router = APIRouter()
 
 
 @router.get("/v1/users", response_model=list[User])
-@inject
 @compose.fastapi.auto_wired(provide)
 def list_users(
     qry: Annotated[ListUsers, Query()],
@@ -65,7 +63,7 @@ def list_users(
 
 
 @router.get("/v1/users/{name}", response_model=User)
-@compose.fastapi.auto_wired(provide, with_injection=True)
+@compose.fastapi.auto_wired(provide)
 def retrieve_user(
     name: str,
     user_repository: UserRepository,

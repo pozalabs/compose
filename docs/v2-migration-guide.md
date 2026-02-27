@@ -138,6 +138,31 @@ def create_item(service: ItemService):
     ...
 ```
 
+### FastAPI: auto_wired()의 with_injection 파라미터 제거
+
+`auto_wired`가 `inject`를 항상 적용하므로, `with_injection=True` 전달이나 수동 `@inject` 적용이 불필요
+
+```python
+# v1
+@inject
+@auto_wired(provider)
+def list_items(service: ItemService):
+    ...
+
+@auto_wired(provider, with_injection=True)
+def get_item(service: ItemService):
+    ...
+
+# v2
+@auto_wired(provider)
+def list_items(service: ItemService):
+    ...
+
+@auto_wired(provider)
+def get_item(service: ItemService):
+    ...
+```
+
 ### FastAPI: to_query() 제거
 
 `as_query()`로 대체
