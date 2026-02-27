@@ -10,8 +10,7 @@ class GunicornSettings(BaseModel):
     wsgi_app: str
     bind: str = "0.0.0.0:80"
     workers: int = Field(default_factory=lambda: (os.cpu_count() or 1) + 1)
-    worker_class: str = "uvicorn.UvicornWorker"
-    threads: int = 2
+    worker_class: str = "uvicorn_worker.UvicornWorker"
     timeout: int = 120
     max_requests: int | None = None
     max_requests_jitter: int | None = None
