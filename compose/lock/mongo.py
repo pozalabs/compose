@@ -7,7 +7,7 @@ import pendulum
 import pymongo
 from pymongo.collection import Collection
 from pymongo.database import Database
-from pymongo.errors import PyMongoError
+from pymongo.errors import DuplicateKeyError
 
 from .exceptions import LockAcquisitionFailedError
 
@@ -89,14 +89,11 @@ class MongoLock:
                     upsert=True,
                     return_document=pymongo.ReturnDocument.AFTER,
                 )
-                if lock is None:
-                    continue
-
                 # MongoDB는 Date 타입에서 나노초를 버리기 때문에 <=로 비교
                 if pendulum.instance(lock["expires_at"], tz=pendulum.UTC) <= expires_at:
                     return True
 
-            except PyMongoError:
+            except DuplicateKeyError:
                 pass
 
             if pendulum.DateTime.utcnow() > try_until:
