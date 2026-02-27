@@ -35,10 +35,10 @@ def _build_query_resolver[Q: BaseModel](q: type[Q], /) -> Callable[..., Q]:
                 pre_validators.setdefault(field_name, []).append(validator)
 
     def factory(**kwargs: Any) -> Q:
-        for name, validators in pre_validators.items():
-            if name in kwargs:
-                for validator in validators:
-                    kwargs[name] = validator(kwargs[name])
+        for key, validators in pre_validators.items():
+            if key in kwargs:
+                for validate in validators:
+                    kwargs[key] = validate(kwargs[key])
         return q(**kwargs)
 
     cast(Any, factory).__signature__ = inspect.Signature(
