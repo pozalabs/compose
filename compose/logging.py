@@ -14,8 +14,10 @@ try:
 except ImportError:
     raise ImportError("Install `loguru` extra to use logging features") from None
 
+from loguru import BasicHandlerConfig
+
 if TYPE_CHECKING:
-    from loguru import BasicHandlerConfig, Logger, Record
+    from loguru import Logger, Record
 
 
 class InterceptHandler(logging.Handler):
