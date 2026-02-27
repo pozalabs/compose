@@ -67,5 +67,5 @@ def test_cannot_decode_expired_token(
 ):
     token = issuer.issue(sub="user-123", expires_in=-1)
 
-    with pytest.raises(exceptions.AuthorizationError, match="Expired or incorrect format"):
+    with pytest.raises(exceptions.AuthorizationError, match="Token has expired"):
         decoder.decode(token)

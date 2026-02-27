@@ -26,7 +26,9 @@ class JWTDecoder:
 
         try:
             decoded.validate(now=int(self.clock.utcnow().timestamp()))
-        except (errors.ExpiredTokenError, errors.InvalidClaimError):
+        except errors.ExpiredTokenError:
+            raise exceptions.AuthorizationError("Token has expired")
+        except errors.InvalidClaimError:
             raise exceptions.AuthorizationError("Expired or incorrect format")
 
         extra = {k: v for k, v in decoded.items() if k not in _STANDARD_CLAIM_KEYS}
