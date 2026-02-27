@@ -1,7 +1,6 @@
 from typing import Annotated
 
-from dependency_injector.wiring import inject
-from fastapi import Depends, Query
+from fastapi import Query
 
 import compose
 from compose.query.mongo import op
@@ -20,10 +19,10 @@ from .router import router
     tags=[constants.OpenApiTag.USER],
     summary="유저 조회",
 )
-@inject
+@compose.fastapi.auto_wired(provide, with_injection=True)
 def retrieve_user(
     name: str,
-    user_repository: UserRepository = Depends(provide(UserRepository)),
+    user_repository: UserRepository,
 ):
     if (user := user_repository.find_by_name(name)) is None:
         raise compose.exceptions.DoesNotExistError()
@@ -37,10 +36,10 @@ def retrieve_user(
     tags=[constants.OpenApiTag.USER],
     summary="유저 조회",
 )
-@inject
+@compose.fastapi.auto_wired(provide, with_injection=True)
 def retrieve_user_by_email(
     email: str,
-    user_repository: UserRepository = Depends(provide(UserRepository)),
+    user_repository: UserRepository,
 ):
     if (user := user_repository.find_by(op.func.Q(op.Eq(email=email)))) is None:
         raise compose.exceptions.DoesNotExistError()
@@ -54,14 +53,11 @@ def retrieve_user_by_email(
     tags=[constants.OpenApiTag.USER],
     summary="유저 목록 조회",
 )
-@inject
-@compose.fastapi.auto_wired(provide)
+@compose.fastapi.auto_wired(provide, with_injection=True)
 def list_users(
     qry: Annotated[query.ListUsers, Query()],
     user_repository: UserRepository,
 ):
-    """`auto_wired` 데코레이터를 사용해 의존성 자동 주입"""
-
     result = user_repository.paginate(qry)
     return compose.schema.ListSchema[schema.User].from_result(result)
 
@@ -72,8 +68,7 @@ def list_users(
     tags=[constants.OpenApiTag.USER],
     summary="최근 유저 목록 조회 (커서 페이지네이션)",
 )
-@inject
-@compose.fastapi.auto_wired(provide)
+@compose.fastapi.auto_wired(provide, with_injection=True)
 def list_recent_users(
     qry: Annotated[query.ListRecentUsers, Query()],
     user_repository: UserRepository,
@@ -88,9 +83,9 @@ def list_recent_users(
     tags=[constants.OpenApiTag.USER],
     summary="유저 추가",
 )
-@inject
+@compose.fastapi.auto_wired(provide, with_injection=True)
 def add_user(
     cmd: command.AddUser,
-    handler: service.AddUserHandler = Depends(provide(service.AddUserHandler)),
+    handler: service.AddUserHandler,
 ):
     return handler.handle(cmd)

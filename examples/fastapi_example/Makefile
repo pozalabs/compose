@@ -1,4 +1,4 @@
-run: build up
+run: clean build up
 
 build:
 	cp -r ../../compose compose
