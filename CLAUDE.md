@@ -22,9 +22,9 @@
 - 식별자(클래스명, 변수명)에는 백틱 사용: `` `base_url` must be set ``
 - 일반 값에는 장식 없이 그대로 표기: `No provider named x for Foo`
 
-## Pre-commit hooks
+## Git hooks (prek)
 
-- ruff lint/format, import 정렬은 pre-commit hook이 자동 처리하므로 수동으로 수행하지 않음
+- ruff lint/format, import 정렬은 prek hook이 자동 처리하므로 수동으로 수행하지 않음
 
 ## 타입 검사
 
