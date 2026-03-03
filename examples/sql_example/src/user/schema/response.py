@@ -1,6 +1,8 @@
+import uuid
+
 import compose
 
 
 class User(compose.schema.TimeStampedSchema):
-    id: int
+    id: uuid.UUID
     name: str

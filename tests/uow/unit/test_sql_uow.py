@@ -1,7 +1,7 @@
 from typing import ClassVar
 
 import pytest
-from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine
+from sqlalchemy import Column, MetaData, String, Table, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 import compose
@@ -13,7 +13,7 @@ metadata = MetaData()
 item_table = Table(
     "items",
     metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("id", String(36), primary_key=True),
     Column("name", String(50)),
     Column("created_at", String),
     Column("updated_at", String),
@@ -55,7 +55,6 @@ def test_with_transaction_commit(uow: SQLUnitOfWork, session_factory: sessionmak
 
     result = uow.with_transaction(create_item)
 
-    assert result.id is not None
     with session_factory() as session:
         found = repo.find_by_id(result.id, session)
         assert found is not None
@@ -96,7 +95,6 @@ def test_sql_transactional_decorator(uow: SQLUnitOfWork, session_factory: sessio
     service = ItemService(uow)
     result = service.create_item(name="decorated-item")
 
-    assert result.id is not None
     with session_factory() as session:
         found = repo.find_by_id(result.id, session)
         assert found is not None

@@ -3,7 +3,7 @@ from typing import ClassVar
 
 import pendulum
 import pytest
-from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine
+from sqlalchemy import Column, MetaData, String, Table, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 import compose
@@ -14,7 +14,7 @@ metadata = MetaData()
 user_table = Table(
     "users",
     metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("id", String(36), primary_key=True),
     Column("name", String(50)),
     Column("created_at", String),
     Column("updated_at", String),
@@ -56,7 +56,6 @@ def test_add_and_find_by_id(repository: UserRepository, session: Session):
     repository.add(user, session)
     session.commit()
 
-    assert user.id is not None
     found = repository.find_by_id(user.id, session)
     assert found is not None
     assert found.name == "alice"
@@ -105,7 +104,6 @@ def test_update(repository: UserRepository, session: Session):
     user = User(name="eve")
     repository.add(user, session)
     session.commit()
-    assert user.id is not None
 
     before_updated_at = user.updated_at
     user.update(name="eve-updated")
@@ -122,7 +120,6 @@ def test_delete(repository: UserRepository, session: Session):
     user = User(name="frank")
     repository.add(user, session)
     session.commit()
-    assert user.id is not None
 
     repository.delete(user.id, session)
     session.commit()
