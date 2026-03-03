@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy.orm import sessionmaker
 from src import constants
 from src.dependency import provide
@@ -17,7 +19,7 @@ from .router import router
 )
 @compose.fastapi.auto_wired(provide)
 def retrieve_user(
-    user_id: int,
+    user_id: uuid.UUID,
     user_repository: UserRepository,
     session_factory: sessionmaker,
 ):
