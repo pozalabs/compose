@@ -3,10 +3,10 @@ from typing import Any, Self
 
 from pydantic import Field
 
-from . import container
+from . import model
 
 
-class OffsetPaginationResult(container.BaseModel):
+class OffsetPaginationResult(model.BaseModel):
     items: list[Any]
     total: int
     page: int = Field(ge=1)
@@ -42,7 +42,7 @@ class OffsetPaginationResult(container.BaseModel):
         return not self.total
 
 
-class CursorPaginationResult(container.BaseModel):
+class CursorPaginationResult(model.BaseModel):
     items: list[Any]
     next_cursor: str | None = None
 

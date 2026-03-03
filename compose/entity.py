@@ -3,12 +3,12 @@ from typing import Any, ClassVar, Generic
 
 from pydantic import Field
 
-from . import container, field
+from . import field, model
 from .typing import IdT
 from .utils import uuid7
 
 
-class Entity(container.TimeStampedModel, Generic[IdT]):
+class Entity(model.TimeStampedModel, Generic[IdT]):
     id: IdT
 
     updatable_fields: ClassVar[set[str]] = set()

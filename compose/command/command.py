@@ -2,11 +2,11 @@ from typing import Generic
 
 from pydantic import ConfigDict
 
-from .. import container, schema
+from .. import model, schema
 from ..typing import IdT
 
 
-class Command(container.BaseModel): ...
+class Command(model.BaseModel): ...
 
 
 class UserCommand(Command, Generic[IdT]):

@@ -3,12 +3,12 @@ from typing import Any, Protocol, Self, get_args
 
 from pydantic import ConfigDict
 
-from .. import container
+from .. import model
 from ..pagination import CursorPaginationResult, OffsetPaginationResult
 from .extra import schema_by_field_name
 
 
-class Schema(container.BaseModel):
+class Schema(model.BaseModel):
     model_config = ConfigDict(json_schema_extra=schema_by_field_name())
 
 
@@ -16,7 +16,7 @@ class Id[T](Schema):
     id: T
 
 
-class TimeStampedSchema(container.TimeStampedModel, Schema): ...
+class TimeStampedSchema(model.TimeStampedModel, Schema): ...
 
 
 class ListSchema[T](Schema):
@@ -36,7 +36,7 @@ class ListSchema[T](Schema):
         annotation = cls.model_fields["items"].annotation
         item_type = get_args(annotation)[0]
 
-        if not issubclass(item_type, container.BaseModel):
+        if not issubclass(item_type, model.BaseModel):
             data = result.model_dump(exclude={"extra"}) | result.extra
             return cls(**data)
 
@@ -71,7 +71,7 @@ class CursorListSchema[T](Schema):
         annotation = cls.model_fields["items"].annotation
         item_type = get_args(annotation)[0]
 
-        if not issubclass(item_type, container.BaseModel):
+        if not issubclass(item_type, model.BaseModel):
             return cls(**result.model_dump())
 
         if (parser := getattr(item_type, parser_name, None)) is None:
@@ -83,7 +83,7 @@ class CursorListSchema[T](Schema):
         )
 
 
-class InvalidParam(container.BaseModel):
+class InvalidParam(model.BaseModel):
     loc: str
     message: str
     type: str
@@ -93,7 +93,7 @@ class HasErrors(Protocol):
     def errors(self) -> Sequence[Any]: ...
 
 
-class Error(container.BaseModel):
+class Error(model.BaseModel):
     title: str
     type: str
     detail: str | None = None

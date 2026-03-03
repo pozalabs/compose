@@ -2,20 +2,20 @@ from typing import Any
 
 from pydantic import Field
 
-from .. import container
+from .. import model
 
 
-class AuthorizationGrant(container.BaseModel):
+class AuthorizationGrant(model.BaseModel):
     access_token: str
     refresh_token: str | None = None
 
 
-class UserResource(container.BaseModel):
+class UserResource(model.BaseModel):
     email: str
     name: str
 
 
-class TokenClaims(container.BaseModel):
+class TokenClaims(model.BaseModel):
     sub: str
     iss: str
     jti: str
