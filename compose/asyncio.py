@@ -2,8 +2,8 @@ import asyncio
 from collections.abc import Awaitable, Callable, Hashable
 
 
-class AsyncJob[K: Hashable, **P, T]:
-    def __init__(
+class AsyncJob[K: Hashable, T]:
+    def __init__[**P](
         self,
         key: K,
         func: Callable[P, Awaitable[T]],
@@ -11,9 +11,10 @@ class AsyncJob[K: Hashable, **P, T]:
         **kwargs: P.kwargs,
     ):
         self.key = key
-        self.func = func
-        self.args = args
-        self.kwargs = kwargs
+        self._invoke: Callable[[], Awaitable[T]] = lambda: func(*args, **kwargs)
+
+    def __call__(self) -> Awaitable[T]:
+        return self._invoke()
 
 
 class AsyncTaskExecutor:
@@ -21,9 +22,9 @@ class AsyncTaskExecutor:
         self.concurrency = concurrency
         self.timeout = timeout
 
-    async def execute[K, **P, T](
+    async def execute[K, T](
         self,
-        jobs: list[AsyncJob[K, P, T]],
+        jobs: list[AsyncJob[K, T]],
         concurrency: int | None = None,
         timeout: float | None = None,
     ) -> dict[K, T]:
@@ -39,8 +40,8 @@ class AsyncTaskExecutor:
             return await coro
 
 
-async def _execute_jobs[K, **P, T](
-    jobs: list[AsyncJob[K, P, T]],
+async def _execute_jobs[K, T](
+    jobs: list[AsyncJob[K, T]],
     semaphore: asyncio.Semaphore,
 ) -> dict[K, T]:
     try:
@@ -55,6 +56,6 @@ async def _execute_jobs[K, **P, T](
     return {key: task.result() for key, task in tasks}
 
 
-async def _execute_job[K, **P, T](job: AsyncJob[K, P, T], semaphore: asyncio.Semaphore) -> T:
+async def _execute_job[K, T](job: AsyncJob[K, T], semaphore: asyncio.Semaphore) -> T:
     async with semaphore:
-        return await job.func(*job.args, **job.kwargs)
+        return await job()
