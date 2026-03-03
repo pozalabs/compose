@@ -2,7 +2,7 @@ from typing import Any
 
 from pydantic import SerializeAsAny, SkipValidation
 
-from compose import container
+from compose import model
 from compose.event import Event
 
 
@@ -20,7 +20,7 @@ from compose.event import Event
 #
 # SkipValidation: 검증을 건너뛰어 하위 클래스 인스턴스를 그대로 보존
 # SerializeAsAny: 선언 타입이 아닌 런타임 실제 타입의 직렬화기를 사용
-class EventMessage(container.BaseModel):
+class EventMessage(model.BaseModel):
     body: SerializeAsAny[SkipValidation[Event[Any]]]
 
 

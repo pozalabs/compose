@@ -3,7 +3,7 @@ from typing import Any, Self
 
 import pymongo
 
-from compose.container import BaseModel
+from compose.model import BaseModel
 
 from .aggregation import Push
 from .comparison import Eq, Gt, Lt

@@ -5,7 +5,7 @@ from typing import Any, Self
 
 from fastapi import Request, Response
 
-from compose import container
+from compose import model
 
 from .exception_handler import ExceptionHandler
 
@@ -22,7 +22,7 @@ class Level(enum.StrEnum):
     ERROR = enum.auto()
 
 
-class ErrorEvent(container.BaseModel):
+class ErrorEvent(model.BaseModel):
     level: Level
 
     @classmethod

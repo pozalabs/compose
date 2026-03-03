@@ -3,7 +3,7 @@ from typing import Any
 
 from pydantic import Field
 
-from compose.container import BaseModel
+from compose.model import BaseModel
 
 
 class GunicornSettings(BaseModel):

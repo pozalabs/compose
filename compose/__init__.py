@@ -26,7 +26,7 @@ from . import (
     uow,
     utils,
 )
-from .container import BaseModel, TimeStampedModel
+from .model import BaseModel, TimeStampedModel
 
 tp = typing
 
