@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+import uuid
 from typing import Any, ClassVar, get_args, get_origin
 
 import pendulum
@@ -14,8 +15,8 @@ from .base import BaseRepository
 class SQLRepository[T: SQLEntity](BaseRepository):
     __table__: ClassVar[Table]
 
-    def find_by_id(self, entity_id: int, session: Session) -> T | None:
-        return self.find_by({"id": entity_id}, session=session)
+    def find_by_id(self, entity_id: uuid.UUID, session: Session) -> T | None:
+        return self.find_by({"id": str(entity_id)}, session=session)
 
     def find_by(self, filter_: dict[str, Any], session: Session) -> T | None:
         table = self.__table__
@@ -49,8 +50,7 @@ class SQLRepository[T: SQLEntity](BaseRepository):
     def add(self, entity: T, session: Session) -> None:
         table = self.__table__
         row = self._to_row(entity)
-        result = session.execute(insert(table).values(**row))
-        entity.id = result.inserted_primary_key[0]
+        session.execute(insert(table).values(**row))
 
     def add_many(self, entities: list[T], session: Session) -> None:
         table = self.__table__
@@ -66,11 +66,11 @@ class SQLRepository[T: SQLEntity](BaseRepository):
             entity.updated_at = now
             row["updated_at"] = now.isoformat()
 
-        session.execute(update(table).where(table.c.id == entity.id).values(**row))
+        session.execute(update(table).where(table.c.id == str(entity.id)).values(**row))
 
-    def delete(self, entity_id: int, session: Session) -> None:
+    def delete(self, entity_id: uuid.UUID, session: Session) -> None:
         table = self.__table__
-        session.execute(delete(table).where(table.c.id == entity_id))
+        session.execute(delete(table).where(table.c.id == str(entity_id)))
 
     @functools.cached_property
     def _entity_type(self) -> type[T]:
@@ -87,7 +87,4 @@ class SQLRepository[T: SQLEntity](BaseRepository):
 
     @staticmethod
     def _to_row(entity: T) -> dict[str, Any]:
-        row = entity.model_dump(mode="json")
-        if row.get("id") is None:
-            row.pop("id", None)
-        return row
+        return entity.model_dump(mode="json")

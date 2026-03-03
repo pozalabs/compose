@@ -1,9 +1,11 @@
+import uuid
 from typing import Any, ClassVar, Generic
 
 from pydantic import Field
 
 from . import container, field
 from .typing import IdT
+from .utils import uuid7
 
 
 class Entity(container.TimeStampedModel, Generic[IdT]):
@@ -39,8 +41,8 @@ except ImportError:
 try:
     from sqlalchemy.orm import Session  # noqa: F401
 
-    class SQLEntity(Entity[int | None]):
-        id: int | None = Field(default=None)
+    class SQLEntity(Entity[uuid.UUID]):
+        id: uuid.UUID = Field(default_factory=uuid7)
 
 except ImportError:
     pass

@@ -42,15 +42,19 @@ def uuid4_hex() -> str:
 
 if sys.version_info >= (3, 14):
 
-    def uuid7_str() -> str:
-        return str(uuid.uuid7())
+    def uuid7() -> uuid.UUID:
+        return uuid.uuid7()
 
 else:
 
-    def uuid7_str() -> str:
+    def uuid7() -> uuid.UUID:
         timestamp_ms = int(time.time() * 1000)
         rand = int.from_bytes(os.urandom(10))
         value = (timestamp_ms & 0xFFFF_FFFF_FFFF) << 80 | rand
         value = (value & ~(0xF << 76)) | (0x7 << 76)
         value = (value & ~(0x3 << 62)) | (0x2 << 62)
-        return str(uuid.UUID(int=value))
+        return uuid.UUID(int=value)
+
+
+def uuid7_str() -> str:
+    return str(uuid7())
