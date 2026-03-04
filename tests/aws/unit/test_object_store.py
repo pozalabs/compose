@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from io import BytesIO
+import io
 
 import boto3
 import botocore.exceptions
@@ -27,7 +27,7 @@ def test_upload_bytes(store: S3ObjectStore):
 
 
 def test_upload_file_object(store: S3ObjectStore):
-    store.upload("file.txt", BytesIO(b"hello"))
+    store.upload("file.txt", io.BytesIO(b"hello"))
 
     assert store.download("file.txt") == b"hello"
 
