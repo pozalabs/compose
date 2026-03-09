@@ -6,16 +6,12 @@ readme = "README.md"
 requires-python = ">=3.13,<3.14"
 authors = []
 dependencies = [
-    "pendulum>=3.0.0,<4.0.0",
-    "pydantic>=2.7.4,<3.0.0",
-    "dependency-injector>=4.43.0,<5.0.0",
-    "pydantic-settings>=2.3.3",
+    "pozalabs-compose",
     "sqlalchemy>=2.0.0,<3.0.0",
     "fastapi>=0.115.11",
     "uvicorn>=0.34.0",
     "loguru>=0.7.3",
 ]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.uv.sources]
+pozalabs-compose = { workspace = true }
