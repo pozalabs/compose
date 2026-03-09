@@ -1,21 +1,18 @@
 FROM public.ecr.aws/docker/library/python:3.13-slim-bookworm AS builder
 
 RUN apt-get update --fix-missing && apt-get upgrade -y
-RUN apt-get install -y --no-install-recommends \
-    gcc \
-    python3-dev
-RUN pip install --upgrade pip && pip install poetry==2.1.1
+RUN apt-get install -y --no-install-recommends gcc python3-dev
+RUN pip install --upgrade pip && pip install uv
 
 WORKDIR /app
 
-COPY pyproject.toml /app/
+COPY pyproject.toml uv.lock ./
+COPY compose/ ./compose/
+COPY examples/fastapi_example/pyproject.toml ./examples/fastapi_example/
 
-RUN poetry config virtualenvs.create false && \
-    poetry lock && \
-    poetry install --only main --no-root && \
-    poetry cache clear --all . --quiet
+RUN uv sync --frozen --no-dev --package fastapi-example
 
-COPY . /app
+COPY examples/fastapi_example/ ./examples/fastapi_example/
 
 FROM public.ecr.aws/docker/library/python:3.13-slim-bookworm AS runner
 
@@ -23,8 +20,10 @@ RUN apt-get update --fix-missing && apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /app/examples/fastapi_example
 
-COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
-COPY --from=builder /app /app
+COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /app/examples/fastapi_example /app/examples/fastapi_example
+COPY --from=builder /app/compose /app/compose
+
+ENV PATH="/app/.venv/bin:$PATH"
