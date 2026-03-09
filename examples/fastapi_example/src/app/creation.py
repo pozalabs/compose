@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import compose
 from src import constants
-from src.dependency import create_container
+from src.dependency import container
 from src.logging import logger  # noqa: F401
 from src.user.entrypoint import router as user_router
 
@@ -32,7 +32,6 @@ def create_app() -> FastAPI:
 
 
 def inject_dependencies(_app: FastAPI) -> None:
-    container = create_container()
     setup_dishka(container, _app)
 
 

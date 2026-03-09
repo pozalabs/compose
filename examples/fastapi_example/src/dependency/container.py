@@ -22,5 +22,4 @@ class InfraProvider(Provider):
         return client.get_database("compose-example")
 
 
-def create_container():
-    return make_async_container(InfraProvider(), UserProvider())
+container = make_async_container(InfraProvider(), UserProvider())

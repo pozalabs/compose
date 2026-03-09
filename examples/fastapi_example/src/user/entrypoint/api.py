@@ -1,6 +1,5 @@
 from typing import Annotated
 
-from dishka import FromDishka
 from fastapi import Query
 
 import compose
@@ -21,7 +20,7 @@ from .router import router
 )
 def retrieve_user(
     name: str,
-    user_repository: FromDishka[UserRepository],
+    user_repository: UserRepository,
 ):
     if (user := user_repository.find_by_name(name)) is None:
         raise compose.exceptions.DoesNotExistError()
@@ -37,7 +36,7 @@ def retrieve_user(
 )
 def retrieve_user_by_email(
     email: str,
-    user_repository: FromDishka[UserRepository],
+    user_repository: UserRepository,
 ):
     if (user := user_repository.find_by(op.func.Q(op.Eq(email=email)))) is None:
         raise compose.exceptions.DoesNotExistError()
@@ -53,7 +52,7 @@ def retrieve_user_by_email(
 )
 def list_users(
     qry: Annotated[query.ListUsers, Query()],
-    user_repository: FromDishka[UserRepository],
+    user_repository: UserRepository,
 ):
     result = user_repository.paginate(qry)
     return compose.schema.ListSchema[schema.User].from_result(result)
@@ -67,7 +66,7 @@ def list_users(
 )
 def list_recent_users(
     qry: Annotated[query.ListRecentUsers, Query()],
-    user_repository: FromDishka[UserRepository],
+    user_repository: UserRepository,
 ):
     result = user_repository.paginate(qry)
     return compose.schema.CursorListSchema[schema.User].from_result(result)
@@ -81,6 +80,6 @@ def list_recent_users(
 )
 def add_user(
     cmd: command.AddUser,
-    handler: FromDishka[service.AddUserHandler],
+    handler: service.AddUserHandler,
 ):
     return handler.handle(cmd)
