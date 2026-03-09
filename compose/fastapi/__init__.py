@@ -78,3 +78,10 @@ try:
     )
 except ImportError:
     pass
+
+try:
+    from .dishka import injected_route  # noqa: F401
+
+    __all__.append("injected_route")
+except ImportError:
+    pass
