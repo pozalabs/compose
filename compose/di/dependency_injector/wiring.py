@@ -1,4 +1,3 @@
-import importlib
 import inspect
 from collections.abc import Callable, Iterable
 from typing import Any, Protocol
@@ -178,26 +177,6 @@ def create_resolver(container: Container) -> Callable[[str], Any]:
     def resolver(name: str) -> Any:
         return resolve_by_name(
             name=name, container=container, provider_types=DEFAULT_RESOLVABLE_PROVIDER_TYPES
-        )
-
-    return resolver
-
-
-def create_lazy_resolver(container_path: str) -> Callable[[str], Any]:
-    def resolver(object_name: str) -> Any:
-        module_path, container_name = container_path.split(":")
-        try:
-            container = importlib.import_module(module_path)
-        except ImportError:
-            raise ImportError(f"Cannot import module {module_path}")
-
-        if (container_cls := getattr(container, container_name, None)) is None:
-            raise ValueError(f"Cannot find container {container_name} in {module_path}")
-
-        return resolve_by_object_name(
-            name=object_name,
-            container=container_cls,
-            provider_types=DEFAULT_RESOLVABLE_PROVIDER_TYPES,
         )
 
     return resolver
