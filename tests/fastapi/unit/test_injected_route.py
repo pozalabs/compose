@@ -9,7 +9,7 @@ from dishka.integrations.fastapi import DishkaRoute, setup_dishka
 from fastapi import FastAPI
 from starlette.testclient import TestClient
 
-from compose.fastapi.dishka import injected_route
+import compose
 
 
 class Greeter:
@@ -31,13 +31,13 @@ def container():
 
 
 def test_route_class_extend_dishka_route(container):
-    route_class = injected_route(container)
+    route_class = compose.fastapi.injected_route(container)
 
     assert issubclass(route_class, DishkaRoute)
 
 
 def test_convert_resolvable_type(container):
-    route_class = injected_route(container)
+    route_class = compose.fastapi.injected_route(container)
     app = FastAPI()
     router_with_route = app.router.__class__(route_class=route_class)
 
@@ -52,7 +52,7 @@ def test_convert_resolvable_type(container):
 
 
 def test_preserve_non_resolvable_type(container):
-    route_class = injected_route(container)
+    route_class = compose.fastapi.injected_route(container)
     app = FastAPI()
     router_with_route = app.router.__class__(route_class=route_class)
 
@@ -67,7 +67,7 @@ def test_preserve_non_resolvable_type(container):
 
 
 def test_skip_unannotated_parameter(container):
-    route_class = injected_route(container)
+    route_class = compose.fastapi.injected_route(container)
     app = FastAPI()
     router_with_route = app.router.__class__(route_class=route_class)
 
@@ -83,7 +83,7 @@ def test_skip_unannotated_parameter(container):
 
 
 def test_skip_annotated_type(container):
-    route_class = injected_route(container)
+    route_class = compose.fastapi.injected_route(container)
     app = FastAPI()
     router_with_route = app.router.__class__(route_class=route_class)
 
@@ -98,7 +98,7 @@ def test_skip_annotated_type(container):
 
 
 def test_skip_optional_type(container):
-    route_class = injected_route(container)
+    route_class = compose.fastapi.injected_route(container)
     app = FastAPI()
     router_with_route = app.router.__class__(route_class=route_class)
 
@@ -113,7 +113,7 @@ def test_skip_optional_type(container):
 
 
 def test_convert_parameter_with_default(container):
-    route_class = injected_route(container)
+    route_class = compose.fastapi.injected_route(container)
     app = FastAPI()
     router_with_route = app.router.__class__(route_class=route_class)
 
@@ -129,7 +129,7 @@ def test_convert_parameter_with_default(container):
 
 
 def test_http_round_trip(container):
-    route_class = injected_route(container)
+    route_class = compose.fastapi.injected_route(container)
     app = FastAPI()
     router_with_route = app.router.__class__(route_class=route_class)
 
