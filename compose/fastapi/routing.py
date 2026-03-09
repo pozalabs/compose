@@ -5,7 +5,7 @@ from typing import Any
 from fastapi import APIRouter as _FastAPIRouter
 from fastapi.routing import APIRoute
 
-from ..di.wiring import Provider
+from ..di.dependency_injector.wiring import Provider
 from .wiring import auto_wired
 
 _OVERRIDE_DEFAULTS = {"response_model_by_alias": False}
