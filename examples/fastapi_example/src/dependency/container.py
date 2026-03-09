@@ -1,28 +1,26 @@
 import pendulum
 import pymongo
-from dependency_injector import providers
+from dishka import Provider, Scope, make_async_container, provide
+from pymongo.database import Database
 
-import compose
-from src.user.dependency import UserContainer
-
-PACKAGES = {
-    "src.user",
-}
+from src.user.dependency import UserProvider
 
 
-class ApplicationContainer(compose.dependency.DeclarativeContainer):
-    mongo_client = providers.Singleton(
-        pymongo.MongoClient,
-        host="mongodb://admin:admin@db:27017",
-        tz_aware=True,
-        tzinfo=pendulum.UTC,
-    )
-    database = providers.Factory(
-        mongo_client.provided.get_database.call(),
-        name="compose-example",
-    )
+class InfraProvider(Provider):
+    scope = Scope.APP
 
-    user = providers.Container(UserContainer, database=database)
+    @provide
+    def mongo_client(self) -> pymongo.MongoClient:
+        return pymongo.MongoClient(
+            host="mongodb://admin:admin@db:27017",
+            tz_aware=True,
+            tzinfo=pendulum.UTC,
+        )
+
+    @provide
+    def database(self, client: pymongo.MongoClient) -> Database:
+        return client.get_database("compose-example")
 
 
-provide = compose.dependency.create_provider(ApplicationContainer)
+def create_container():
+    return make_async_container(InfraProvider(), UserProvider())

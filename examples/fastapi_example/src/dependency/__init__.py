@@ -1,3 +1,3 @@
-from .container import ApplicationContainer, provide
+from .container import create_container
 
-__all__ = ["ApplicationContainer", "provide"]
+__all__ = ["create_container"]

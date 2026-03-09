@@ -1,3 +1,4 @@
-import compose
+from dishka.integrations.fastapi import DishkaRoute
+from fastapi import APIRouter
 
-router = compose.fastapi.APIRouter()
+router = APIRouter(route_class=DishkaRoute)
