@@ -9,15 +9,15 @@ from dishka.registry import Registry
 from fastapi.routing import APIRoute
 
 
-def create_auto_wired_route(container: AsyncContainer) -> type[APIRoute]:
+def injected_route(container: AsyncContainer) -> type[APIRoute]:
     resolvable = _collect_resolvable_types(container)
 
-    class AutoWiredDishkaRoute(DishkaRoute):
+    class InjectedDishkaRoute(DishkaRoute):
         def __init__(self, path: str, endpoint: Callable[..., Any], **kwargs: Any):
             endpoint = _convert_signature(endpoint, resolvable)
             super().__init__(path, endpoint, **kwargs)
 
-    return AutoWiredDishkaRoute
+    return InjectedDishkaRoute
 
 
 def _collect_resolvable_types(container: AsyncContainer) -> set[type]:
