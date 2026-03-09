@@ -6,7 +6,7 @@ import compose
 from src import constants
 from src.dependency import create_container
 from src.logging import logger  # noqa: F401
-from src.user.entrypoint.router import router as user_router
+from src.user.entrypoint import router as user_router
 
 from . import exceptions
 
