@@ -5,6 +5,7 @@ from typing import Annotated, Any, Union, get_args, get_origin
 
 from dishka import AsyncContainer, FromDishka
 from dishka.integrations.fastapi import DishkaRoute
+from dishka.registry import Registry
 from fastapi.routing import APIRoute
 
 
@@ -21,7 +22,7 @@ def create_auto_wired_route(container: AsyncContainer) -> type[APIRoute]:
 
 def _collect_resolvable_types(container: AsyncContainer) -> set[type]:
     result: set[type] = set()
-    registry = container.registry
+    registry: Registry | None = container.registry
     while registry is not None:
         for key in registry.factories:
             if isinstance(key.type_hint, type):
@@ -81,6 +82,6 @@ def _convert_signature(
     if "return" in inspect.get_annotations(endpoint):
         new_annotations["return"] = inspect.get_annotations(endpoint)["return"]
 
-    endpoint.__signature__ = sig.replace(parameters=new_params)
-    endpoint.__annotations__ = new_annotations
+    endpoint.__signature__ = sig.replace(parameters=new_params)  # type: ignore[attr-defined]
+    endpoint.__annotations__ = new_annotations  # type: ignore[attr-defined]
     return endpoint
