@@ -7,7 +7,7 @@ RUN apt-get install -y --no-install-recommends \
     curl \
     ca-certificates
 
-ADD https://astral.sh/uv/0.9.27/install.sh /uv-installer.sh
+ADD https://astral.sh/uv/0.10.9/install.sh /uv-installer.sh
 RUN sh /uv-installer.sh && rm /uv-installer.sh
 
 ENV PATH="/root/.local/bin/:$PATH"
