@@ -5,7 +5,7 @@ from typing import Annotated, Any, Protocol
 from dependency_injector.wiring import inject
 from fastapi import Depends
 
-from compose.dependency.wiring import Provider
+from compose.di.wiring import Provider
 
 
 class HasSignature(Protocol):

@@ -3,7 +3,7 @@ import re
 from collections.abc import Callable
 from typing import Protocol, Self
 
-from compose.dependency.wiring import create_lazy_resolver
+from compose.di.wiring import create_lazy_resolver
 from compose.event import Event
 
 

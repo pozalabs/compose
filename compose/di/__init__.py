@@ -1,9 +1,8 @@
-from compose.di.wiring import (
+from .container import DeclarativeContainer
+from .provider import factory_of_factory
+from .wiring import (
     DEFAULT_RESOLVABLE_PROVIDER_TYPES,
-    Provider,
-    create_lazy_resolver,
     create_provider,
-    create_resolver,
     get_wiring_packages,
     provide,
     resolve,
@@ -13,10 +12,9 @@ from compose.di.wiring import (
 
 __all__ = [
     "DEFAULT_RESOLVABLE_PROVIDER_TYPES",
-    "Provider",
-    "create_lazy_resolver",
+    "DeclarativeContainer",
     "create_provider",
-    "create_resolver",
+    "factory_of_factory",
     "get_wiring_packages",
     "provide",
     "resolve",
