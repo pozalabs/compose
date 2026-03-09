@@ -1,4 +1,4 @@
-from compose.di.wiring import (
+from compose.di.dependency_injector.wiring import (
     DEFAULT_RESOLVABLE_PROVIDER_TYPES,
     Provider,
     create_lazy_resolver,
