@@ -1,8 +1,8 @@
-from .container import DeclarativeContainer
-from .provider import factory_of_factory
-from .wiring import (
+from compose.di import (
     DEFAULT_RESOLVABLE_PROVIDER_TYPES,
+    DeclarativeContainer,
     create_provider,
+    factory_of_factory,
     get_wiring_packages,
     provide,
     resolve,
