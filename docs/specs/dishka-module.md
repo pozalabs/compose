@@ -137,4 +137,4 @@ await handler.execute(cmd)
 
 ### 예제 검증
 
-- `examples/fastapi_example`에서 dependency-injector 대신 dishka를 사용하도록 전환하여 실제 동작 확인
+- `examples/fastapi_example`에서 로컬 `create_auto_wired_route` 대신 `compose.fastapi.injected_route`를 사용하도록 전환하여 실제 동작 확인
