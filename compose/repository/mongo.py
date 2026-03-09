@@ -54,7 +54,7 @@ class MongoRepository[T: Entity](BaseRepository):
         self.collection = collection
 
     @classmethod
-    def create(cls, database: Database, **kwargs) -> MongoRepository:
+    def create(cls, database: Database, **kwargs) -> Self:
         collection = database.get_collection(cls.__collection_name__, **kwargs)
         if (
             cls.__collection_name__ not in database.list_collection_names()
