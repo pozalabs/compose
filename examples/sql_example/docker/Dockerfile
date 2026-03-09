@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/python:3.13.11-slim-bookworm AS builder
+FROM public.ecr.aws/docker/library/python:3.13.12-slim-bookworm AS builder
 
 RUN apt-get update --fix-missing && apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends \
@@ -27,7 +27,7 @@ RUN uv sync --frozen --no-dev --package sql-example && \
 
 COPY examples/sql_example/ ./examples/sql_example/
 
-FROM public.ecr.aws/docker/library/python:3.13.11-slim-bookworm AS runner
+FROM public.ecr.aws/docker/library/python:3.13.12-slim-bookworm AS runner
 
 RUN apt-get update --fix-missing && apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends \
