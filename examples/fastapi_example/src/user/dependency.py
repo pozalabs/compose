@@ -1,26 +1,17 @@
-from dependency_injector import containers, providers
+from dishka import Provider, Scope, provide
+from pymongo.database import Database
 
-from src.user import service
 from src.user.adapter.repository import UserRepository
+from src.user.service.command_handler import AddUserHandler
 
 
-class AdapterContainer(containers.DeclarativeContainer):
-    database = providers.Dependency()
+class UserProvider(Provider):
+    scope = Scope.REQUEST
 
-    user_repository = providers.Factory(UserRepository.create, database=database)
+    @provide
+    def user_repository(self, database: Database) -> UserRepository:
+        return UserRepository.create(database)
 
-
-class ServiceContainer(containers.DeclarativeContainer):
-    adapter = providers.DependenciesContainer()
-
-    add_user_handler = providers.Factory(
-        service.AddUserHandler,
-        user_repository=adapter.user_repository,
-    )
-
-
-class UserContainer(containers.DeclarativeContainer):
-    database = providers.Dependency()
-
-    adapter = providers.Container(AdapterContainer, database=database)
-    service = providers.Container(ServiceContainer, adapter=adapter)
+    @provide
+    def add_user_handler(self, user_repository: UserRepository) -> AddUserHandler:
+        return AddUserHandler(user_repository=user_repository)

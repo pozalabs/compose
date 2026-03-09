@@ -1,12 +1,12 @@
+from dishka.integrations.fastapi import setup_dishka
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 import compose
 from src import constants
-from src.dependency import ApplicationContainer
-from src.dependency.container import PACKAGES
+from src.dependency import container
 from src.logging import logger  # noqa: F401
-from src.user.entrypoint.router import router as user_router
+from src.user.entrypoint import router as user_router
 
 from . import exceptions
 
@@ -32,9 +32,7 @@ def create_app() -> FastAPI:
 
 
 def inject_dependencies(_app: FastAPI) -> None:
-    container = ApplicationContainer.wired(packages=PACKAGES)
-
-    _app.container = container
+    setup_dishka(container, _app)
 
 
 def add_middlewares(_app: FastAPI) -> None:

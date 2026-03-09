@@ -5,7 +5,6 @@ from fastapi import Query
 import compose
 from compose.query.mongo import op
 from src import constants
-from src.dependency import provide
 from src.user import schema, service
 from src.user.adapter.repository import UserRepository
 from src.user.domain import command, query
@@ -19,7 +18,6 @@ from .router import router
     tags=[constants.OpenApiTag.USER],
     summary="유저 조회",
 )
-@compose.fastapi.auto_wired(provide)
 def retrieve_user(
     name: str,
     user_repository: UserRepository,
@@ -36,7 +34,6 @@ def retrieve_user(
     tags=[constants.OpenApiTag.USER],
     summary="유저 조회",
 )
-@compose.fastapi.auto_wired(provide)
 def retrieve_user_by_email(
     email: str,
     user_repository: UserRepository,
@@ -53,7 +50,6 @@ def retrieve_user_by_email(
     tags=[constants.OpenApiTag.USER],
     summary="유저 목록 조회",
 )
-@compose.fastapi.auto_wired(provide)
 def list_users(
     qry: Annotated[query.ListUsers, Query()],
     user_repository: UserRepository,
@@ -68,7 +64,6 @@ def list_users(
     tags=[constants.OpenApiTag.USER],
     summary="최근 유저 목록 조회 (커서 페이지네이션)",
 )
-@compose.fastapi.auto_wired(provide)
 def list_recent_users(
     qry: Annotated[query.ListRecentUsers, Query()],
     user_repository: UserRepository,
@@ -83,7 +78,6 @@ def list_recent_users(
     tags=[constants.OpenApiTag.USER],
     summary="유저 추가",
 )
-@compose.fastapi.auto_wired(provide)
 def add_user(
     cmd: command.AddUser,
     handler: service.AddUserHandler,
