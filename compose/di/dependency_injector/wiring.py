@@ -163,6 +163,17 @@ def provide[T](
     ]
 
 
+def create_event_handler_resolver(container: Container) -> Callable[[type], Any]:
+    async def resolver(handler_type: type) -> Any:
+        return resolve_by_object_name(
+            name=handler_type.__name__,
+            container=container,
+            provider_types=DEFAULT_RESOLVABLE_PROVIDER_TYPES,
+        )
+
+    return resolver
+
+
 def create_resolver(container: Container) -> Callable[[str], Any]:
     def resolver(name: str) -> Any:
         return resolve_by_name(
