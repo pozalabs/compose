@@ -8,8 +8,8 @@ import compose
 from compose.messaging.event_bus import EventHandler
 
 
-def event_handler_dependency_resolver(handler_name: str) -> EventHandler:
-    return globals()[handler_name]()
+async def event_handler_dependency_resolver(handler_type: type[EventHandler]) -> EventHandler:
+    return handler_type()
 
 
 event_bus = compose.messaging.EventBus(event_handler_dependency_resolver)

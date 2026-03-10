@@ -1,8 +1,11 @@
-from compose.di.dependency_injector import (
+from .container import DeclarativeContainer
+from .provider import factory_of_factory
+from .wiring import (
     DEFAULT_RESOLVABLE_PROVIDER_TYPES,
-    DeclarativeContainer,
+    Provider,
+    create_event_handler_resolver,
     create_provider,
-    factory_of_factory,
+    create_resolver,
     get_wiring_packages,
     provide,
     resolve,
@@ -13,7 +16,10 @@ from compose.di.dependency_injector import (
 __all__ = [
     "DEFAULT_RESOLVABLE_PROVIDER_TYPES",
     "DeclarativeContainer",
+    "Provider",
+    "create_event_handler_resolver",
     "create_provider",
+    "create_resolver",
     "factory_of_factory",
     "get_wiring_packages",
     "provide",

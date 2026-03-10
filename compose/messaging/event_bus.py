@@ -1,9 +1,7 @@
 import collections
-import re
-from collections.abc import Callable
-from typing import Protocol, Self
+from collections.abc import Awaitable, Callable
+from typing import Protocol
 
-from compose.di.wiring import create_lazy_resolver
 from compose.event import Event
 
 
@@ -12,26 +10,17 @@ class EventHandler(Protocol):
 
 
 class EventBus:
-    def __init__(self, dependency_resolver: Callable[[str], EventHandler]):
+    def __init__(
+        self, dependency_resolver: Callable[[type[EventHandler]], Awaitable[EventHandler]]
+    ):
         self.dependency_resolver = dependency_resolver
 
-        self._event_handlers: dict[str, set[str]] = collections.defaultdict(set)
-
-    @classmethod
-    def with_container(cls, container_path: str) -> Self:
-        container_path_pattern = re.compile("^(?P<module_path>.+):(?P<container_name>.+)$")
-        if container_path_pattern.match(container_path) is None:
-            raise ValueError(
-                f"Invalid container path: {container_path}. "
-                "Must be in the format `module.path:ContainerName`"
-            )
-
-        return cls(dependency_resolver=create_lazy_resolver(container_path))
+        self._event_handlers: dict[str, set[type[EventHandler]]] = collections.defaultdict(set)
 
     async def handle_event(self, evt: Event) -> None:
-        handler_names = self._event_handlers.get(evt.__class__.__name__, set())
-        for handler_name in handler_names:
-            handler = self.dependency_resolver(handler_name)
+        handler_types = self._event_handlers.get(evt.__class__.__name__, set())
+        for handler_type in handler_types:
+            handler = await self.dependency_resolver(handler_type)
             await handler.handle(evt)
 
     def register(
@@ -39,15 +28,14 @@ class EventBus:
     ) -> Callable[[type[EventHandler]], type[EventHandler]]:
         def wrapper(handler_cls: type[EventHandler]) -> type[EventHandler]:
             event_name = event_cls.__name__
-            handler_name = handler_cls.__name__
 
-            registered_handler_names = self._event_handlers.get(event_cls.__name__, set())
-            if handler_cls.__name__ in registered_handler_names:
+            registered_handler_types = self._event_handlers.get(event_name, set())
+            if handler_cls in registered_handler_types:
                 raise ValueError(
-                    f"Handler {handler_name} already registered for event {event_name}"
+                    f"Handler `{handler_cls.__name__}` already registered for event `{event_name}`"
                 )
 
-            self._event_handlers[event_name].add(handler_name)
+            self._event_handlers[event_name].add(handler_cls)
             return handler_cls
 
         return wrapper

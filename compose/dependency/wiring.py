@@ -1,7 +1,6 @@
-from compose.di.wiring import (
+from compose.di.dependency_injector.wiring import (
     DEFAULT_RESOLVABLE_PROVIDER_TYPES,
     Provider,
-    create_lazy_resolver,
     create_provider,
     create_resolver,
     get_wiring_packages,
@@ -14,7 +13,6 @@ from compose.di.wiring import (
 __all__ = [
     "DEFAULT_RESOLVABLE_PROVIDER_TYPES",
     "Provider",
-    "create_lazy_resolver",
     "create_provider",
     "create_resolver",
     "get_wiring_packages",
