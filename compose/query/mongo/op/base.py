@@ -14,7 +14,7 @@ class Operator(abc.ABC):
     def expression(self) -> Any:
         raise NotImplementedError
 
-    def then(self, op: Callable[..., Operator]) -> Operator:
+    def pipe(self, op: Callable[..., Operator]) -> Operator:
         return op(self.expression())
 
 
