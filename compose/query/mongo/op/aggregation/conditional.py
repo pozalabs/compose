@@ -1,6 +1,6 @@
 from typing import Any
 
-from ..base import Evaluable, GeneralAggregationOperator, Operator
+from ..base import GeneralAggregationOperator, Operator, deep_evaluate
 from ..types import DictExpression
 
 
@@ -24,8 +24,8 @@ class Cond(Operator):
     def expression(self) -> DictExpression:
         return {
             "$cond": {
-                "if": Evaluable(self.if_).expression(),
-                "then": Evaluable(self.then).expression(),
-                "else": Evaluable(self.else_).expression(),
+                "if": deep_evaluate(self.if_),
+                "then": deep_evaluate(self.then),
+                "else": deep_evaluate(self.else_),
             }
         }

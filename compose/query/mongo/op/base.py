@@ -62,7 +62,7 @@ class GeneralAggregationOperator(Operator):
         self.expressions = list(expressions)
 
     def expression(self) -> DictExpression:
-        return Evaluable({self.mongo_operator: self.expressions}).expression()
+        return deep_evaluate({self.mongo_operator: self.expressions})
 
 
 class Stage[T](Operator):
@@ -84,23 +84,19 @@ class Merge[T](Operator):
         return cls(*ops, initial={})
 
 
-class Evaluable(Operator):
-    def __init__(self, op: Any):
-        self.op = op
-
-    def expression(self) -> Any:
-        match self.op:
-            case Operator():
-                return self.op.expression()
-            case dict():
-                return {k: Evaluable(v).expression() for k, v in self.op.items()}
-            case list():
-                return [Evaluable(v).expression() for v in self.op]
-            case _:
-                return self.op
-
-
 def evaluate(value: Any) -> Any:
     if isinstance(value, Operator):
         return value.expression()
     return value
+
+
+def deep_evaluate(value: Any) -> Any:
+    match value:
+        case Operator():
+            return value.expression()
+        case dict():
+            return {k: deep_evaluate(v) for k, v in value.items()}
+        case list():
+            return [deep_evaluate(v) for v in value]
+        case _:
+            return value

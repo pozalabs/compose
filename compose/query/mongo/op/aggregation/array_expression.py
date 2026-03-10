@@ -1,6 +1,6 @@
 from typing import Any, Self, Unpack
 
-from ..base import Evaluable, Merge, Operator, evaluate
+from ..base import Merge, Operator, deep_evaluate, evaluate
 from ..sort import SortBy
 from ..types import DictExpression, _String
 
@@ -16,7 +16,7 @@ class Map(Operator):
             "$map": {
                 "input": evaluate(self.input),
                 "as": self.as_,
-                "in": Evaluable(self.in_).expression(),
+                "in": deep_evaluate(self.in_),
             }
         }
 
@@ -26,7 +26,7 @@ class Size(Operator):
         self._expression = expression
 
     def expression(self) -> DictExpression:
-        return {"$size": Evaluable(self._expression).expression()}
+        return {"$size": deep_evaluate(self._expression)}
 
 
 class Filter(Operator):
@@ -40,7 +40,7 @@ class Filter(Operator):
         result: DictExpression = {
             "input": evaluate(self.input),
             "as": self.as_,
-            "cond": Evaluable(self.cond).expression(),
+            "cond": deep_evaluate(self.cond),
         }
         if self.limit is not None:
             result["limit"] = evaluate(self.limit)
@@ -58,7 +58,7 @@ class Reduce(Operator):
             "$reduce": {
                 "input": evaluate(self.input),
                 "initialValue": evaluate(self.initial_value),
-                "in": Evaluable(self.in_).expression(),
+                "in": deep_evaluate(self.in_),
             }
         }
 
@@ -79,7 +79,7 @@ class SortArray(Operator):
     def expression(self) -> DictExpression:
         return {
             "$sortArray": {
-                "input": Evaluable(self.input).expression(),
+                "input": deep_evaluate(self.input),
                 "sortBy": Merge.dict(*self.sort_by).expression(),
             }
         }

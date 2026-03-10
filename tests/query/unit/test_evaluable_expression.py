@@ -2,44 +2,43 @@ from typing import Any
 
 import pytest
 
-from compose.query.mongo.op import AEq, Evaluable, Filter, Raw, Spec
+from compose.query.mongo.op import AEq, Filter, Raw, Spec
+from compose.query.mongo.op.base import deep_evaluate
 
 
 @pytest.mark.parametrize(
-    "op, expected",
+    "value, expected",
     [
         (
-            Evaluable(Spec(field="field", spec=1)),
+            Spec(field="field", spec=1),
             {"field": 1},
         ),
         (
-            Evaluable({"field": 1}),
+            {"field": 1},
             {"field": 1},
         ),
         (
-            Evaluable("$field"),
+            "$field",
             "$field",
         ),
         (
-            Evaluable(
-                {
-                    "$mergeObjects": [
-                        "$$tag",
-                        Spec(
-                            field="keyword",
-                            spec=Raw(
-                                {
-                                    "$first": Filter(
-                                        input_="$keywords",
-                                        as_="keyword",
-                                        cond=AEq("$$keyword._id", "$$tag.keyword_id"),
-                                    )
-                                }
-                            ),
+            {
+                "$mergeObjects": [
+                    "$$tag",
+                    Spec(
+                        field="keyword",
+                        spec=Raw(
+                            {
+                                "$first": Filter(
+                                    input_="$keywords",
+                                    as_="keyword",
+                                    cond=AEq("$$keyword._id", "$$tag.keyword_id"),
+                                )
+                            }
                         ),
-                    ]
-                }
-            ),
+                    ),
+                ]
+            },
             {
                 "$mergeObjects": [
                     "$$tag",
@@ -65,5 +64,5 @@ from compose.query.mongo.op import AEq, Evaluable, Filter, Raw, Spec
         "원시 표현식과 `Operator`로 이루어진 중첩 평가식을 중첩문 가장 아래까지 모두 평가한다.",
     ),
 )
-def test_expression(op: Evaluable, expected: Any):
-    assert op.expression() == expected
+def test_deep_evaluate(value: Any, expected: Any):
+    assert deep_evaluate(value) == expected
