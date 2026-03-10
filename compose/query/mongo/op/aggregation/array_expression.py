@@ -2,7 +2,7 @@ from typing import Any, Self, Unpack
 
 from ..base import Evaluable, Merge, Operator, evaluate
 from ..sort import SortBy
-from ..types import DictExpression, MongoKeyword, _String
+from ..types import DictExpression, _String
 
 
 class Map(Operator):
@@ -14,8 +14,9 @@ class Map(Operator):
     def expression(self) -> DictExpression:
         return {
             "$map": {
-                MongoKeyword.from_py(field): Evaluable(value).expression()
-                for field, value in self.__dict__.items()
+                "input": evaluate(self.input),
+                "as": self.as_,
+                "in": Evaluable(self.in_).expression(),
             }
         }
 
@@ -36,13 +37,14 @@ class Filter(Operator):
         self.limit = limit
 
     def expression(self) -> DictExpression:
-        return {
-            "$filter": {
-                MongoKeyword.from_py(field): Evaluable(value).expression()
-                for field, value in self.__dict__.items()
-                if value is not None
-            },
+        result: DictExpression = {
+            "input": evaluate(self.input),
+            "as": self.as_,
+            "cond": Evaluable(self.cond).expression(),
         }
+        if self.limit is not None:
+            result["limit"] = evaluate(self.limit)
+        return {"$filter": result}
 
 
 class Reduce(Operator):
@@ -54,8 +56,9 @@ class Reduce(Operator):
     def expression(self) -> DictExpression:
         return {
             "$reduce": {
-                MongoKeyword.from_py(field): Evaluable(value).expression()
-                for field, value in self.__dict__.items()
+                "input": evaluate(self.input),
+                "initialValue": evaluate(self.initial_value),
+                "in": Evaluable(self.in_).expression(),
             }
         }
 
