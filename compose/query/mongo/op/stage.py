@@ -1,6 +1,6 @@
 from typing import Any, Self
 
-from .base import Evaluable, Merge, Operator, Stage
+from .base import Merge, Operator, Stage, deep_evaluate
 from .evaluation import Expr
 from .logical import And, Nor, Or
 from .pipeline import Pipeline
@@ -55,7 +55,7 @@ class Spec(Operator):
         self.spec = spec
 
     def expression(self) -> DictExpression:
-        return {self.field: Evaluable(self.spec).expression()}
+        return {self.field: deep_evaluate(self.spec)}
 
     @classmethod
     def include(cls, field: str) -> Self:
@@ -252,7 +252,7 @@ class ReplaceRoot(Stage[DictExpression]):
         self.new_root = new_root
 
     def expression(self) -> DictExpression:
-        return {"$replaceRoot": {"newRoot": Evaluable(self.new_root).expression()}}
+        return {"$replaceRoot": {"newRoot": deep_evaluate(self.new_root)}}
 
 
 class Group(Stage[DictExpression]):
@@ -263,7 +263,7 @@ class Group(Stage[DictExpression]):
     def expression(self) -> DictExpression:
         return {
             "$group": {
-                "_id": Evaluable(self.key).expression(),
+                "_id": deep_evaluate(self.key),
                 **Merge.dict(*self.ops).expression(),
             }
         }

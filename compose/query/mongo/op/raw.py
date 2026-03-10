@@ -1,6 +1,6 @@
 from typing import Generic
 
-from .base import Evaluable, Operator
+from .base import Operator, deep_evaluate
 from .types import Expression
 
 
@@ -9,4 +9,4 @@ class Raw(Generic[Expression], Operator):
         self._expression = expression  # type: ignore
 
     def expression(self) -> Expression:
-        return Evaluable(self._expression).expression()
+        return deep_evaluate(self._expression)
