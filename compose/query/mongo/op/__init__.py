@@ -2,7 +2,7 @@ from . import func  # noqa: F401
 from .aggregation import *  # noqa: F403
 from .base import *  # noqa: F403
 from .comparison import *  # noqa: F403
-from .evaulation import *  # noqa: F403
+from .evaluation import *  # noqa: F403
 from .logical import *  # noqa: F403
 from .pagination import *  # noqa: F403
 from .pipeline import *  # noqa: F403
