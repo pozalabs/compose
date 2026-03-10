@@ -1,7 +1,7 @@
 from typing import Any, Self
 
 from .base import Evaluable, Merge, Operator, Stage
-from .evaulation import Expr
+from .evaluation import Expr
 from .logical import And, Nor, Or
 from .pipeline import Pipeline
 from .sort import SortBy
