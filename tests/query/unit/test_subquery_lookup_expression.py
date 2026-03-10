@@ -37,8 +37,8 @@ from compose.query.mongo.op import DictExpression, Pipeline, Project, Spec, Subq
         ),
     ],
     ids=[
-        "include let when provided",
-        "exclude let key when None",
+        "let이 제공되면 출력에 포함",
+        "let이 None이면 출력에서 제외",
     ],
 )
 def test_expression(op: SubqueryLookup, expected: DictExpression):
