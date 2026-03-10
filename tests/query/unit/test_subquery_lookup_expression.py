@@ -22,6 +22,23 @@ from compose.query.mongo.op import DictExpression, Pipeline, Project, Spec, Subq
                 }
             },
         ),
+        (
+            SubqueryLookup(
+                from_="from_field",
+                pipeline=Pipeline(Project(Spec("_id", 1))),
+            ),
+            {
+                "$lookup": {
+                    "from": "from_field",
+                    "as": "from_field",
+                    "pipeline": [{"$project": {"_id": 1}}],
+                }
+            },
+        ),
+    ],
+    ids=[
+        "let이 제공되면 출력에 포함",
+        "let이 None이면 출력에서 제외",
     ],
 )
 def test_expression(op: SubqueryLookup, expected: DictExpression):
