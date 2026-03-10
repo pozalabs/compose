@@ -5,7 +5,7 @@ from .evaluation import Expr
 from .logical import And, Nor, Or
 from .pipeline import Pipeline
 from .sort import SortBy
-from .types import DictExpression, MongoKeyword, _FieldPath, _NonNegativeInt, _PositiveInt
+from .types import DictExpression, _FieldPath, _NonNegativeInt, _PositiveInt
 
 
 class EmptyStage(Stage[DictExpression]):
@@ -87,20 +87,22 @@ class Lookup(Stage[DictExpression]):
         self.from_ = from_
         self.as_ = as_ or self.from_
 
-    def expression(self) -> DictExpression:
-        return {
-            "$lookup": {
-                MongoKeyword.from_py(field): Evaluable(value).expression()
-                for field, value in self.__dict__.items()
-            }
-        }
-
 
 class EqualityLookup(Lookup):
     def __init__(self, from_: str, local_field: str, foreign_field: str, as_: str | None = None):
         super().__init__(from_=from_, as_=as_)
         self.local_field = local_field
         self.foreign_field = foreign_field
+
+    def expression(self) -> DictExpression:
+        return {
+            "$lookup": {
+                "from": self.from_,
+                "as": self.as_,
+                "localField": self.local_field,
+                "foreignField": self.foreign_field,
+            }
+        }
 
     @classmethod
     def on_id(cls, from_: str, local_field: str, as_: str | None = None) -> Self:
@@ -124,6 +126,16 @@ class SubqueryLookup(Lookup):
         self.let = let
         self.pipeline = pipeline
 
+    def expression(self) -> DictExpression:
+        result: DictExpression = {
+            "from": self.from_,
+            "as": self.as_,
+            "pipeline": self.pipeline.expression(),
+        }
+        if self.let is not None:
+            result["let"] = self.let.expression()
+        return {"$lookup": result}
+
 
 class Unwind(Stage[DictExpression]):
     def __init__(
@@ -137,13 +149,12 @@ class Unwind(Stage[DictExpression]):
         self.preserve_null_and_empty_arrays = preserve_null_and_empty_arrays
 
     def expression(self) -> DictExpression:
-        return {
-            "$unwind": {
-                MongoKeyword.from_py(field): value
-                for field, value in self.__dict__.items()
-                if value is not None
-            }
-        }
+        result: DictExpression = {"path": self.path}
+        if self.include_array_index is not None:
+            result["includeArrayIndex"] = self.include_array_index
+        if self.preserve_null_and_empty_arrays is not None:
+            result["preserveNullAndEmptyArrays"] = self.preserve_null_and_empty_arrays
+        return {"$unwind": result}
 
     @classmethod
     def preserve_missing(cls, path: str, include_array_index: str | None = None) -> Self:
