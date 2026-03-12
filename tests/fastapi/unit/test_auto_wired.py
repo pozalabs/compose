@@ -82,7 +82,7 @@ def container():
 @pytest.fixture
 def app(container: ApplicationContainer) -> FastAPI:
     app = FastAPI()
-    app.container = container
+    app.container = container  # type: ignore[missing-attribute]
     app.include_router(router)
     return app
 
