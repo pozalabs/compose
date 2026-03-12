@@ -38,7 +38,7 @@ def retrieve_user_by_email(
     email: str,
     user_repository: UserRepository,
 ):
-    if (user := user_repository.find_by(op.func.Q(op.Eq(email=email)))) is None:
+    if (user := user_repository.find_by(op.func.Q(op.Eq("email", email)))) is None:
         raise compose.exceptions.DoesNotExistError()
 
     return schema.User.model_validate(user.model_dump(mode="json"))
