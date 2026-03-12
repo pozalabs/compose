@@ -1,6 +1,6 @@
 import inspect
 from collections.abc import Callable
-from typing import Annotated, Any, Protocol
+from typing import Annotated, Any
 
 from dependency_injector.wiring import inject
 from fastapi import Depends
@@ -8,13 +8,7 @@ from fastapi import Depends
 from compose.di.dependency_injector.wiring import Provider
 
 
-class HasSignature(Protocol):
-    __signature__: inspect.Signature
-
-    def __call__(self, *args: Any, **kwargs: Any) -> Any: ...
-
-
-def auto_wired[F: HasSignature](provider: Provider) -> Callable[[F], F]:
+def auto_wired[F: Callable[..., Any]](provider: Provider) -> Callable[[F], F]:
     """
     FastAPI 엔드포인트에 의존성을 자동으로 주입하는 데코레이터.
 
@@ -37,7 +31,7 @@ def auto_wired[F: HasSignature](provider: Provider) -> Callable[[F], F]:
 
             updated_params.append(updated_param)
 
-        f.__signature__ = signature.replace(parameters=updated_params)
+        setattr(f, "__signature__", signature.replace(parameters=updated_params))
         f = inject(f)
 
         return f
