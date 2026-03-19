@@ -60,6 +60,8 @@ Pozalabs 백엔드 서비스의 공통 컴포넌트 라이브러리
 
 ## 시작하기
 
+- Python 3.13+
+
 ```bash
 uv add pozalabs-compose
 ```
