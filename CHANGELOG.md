@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v2.3.0 (2026-03-19)
+
+### New Features
+
+- `compose.dag` 모듈 추가: 의존성 그래프 기반 실행기(`DAGJob`, `DAGExecutor`) 제공
+  - 기존 `compose.concurrent`의 `DependencyJob`/`DependencyExecutor`를 이름 변경 후 독립 모듈로 분리
+
+### Improvements
+
+- `auto_wired` 데코레이터가 더 다양한 callable 타입과 호환
+
 ## v2.2.0 (2026-03-10)
 
 ### Breaking Changes

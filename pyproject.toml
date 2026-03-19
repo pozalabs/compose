@@ -1,6 +1,6 @@
 [project]
 name = "pozalabs-compose"
-version = "2.2.0"
+version = "2.3.0"
 description = "Backend components for Pozalabs"
 license = "MIT"
 authors = [
