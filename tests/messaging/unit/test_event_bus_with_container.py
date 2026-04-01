@@ -6,10 +6,8 @@ from compose.di.dependency_injector.wiring import create_event_handler_resolver
 from compose.messaging.event_bus import EventBus
 
 
-class SomethingHappened(compose.event.Event[compose.types.PyObjectId]):
-    id: compose.types.PyObjectId = compose.field.PyObjectIdField(
-        default_factory=compose.types.PyObjectId
-    )
+class SomethingHappened(compose.event.Event):
+    pass
 
 
 class SomethingHappenedHandler:

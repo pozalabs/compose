@@ -12,10 +12,7 @@ def local_message_queue() -> compose.messaging.LocalMessageQueue:
     compose.messaging.event_store.reset(token)
 
 
-class SomeEvent(compose.event.Event[compose.types.PyObjectId]):
-    id: compose.types.PyObjectId = compose.field.PyObjectIdField(
-        default_factory=compose.types.PyObjectId
-    )
+class SomeEvent(compose.event.Event):
     name: str
 
 
