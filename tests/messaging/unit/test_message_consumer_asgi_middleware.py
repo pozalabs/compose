@@ -16,10 +16,7 @@ event_bus = compose.messaging.EventBus(event_handler_dependency_resolver)
 message_queue = compose.messaging.LocalMessageQueue()
 
 
-class OrderPlaced(compose.event.Event[compose.types.PyObjectId]):
-    id: compose.types.PyObjectId = compose.field.PyObjectIdField(
-        default_factory=compose.types.PyObjectId
-    )
+class OrderPlaced(compose.event.Event):
     sku: str
 
 

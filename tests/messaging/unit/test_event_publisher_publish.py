@@ -19,17 +19,15 @@ class InMemoryMessageQueue(compose.messaging.MessageQueue):
         self._queue.remove(message)
 
 
-class SomeEvent(compose.event.Event[compose.types.PyObjectId]):
-    id: compose.types.PyObjectId = compose.field.PyObjectIdField(
-        default_factory=compose.types.PyObjectId
-    )
+class SomeEvent(compose.event.Event):
+    pass
 
 
 def test_publish():
     queue = InMemoryMessageQueue()
     publisher = compose.messaging.EventPublisher(queue)
     evt = SomeEvent(
-        id=compose.types.PyObjectId(b"test-evt-001"),
+        id="test-evt-001",
         published_at=pendulum.datetime(2023, 12, 1),
     )
 
