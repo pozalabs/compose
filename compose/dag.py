@@ -10,11 +10,13 @@ class DAGJob[K: Hashable, **P, T]:
         key: K,
         dependencies: set[K],
         func: Callable[P, T],
+        *args: P.args,
         **kwargs: P.kwargs,
     ):
         self.key = key
         self.dependencies = dependencies
         self.func = func
+        self.args = args
         self.kwargs = kwargs
 
     @classmethod
@@ -22,12 +24,14 @@ class DAGJob[K: Hashable, **P, T]:
         cls,
         key: K,
         func: Callable[P, T],
+        *args: P.args,
         **kwargs: P.kwargs,
     ) -> Self:
         return cls(
             key=key,
             dependencies=set(),
             func=func,
+            *args,  # type: ignore[bad-argument-type]
             **kwargs,
         )
 
@@ -62,7 +66,7 @@ class DAGExecutor:
                 while ready_queue and len(active_futures) < max_workers:
                     job_key = ready_queue.popleft()
                     job = job_map[job_key]
-                    future = executor.submit(job.func, **job.kwargs)
+                    future = executor.submit(job.func, *job.args, **job.kwargs)  # type: ignore[bad-argument-type]
                     active_futures[future] = job_key
 
                 if not active_futures:
@@ -105,7 +109,7 @@ class DAGExecutor:
         return ready_queue
 
     @staticmethod
-    def _build_dependents[K](dependencies: dict[str, set[K]]) -> dict[str, set[K]]:
+    def _build_dependents[K](dependencies: dict[K, set[K]]) -> dict[K, set[K]]:
         dependents = collections.defaultdict(set)
         for key, deps in dependencies.items():
             for dep in deps:
