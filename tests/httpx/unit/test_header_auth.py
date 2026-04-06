@@ -69,12 +69,12 @@ def client(app: FastAPI) -> TestClient:
     [
         (
             "/items/single-key-auth",
-            compose.httpx.HeaderAuth.single("api-key"),
+            compose.httpx.HeaderAuth.from_api_key("api-key"),
             http.HTTPStatus.OK,
         ),
         (
             "/items/single-key-auth",
-            compose.httpx.HeaderAuth.single("invali-api-key"),
+            compose.httpx.HeaderAuth.from_api_key("invali-api-key"),
             http.HTTPStatus.UNAUTHORIZED,
         ),
         (
