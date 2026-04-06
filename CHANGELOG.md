@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## v2.4.0 (2026-04-06)
+
+### Breaking Changes
+
+**auth**
+
+- `HeaderAuth` 초기화 및 팩토리 메서드 이름 변경
+  - `HeaderAuth(secrets=...)` → `HeaderAuth(headers=...)`
+  - `HeaderAuth.single(key=...)` → `HeaderAuth.from_api_key(api_key=...)`
+
+**event**
+
+- `Event` 클래스에서 제네릭 타입 파라미터 제거, id 타입을 `str`로 고정
+  - `Event[PyObjectId]` → `Event` (id는 `str(uuid4())`로 자동 생성)
+
 ## v2.3.0 (2026-03-19)
 
 ### New Features
