@@ -3,10 +3,6 @@ from collections.abc import Callable
 from typing import Any
 
 from fastapi import APIRouter as _FastAPIRouter
-from fastapi.routing import APIRoute
-
-from ..di.dependency_injector.wiring import Provider
-from .wiring import auto_wired
 
 _OVERRIDE_DEFAULTS = {"response_model_by_alias": False}
 _OVERRIDE_METHODS = {
@@ -46,11 +42,10 @@ for _method_name in _OVERRIDE_METHODS:
 
 
 @functools.lru_cache(1)
-def create_auto_wired_route(provider: Provider) -> type[APIRoute]:
-    """
-    Provider를 사용하는 AutoWiredAPIRoute를 생성하는 팩토리 함수.
-    클래스 변수 대신 클로저를 사용하여 해시 문제를 회피
-    """
+def create_auto_wired_route(provider: Any) -> type:
+    from fastapi.routing import APIRoute
+
+    from .wiring import auto_wired
 
     class AutoWiredAPIRoute(APIRoute):
         def __init__(self, path: str, endpoint: Callable[..., Any], **kwargs: Any):

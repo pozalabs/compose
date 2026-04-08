@@ -9,6 +9,7 @@ from pydantic import Field
 from starlette.testclient import TestClient
 
 import compose
+from compose.di.dependency_injector import DeclarativeContainer, create_provider
 
 
 class User(compose.BaseModel):
@@ -40,15 +41,15 @@ class UserRepository:
         return [item for item in self._items if filter_users(item)]
 
 
-class UserContainer(compose.dependency.DeclarativeContainer):
+class UserContainer(DeclarativeContainer):
     user_repository = providers.Singleton(UserRepository)
 
 
-class ApplicationContainer(compose.dependency.DeclarativeContainer):
+class ApplicationContainer(DeclarativeContainer):
     user = providers.Container(UserContainer)
 
 
-provide = compose.dependency.create_provider(ApplicationContainer)
+provide = create_provider(ApplicationContainer)
 router = APIRouter(route_class=compose.fastapi.create_auto_wired_route(provide))
 
 

@@ -5,7 +5,7 @@ from typing import Any
 import pytest
 from dependency_injector import containers, providers
 
-from compose.dependency import (
+from compose.di.dependency_injector import (
     DEFAULT_RESOLVABLE_PROVIDER_TYPES,
     resolve,
     resolve_by_name,

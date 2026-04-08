@@ -3,8 +3,7 @@ from collections.abc import Iterable
 import pytest
 from dependency_injector import containers, providers
 
-from compose.dependency import provide
-from compose.dependency.wiring import create_provider
+from compose.di.dependency_injector import create_provider, provide
 
 
 class RepositoryA:
