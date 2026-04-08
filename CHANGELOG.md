@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v2.6.0 (unreleased)
+## v2.6.0 (2026-04-08)
 
 ### Breaking Changes
 
@@ -26,6 +26,14 @@
   # After (순서 의존 + 결과 무시)
   DAGJob(key="a", dependencies={"upstream"}, func=lambda _: add(a=1, b=2))
   ```
+
+### Features
+
+**logging**
+
+- `create_logger`에 `serialize` 파라미터 추가
+  - `serialize=True`로 JSON 직렬화 출력 활성화
+  - 기본값 `False` (기존 동작 유지)
 
 ## v2.5.0 (2026-04-08)
 
