@@ -59,17 +59,19 @@ async def test_execute_with_concurrency_limit():
 
 
 @pytest.mark.asyncio
-async def test_execute_fail_fast():
+async def test_capture_job_error_with_successful_result():
     executor = compose.asyncio.AsyncTaskExecutor(concurrency=2)
 
-    with pytest.raises(ValueError, match="Task failed"):
-        await executor.execute(
-            jobs=[
-                compose.asyncio.AsyncJob(key="success", func=slow_task, delay=0.1),
-                compose.asyncio.AsyncJob(key="failure", func=failing_task),
-                compose.asyncio.AsyncJob(key="slow", func=slow_task, delay=0.2),
-            ],
-        )
+    actual = await executor.execute(
+        jobs=[
+            compose.asyncio.AsyncJob(key="success", func=slow_task, delay=0.01),
+            compose.asyncio.AsyncJob(key="failure", func=failing_task),
+        ],
+    )
+
+    assert actual["success"] == "completed"
+    assert isinstance(actual["failure"], ValueError)
+    assert str(actual["failure"]) == "Task failed"
 
 
 @pytest.mark.asyncio
