@@ -19,16 +19,14 @@ def test_execute_no_dependencies():
     executor = compose.dag.DAGExecutor(max_workers=2)
 
     jobs = [
-        compose.dag.DAGJob(
+        compose.dag.DAGJob.fixed(
             key="job1",
-            dependencies=set(),
             func=add,
             a=1,
             b=2,
         ),
-        compose.dag.DAGJob(
+        compose.dag.DAGJob.fixed(
             key="job2",
-            dependencies=set(),
             func=multiply,
             a=3,
             b=4,
@@ -46,30 +44,27 @@ def test_execute_no_dependencies():
 
 
 def test_execute_with_dependencies():
-    """Test execution of jobs with dependencies"""
     executor = compose.dag.DAGExecutor(max_workers=2)
 
     jobs = [
-        compose.dag.DAGJob(
+        compose.dag.DAGJob.fixed(
             key="stage1_a",
-            dependencies=set(),
             func=add,
             a=1,
             b=2,
         ),
-        compose.dag.DAGJob(
+        compose.dag.DAGJob.fixed(
             key="stage1_b",
-            dependencies=set(),
             func=add,
             a=3,
             b=4,
         ),
-        compose.dag.DAGJob(
+        compose.dag.DAGJob.fixed(
             key="stage2",
-            dependencies={"stage1_a", "stage1_b"},
             func=multiply,
             a=2,
             b=3,
+            dependencies={"stage1_a", "stage1_b"},
         ),
     ]
 
@@ -88,33 +83,32 @@ def test_execute_diamond_dependency():
     executor = compose.dag.DAGExecutor(max_workers=2)
 
     jobs = [
-        compose.dag.DAGJob(
+        compose.dag.DAGJob.fixed(
             key="root",
-            dependencies=set(),
             func=add,
             a=10,
             b=5,
         ),
-        compose.dag.DAGJob(
+        compose.dag.DAGJob.fixed(
             key="left_branch",
-            dependencies={"root"},
             func=multiply,
             a=2,
             b=3,
-        ),
-        compose.dag.DAGJob(
-            key="right_branch",
             dependencies={"root"},
+        ),
+        compose.dag.DAGJob.fixed(
+            key="right_branch",
             func=add,
             a=1,
             b=1,
+            dependencies={"root"},
         ),
-        compose.dag.DAGJob(
+        compose.dag.DAGJob.fixed(
             key="convergence",
-            dependencies={"left_branch", "right_branch"},
             func=add,
             a=100,
             b=200,
+            dependencies={"left_branch", "right_branch"},
         ),
     ]
 
@@ -142,16 +136,14 @@ def test_execute_with_exception():
     executor = compose.dag.DAGExecutor(max_workers=2)
 
     jobs = [
-        compose.dag.DAGJob(
+        compose.dag.DAGJob.fixed(
             key="normal",
-            dependencies=set(),
             func=add,
             a=1,
             b=2,
         ),
-        compose.dag.DAGJob(
+        compose.dag.DAGJob.fixed(
             key="failing",
-            dependencies=set(),
             func=failing_task,
             message="test error",
         ),
