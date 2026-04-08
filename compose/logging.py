@@ -111,7 +111,6 @@ class LogDisplayConfig:
 
 
 def create_logger(serialize: bool = False, **config: Unpack[BasicHandlerConfig]) -> Logger:  # type: ignore[bad-function-definition]
-    display = LogDisplayConfig.serialized() if serialize else LogDisplayConfig.non_serialized()
     level = config.get("level", logging.INFO)
 
     intercept_handler = InterceptHandler()
@@ -128,7 +127,11 @@ def create_logger(serialize: bool = False, **config: Unpack[BasicHandlerConfig])
                     LogFilterNotContains("/health-check"),
                     LogFilterNotContains("/metrics"),
                 ),
-                **dataclasses.asdict(display),
+                **dataclasses.asdict(
+                    LogDisplayConfig.serialized()
+                    if serialize
+                    else LogDisplayConfig.non_serialized()
+                ),
             }
             | config
         ]
