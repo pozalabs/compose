@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## v2.6.0 (unreleased)
+
+### Breaking Changes
+
+**dag**
+
+- `DAGJob`의 func 시그니처가 `Callable[P, T]`에서 `Callable[[dict[K, T]], T]`로 변경
+  - func는 의존성 결과 딕셔너리(`results`)를 받아 실행 결과를 반환
+  - `results`에는 해당 job의 `dependencies`에 선언한 키의 결과만 포함
+  - 고정 인자를 사용하는 경우 `DAGJob.fixed()` 팩토리 메서드 사용
+
+  ```python
+  # Before
+  DAGJob(key="a", dependencies=set(), func=add, a=1, b=2)
+  DAGJob.no_dependencies(key="a", func=add, a=1, b=2)
+
+  # After (결과 주입)
+  DAGJob(key="sum", dependencies={"a", "b"}, func=lambda results: results["a"] + results["b"])
+
+  # After (고정 인자)
+  DAGJob.fixed(key="a", func=add, a=1, b=2)
+  DAGJob.fixed(key="a", func=add, a=1, b=2, dependencies={"upstream"})
+  ```
+
 ## v2.5.0 (2026-04-08)
 
 ### Breaking Changes
