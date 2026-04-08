@@ -16,17 +16,17 @@ class DAGJob[K: Hashable, T]:
         self.func = func
 
     @classmethod
-    def fixed(
+    def bound[**P](
         cls,
         key: K,
-        func: Callable[..., T],
-        *args,
-        dependencies: set[K] | None = None,
-        **kwargs,
+        func: Callable[P, T],
+        /,
+        *args: P.args,
+        **kwargs: P.kwargs,
     ) -> Self:
         return cls(
             key=key,
-            dependencies=dependencies or set(),
+            dependencies=set(),
             func=lambda _: func(*args, **kwargs),
         )
 
@@ -61,8 +61,8 @@ class DAGExecutor:
                 while ready_queue and len(active_futures) < max_workers:
                     job_key = ready_queue.popleft()
                     job = job_map[job_key]
-                    results = {k: completed[k] for k in job.dependencies}
-                    future = executor.submit(job.func, results)
+                    result = {k: completed[k] for k in job.dependencies}
+                    future = executor.submit(job.func, result)
                     active_futures[future] = job_key
 
                 if not active_futures:
