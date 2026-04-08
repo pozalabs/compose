@@ -3,7 +3,7 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-03-30T04:17:50.315033Z"
+exclude-newer = "2026-04-01T02:53:35.492512Z"
 exclude-newer-span = "P7D"
 
 [manifest]
@@ -877,7 +877,7 @@ wheels = [
 
 [[package]]
 name = "pozalabs-compose"
-version = "2.4.0"
+version = "2.5.0"
 source = { editable = "." }
 dependencies = [
     { name = "dependency-injector" },
