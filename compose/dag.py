@@ -16,17 +16,17 @@ class DAGJob[K: Hashable, T]:
         self.func = func
 
     @classmethod
-    def fixed(
+    def bound[**P](
         cls,
         key: K,
-        func: Callable[..., T],
-        *args,
-        dependencies: set[K] | None = None,
-        **kwargs,
+        func: Callable[P, T],
+        /,
+        *args: P.args,
+        **kwargs: P.kwargs,
     ) -> Self:
         return cls(
             key=key,
-            dependencies=dependencies or set(),
+            dependencies=set(),
             func=lambda _: func(*args, **kwargs),
         )
 
