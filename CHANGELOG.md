@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v2.5.0 (2026-04-08)
+
+### Breaking Changes
+
+**concurrent**
+
+- 병렬 실행기(`AsyncTaskExecutor`, `ThreadPoolExecutor`, `execute_in_pool`)의 반환 타입이 `dict[K, T]`에서 `dict[K, T | Exception]`으로 변경
+  - 개별 job 실패 시 전체 실패 대신 해당 job의 결과에 `Exception` 객체 반환
+  - 실행 결과는 `match/case`로 성공/실패 판별: `case Exception()` → 실패, `case T()` → 성공
+
 ## v2.4.0 (2026-04-06)
 
 ### Breaking Changes
