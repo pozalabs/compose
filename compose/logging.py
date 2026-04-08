@@ -110,7 +110,7 @@ class LogDisplayConfig:
         )
 
 
-def create_logger(**config: Unpack[BasicHandlerConfig]) -> Logger:
+def create_logger(serialize: bool = False, **config: Unpack[BasicHandlerConfig]) -> Logger:  # type: ignore[bad-function-definition]
     level = config.get("level", logging.INFO)
 
     intercept_handler = InterceptHandler()
@@ -118,7 +118,7 @@ def create_logger(**config: Unpack[BasicHandlerConfig]) -> Logger:
     route_to_loguru(intercept_handler=intercept_handler)
 
     logger.configure(
-        handlers=[
+        handlers=[  # type: ignore[bad-argument-type]
             {
                 "sink": sys.stdout,
                 "level": level,
@@ -127,7 +127,11 @@ def create_logger(**config: Unpack[BasicHandlerConfig]) -> Logger:
                     LogFilterNotContains("/health-check"),
                     LogFilterNotContains("/metrics"),
                 ),
-                **dataclasses.asdict(LogDisplayConfig.non_serialized()),
+                **dataclasses.asdict(
+                    LogDisplayConfig.serialized()
+                    if serialize
+                    else LogDisplayConfig.non_serialized()
+                ),
             }
             | config
         ]
