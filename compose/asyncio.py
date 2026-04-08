@@ -27,7 +27,7 @@ class AsyncTaskExecutor:
         jobs: list[AsyncJob[K, T]],
         concurrency: int | None = None,
         timeout: float | None = None,
-    ) -> dict[K, T]:
+    ) -> dict[K, T | Exception]:
         concurrency = concurrency if concurrency is not None else self.concurrency
         timeout = timeout if timeout is not None else self.timeout
 
@@ -43,19 +43,18 @@ class AsyncTaskExecutor:
 async def _execute_jobs[K, T](
     jobs: list[AsyncJob[K, T]],
     semaphore: asyncio.Semaphore,
-) -> dict[K, T]:
-    try:
-        async with asyncio.TaskGroup() as tg:
-            tasks = [
-                (job.key, tg.create_task(_execute_job(job=job, semaphore=semaphore)))
-                for job in jobs
-            ]
-    except* Exception as eg:
-        raise eg.exceptions[0]
+) -> dict[K, T | Exception]:
+    async with asyncio.TaskGroup() as tg:
+        tasks = [
+            (job.key, tg.create_task(_execute_job(job=job, semaphore=semaphore))) for job in jobs
+        ]
 
     return {key: task.result() for key, task in tasks}
 
 
-async def _execute_job[K, T](job: AsyncJob[K, T], semaphore: asyncio.Semaphore) -> T:
+async def _execute_job[K, T](job: AsyncJob[K, T], semaphore: asyncio.Semaphore) -> T | Exception:
     async with semaphore:
-        return await job()
+        try:
+            return await job()
+        except Exception as exc:
+            return exc
