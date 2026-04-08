@@ -214,3 +214,22 @@ def test_results_contain_only_declared_dependencies():
     executor.execute(jobs)
 
     assert received_keys == {"a"}
+
+
+def test_fixed_ignore_dependency_results():
+    executor = compose.dag.DAGExecutor(max_workers=1)
+
+    jobs = [
+        compose.dag.DAGJob.fixed(key="upstream", func=add, a=1, b=2),
+        compose.dag.DAGJob.fixed(
+            key="downstream",
+            func=multiply,
+            a=5,
+            b=6,
+            dependencies={"upstream"},
+        ),
+    ]
+
+    actual = executor.execute(jobs)
+
+    assert actual == {"upstream": 3, "downstream": 30}
