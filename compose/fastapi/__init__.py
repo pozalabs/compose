@@ -18,9 +18,8 @@ try:
     from .otel import NonInstrumentedUrls
     from .param import FromAuth, FromPath, OffsetPaginationParams, as_query, with_fields
     from .response import NoContentResponse, ZipStreamingResponse
-    from .routing import APIRouter, create_auto_wired_route
+    from .routing import APIRouter
     from .security import APIKeyHeader, CookieAuth, HTTPBasic, HTTPBearer, unauthorized_error
-    from .wiring import auto_wired
 except ImportError:
     raise ImportError("Install `fastapi` to use `compose.fastapi` package") from None
 
@@ -47,8 +46,6 @@ __all__ = [
     "add_health_check_endpoint",
     "additional_responses",
     "as_query",
-    "auto_wired",
-    "create_auto_wired_route",
     "create_exception_handler",
     "default_exception_handlers",
     "health_check",
@@ -76,6 +73,14 @@ try:
             "init_sentry",
         ]
     )
+except ImportError:
+    pass
+
+try:
+    from .routing import create_auto_wired_route  # noqa: F401
+    from .wiring import auto_wired  # noqa: F401
+
+    __all__.extend(["auto_wired", "create_auto_wired_route"])
 except ImportError:
     pass
 

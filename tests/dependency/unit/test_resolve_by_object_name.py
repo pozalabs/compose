@@ -4,11 +4,10 @@ from typing import Any
 import pytest
 from dependency_injector import containers, providers
 
-from compose.dependency import resolve_by_object_name
+from compose.di.dependency_injector import resolve_by_object_name
 
 
-class Repository:
-    ...
+class Repository: ...
 
 
 class RepositoryA:

@@ -2,7 +2,7 @@ import pytest
 from dependency_injector import providers
 from dependency_injector.wiring import inject
 
-import compose
+from compose.di.dependency_injector import DeclarativeContainer, provide
 
 
 class Adder:
@@ -13,7 +13,7 @@ class Adder:
         return self.initial + v
 
 
-class ApplicationContainer(compose.dependency.DeclarativeContainer):
+class ApplicationContainer(DeclarativeContainer):
     adder = providers.Factory(Adder, initial=1)
 
 
@@ -27,7 +27,7 @@ def container():
 @inject
 def add(
     v: int,
-    adder: Adder = compose.dependency.provide(Adder, ApplicationContainer),
+    adder: Adder = provide(Adder, ApplicationContainer),
 ) -> int:
     return adder.add(v)
 
