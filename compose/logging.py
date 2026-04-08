@@ -119,7 +119,7 @@ def create_logger(serialize: bool = False, **config: Unpack[BasicHandlerConfig])
     route_to_loguru(intercept_handler=intercept_handler)
 
     logger.configure(
-        handlers=[
+        handlers=[  # type: ignore[bad-argument-type]
             {
                 "sink": sys.stdout,
                 "level": level,
