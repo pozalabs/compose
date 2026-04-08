@@ -61,8 +61,8 @@ class DAGExecutor:
                 while ready_queue and len(active_futures) < max_workers:
                     job_key = ready_queue.popleft()
                     job = job_map[job_key]
-                    result = {k: completed[k] for k in job.dependencies}
-                    future = executor.submit(job.func, result)
+                    results = {k: completed[k] for k in job.dependencies}
+                    future = executor.submit(job.func, results)
                     active_futures[future] = job_key
 
                 if not active_futures:

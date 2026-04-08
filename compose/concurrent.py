@@ -8,7 +8,7 @@ def execute_in_pool[K, T](
     funcs: dict[K, functools.partial[T]],
     timeout: int | None = None,
 ) -> dict[K, T | Exception]:
-    result: dict[K, T | Exception] = {}
+    results: dict[K, T | Exception] = {}
     with pool_factory() as executor:
         future_to_key: dict[concurrent.futures.Future[T], K] = {}
         for key, func in funcs.items():
@@ -17,11 +17,11 @@ def execute_in_pool[K, T](
 
         for future in concurrent.futures.as_completed(future_to_key, timeout=timeout):
             try:
-                result[future_to_key[future]] = future.result()
+                results[future_to_key[future]] = future.result()
             except Exception as exc:
-                result[future_to_key[future]] = exc
+                results[future_to_key[future]] = exc
 
-    return result
+    return results
 
 
 class ThreadPoolJob[K: Hashable, **P, T]:
@@ -49,7 +49,7 @@ class ThreadPoolExecutor:
         max_workers: int | None = None,
         timeout: int | None = None,
     ) -> dict[K, T | Exception]:
-        result: dict[K, T | Exception] = {}
+        results: dict[K, T | Exception] = {}
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=max_workers or self.max_workers
         ) as executor:
@@ -63,8 +63,8 @@ class ThreadPoolExecutor:
                 future_to_key, timeout=timeout or self.timeout
             ):
                 try:
-                    result[future_to_key[future]] = future.result()
+                    results[future_to_key[future]] = future.result()
                 except Exception as exc:
-                    result[future_to_key[future]] = exc
+                    results[future_to_key[future]] = exc
 
-        return result
+        return results
