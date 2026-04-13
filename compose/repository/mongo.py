@@ -58,7 +58,7 @@ class MongoRepository[T: Entity](BaseRepository):
         return cls(collection=collection)
 
     def ensure_indexes(self) -> None:
-        if self.__indexes__:
+        if self.__indexes__ is not None:
             self.collection.create_indexes(self.__indexes__)
 
     def find_by_id(
