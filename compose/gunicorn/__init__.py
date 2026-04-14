@@ -1,3 +1,3 @@
-from .settings import GunicornSettings
+from .settings import GunicornSettings, export_settings
 
-__all__ = ["GunicornSettings"]
+__all__ = ["GunicornSettings", "export_settings"]
