@@ -1,4 +1,4 @@
-from pydantic import SerializeAsAny, SkipValidation
+from pydantic import SkipValidation
 
 from compose import model
 from compose.event import Event
@@ -15,10 +15,11 @@ from compose.event import Event
 # 하위 클래스 인스턴스를 Event로 변환하고(extra="ignore"로 추가 필드 제거),
 # 직렬화 시에도 Event 스키마를 사용하여 하위 클래스의 필드를 처리하지 못함.
 #
-# SkipValidation: 검증을 건너뛰어 하위 클래스 인스턴스를 그대로 보존
-# SerializeAsAny: 선언 타입이 아닌 런타임 실제 타입의 직렬화기를 사용
+# SkipValidation은 검증을 건너뛰어 하위 클래스 인스턴스를 그대로 보존. 직렬화 시
+# 하위 클래스 필드를 포함하는 동작은 Event.model_config의 polymorphic_serialization에
+# 의해 보장됨.
 class EventMessage(model.BaseModel):
-    body: SerializeAsAny[SkipValidation[Event]]
+    body: SkipValidation[Event]
 
 
 class SqsEventMessage(EventMessage):
