@@ -13,7 +13,6 @@ from pymongo.results import UpdateResult
 from .. import types
 from ..entity import Entity
 from ..query.mongo import MongoPaginationQuery, MongoQuery
-from ..utils import descendants_of
 from .base import BaseRepository
 
 
@@ -56,13 +55,11 @@ class MongoRepository[T: Entity](BaseRepository):
     @classmethod
     def create(cls, database: Database, **kwargs) -> Self:
         collection = database.get_collection(cls.__collection_name__, **kwargs)
-        if (
-            cls.__collection_name__ not in database.list_collection_names()
-            and cls.__indexes__ is not None
-        ):
-            collection.create_indexes(cls.__indexes__)
-
         return cls(collection=collection)
+
+    def ensure_indexes(self) -> None:
+        if self.__indexes__ is not None:
+            self.collection.create_indexes(self.__indexes__)
 
     def find_by_id(
         self,
@@ -245,20 +242,6 @@ class MongoRepository[T: Entity](BaseRepository):
         return get_args(orig_base)[0]
 
 
-def setup_indexes(*databases: *tuple[Database, ...]) -> None:
-    index_map: dict[str, list[pymongo.IndexModel]] = {}
-    for subclass in descendants_of(MongoRepository):
-        collection_name = subclass.__collection_name__
-        indexes = subclass.__indexes__ or []
-        if not (collection_name and indexes):
-            continue
-        collected = index_map.setdefault(collection_name, [])
-        collected_documents = [idx.document for idx in collected]
-        collected.extend(idx for idx in indexes if idx.document not in collected_documents)
-
-    for database in databases:
-        collection_names = database.list_collection_names()
-        for collection_name, indexes in index_map.items():
-            if collection_name not in collection_names:
-                continue
-            database.get_collection(collection_name).create_indexes(indexes)
+def setup_indexes(*repositories: *tuple[MongoRepository, ...]) -> None:
+    for repository in repositories:
+        repository.ensure_indexes()
