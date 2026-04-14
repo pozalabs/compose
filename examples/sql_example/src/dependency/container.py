@@ -3,18 +3,18 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from src.user.dependency import UserContainer
 
-import compose
+from compose.di import dependency_injector as di
 
 PACKAGES = {
     "src.user",
 }
 
 
-class ApplicationContainer(compose.dependency.DeclarativeContainer):
+class ApplicationContainer(di.DeclarativeContainer):
     engine = providers.Singleton(create_engine, "sqlite:///users.db")
     session_factory = providers.Singleton(sessionmaker, bind=engine)
 
     user = providers.Container(UserContainer, session_factory=session_factory)
 
 
-provide = compose.dependency.create_provider(ApplicationContainer)
+provide = di.create_provider(ApplicationContainer)
