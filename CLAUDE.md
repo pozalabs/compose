@@ -5,7 +5,7 @@
 이슈 생성 시 아래 정보 사용
 
 - area: compose
-- team: 내부제품
+- team: internal
 
 ## 에러 메시지
 
