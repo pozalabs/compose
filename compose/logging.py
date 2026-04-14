@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import dataclasses
 import enum
+import functools
+import inspect
 import logging
 import os
 import sys
-from collections.abc import Iterable
+import time
+from collections.abc import Callable, Iterable
 from types import FrameType
 from typing import TYPE_CHECKING, Protocol, Self, Unpack
 
 try:
-    from loguru import logger
+    from loguru import logger as _logger
 except ImportError:
     raise ImportError("Install `loguru` extra to use logging features") from None
 
@@ -31,7 +34,7 @@ class InterceptHandler(logging.Handler):
         # 콜스택을 역추적하여 실제 로그 호출 지점의 depth를 계산함.
         # loguru가 InterceptHandler 내부가 아닌 원래 로그 발생 위치를 기록하기 위함.
         try:
-            level = logger.level(record.levelname).name
+            level = _logger.level(record.levelname).name
         except ValueError:
             level = record.levelno
 
@@ -41,7 +44,7 @@ class InterceptHandler(logging.Handler):
             frame = frame.f_back
             depth += 1
 
-        logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
+        _logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
 def route_to_loguru(
@@ -117,7 +120,7 @@ def create_logger(serialize: bool = False, **config: Unpack[BasicHandlerConfig])
     logging.basicConfig(handlers=[intercept_handler], level=level, force=True)
     route_to_loguru(intercept_handler=intercept_handler)
 
-    logger.configure(
+    _logger.configure(
         handlers=[  # type: ignore[bad-argument-type]
             {
                 "sink": sys.stdout,
@@ -137,10 +140,53 @@ def create_logger(serialize: bool = False, **config: Unpack[BasicHandlerConfig])
         ]
     )
 
-    return logger
+    return _logger
 
 
 class LogLevel(int):
     @classmethod
     def from_env(cls, env: str) -> Self:
         return cls(os.getenv(env, logging.INFO))
+
+
+def log_elapsed[T](
+    func_name: str,
+    logger: Logger,
+    func: Callable[[], T],
+) -> T:
+    start = time.perf_counter()
+    result = func()
+    _emit_elapsed(logger, func_name, start)
+    return result
+
+
+def create_elapsed_logger(logger: Logger):
+    def decorator[T, **P](func: Callable[P, T]) -> Callable[P, T]:
+        func_name = func.__qualname__
+
+        if inspect.iscoroutinefunction(func):
+
+            @functools.wraps(func)
+            async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+                start = time.perf_counter()
+                result = await func(*args, **kwargs)  # type: ignore[not-async]
+                _emit_elapsed(logger, func_name, start)
+                return result
+
+            return async_wrapper  # type: ignore[bad-return]
+
+        @functools.wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+            start = time.perf_counter()
+            result = func(*args, **kwargs)
+            _emit_elapsed(logger, func_name, start)
+            return result
+
+        return wrapper
+
+    return decorator
+
+
+def _emit_elapsed(logger: Logger, func_name: str, start: float) -> None:
+    elapsed = time.perf_counter() - start
+    logger.bind(func_name=func_name, elapsed=elapsed).info(f"{func_name} took {elapsed:.3f}s")
