@@ -1,5 +1,39 @@
 # CHANGELOG
 
+## v2.6.1 (2026-04-21)
+
+### Breaking Changes
+
+**di**
+
+- `dependency-injector`가 선택 의존성으로 전환
+  - 사용하는 경우 `pip install pozalabs-compose[di]`로 설치
+- DI 모듈의 re-export 제거
+
+### Features
+
+**mongodb**
+
+- Repository 인덱스 동기화 시 Database 네임스페이스 구분 지원
+
+**logging**
+
+- 경과 시간 로깅 유틸리티를 `logging` 모듈로 통합
+
+**event**
+
+- `EventMessage`의 다형적 직렬화를 `model_config` 기반으로 전환
+
+### Bug Fixes
+
+**querying**
+
+- `as_query`에서 non-dataclass metadata 포함 시 `asdict` 크래시 수정
+
+**gunicorn**
+
+- `export_settings` 함수 re-export 누락 수정
+
 ## v2.6.0 (2026-04-08)
 
 ### Breaking Changes
