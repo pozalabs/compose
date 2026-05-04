@@ -3,8 +3,8 @@ import logging
 
 from compose import types
 
-from .. import EventMessage
 from ..event_bus import EventBus
+from ..model import EventMessage
 from ..queue.base import MessageQueue
 from ..signal_handler import DefaultSignalHandler, SignalHandler
 from .hook import DEFAULT_HOOKS, Hook, HookArgType, HookEventType, default_hook
