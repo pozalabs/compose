@@ -1,115 +1,113 @@
-import types
-from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, Self, cast
+from typing import Any, Self
 
-from compose import typing
-
-from .helper import CoreSchemaGettable
-
-MARKER_IS_COMPOSE_VALIDATOR = "_is_compose_validator"
-MARKER_COMPOSE_VALIDATORS = "_compose_validators"
+from pydantic import GetCoreSchemaHandler
+from pydantic_core import core_schema
 
 
-def caster[T](factory: Callable[[Any], T], /) -> Callable[[Any], T]:
-    def _cast(v: Any) -> T:
-        return factory(v)
-
-    return _cast
+def validator(fn):
+    fn._is_validator = True
+    return fn
 
 
-def validator[**P, T](func: Callable[P, T]) -> Callable[P, T]:
-    setattr(func, MARKER_IS_COMPOSE_VALIDATOR, True)
-    return func
-
-
-class ValidatablePrimitive[T]:
-    if TYPE_CHECKING:
-
-        def __init__(self, *args, **kwargs) -> None: ...
-
-    @classmethod
-    def __get_validators__(cls) -> typing.ValidatorGenerator:
-        yield from getattr(cls, MARKER_COMPOSE_VALIDATORS, [])
-
-    @classmethod
-    @validator
-    def cast(cls, v: T) -> Self:
-        return cls(v)
+class Str(str):
+    _validators: list = []
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-
-        cls._compose_validators = [
-            getattr(cls, name)
-            for base_cls in cls.__mro__
-            for name, member in base_cls.__dict__.items()
-            if (
-                isinstance(member, classmethod)
-                and hasattr(member.__wrapped__, MARKER_IS_COMPOSE_VALIDATOR)
-            )
+        cls._validators = [
+            member.__func__
+            for klass in reversed(cls.__mro__)
+            for member in klass.__dict__.values()
+            if isinstance(member, classmethod) and getattr(member.__func__, "_is_validator", False)
         ]
 
+    @classmethod
+    def validated(cls, v, /) -> Self:
+        for fn in cls._validators:
+            v = fn(cls, v)
+        return cls(v)
 
-class Str(str, ValidatablePrimitive[str], CoreSchemaGettable[str]): ...
-
-
-class Int(int, ValidatablePrimitive[int], CoreSchemaGettable[int]): ...
-
-
-class Float(float, ValidatablePrimitive[float], CoreSchemaGettable[float]): ...
-
-
-def _create_list_type[T](t: type[T], /) -> type[list[T]]:
-    def __get_validators__(c) -> typing.ValidatorGenerator:
-        yield caster(c)
-
-    return cast(
-        type[list[T]],
-        types.new_class(
-            f"{t.__name__.title()}List",
-            (list[t], ValidatablePrimitive[t], CoreSchemaGettable[list[t]]),
-            exec_body=lambda ns: ns.update(
-                {
-                    "__get_validators__": classmethod(__get_validators__),
-                }
-            ),
-        ),
-    )
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        return core_schema.no_info_after_validator_function(source_type.validated, handler(str))
 
 
-def create_list_type[T]() -> Callable[[type[T]], type[list[T]]]:
-    cache = {}
+class Int(int):
+    _validators: list = []
 
-    def factory(t: type[T]) -> type[list[T]]:
-        type_name = t.__name__
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls._validators = [
+            member.__func__
+            for klass in reversed(cls.__mro__)
+            for member in klass.__dict__.values()
+            if isinstance(member, classmethod) and getattr(member.__func__, "_is_validator", False)
+        ]
 
-        if (cached := cache.get(type_name)) is not None:
-            return cached
+    @classmethod
+    def validated(cls, v, /) -> Self:
+        for fn in cls._validators:
+            v = fn(cls, v)
+        return cls(v)
 
-        _result = _create_list_type(t)
-        cache[type_name] = _result
-        return _result
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        return core_schema.no_info_after_validator_function(source_type.validated, handler(int))
 
-    return factory
 
+class Float(float):
+    _validators: list = []
 
-TypedList = create_list_type()
-StrList = TypedList(str)
-IntList = TypedList(int)
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls._validators = [
+            member.__func__
+            for klass in reversed(cls.__mro__)
+            for member in klass.__dict__.values()
+            if isinstance(member, classmethod) and getattr(member.__func__, "_is_validator", False)
+        ]
+
+    @classmethod
+    def validated(cls, v, /) -> Self:
+        for fn in cls._validators:
+            v = fn(cls, v)
+        return cls(v)
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        return core_schema.no_info_after_validator_function(source_type.validated, handler(float))
 
 
 class ListMeta(type):
-    _cache = {}
+    _cache: dict[str, type] = {}
 
-    def __getitem__(self, item):
-        type_name = item.__name__
-
-        if (cached := self._cache.get(type_name)) is not None:
+    def __getitem__(cls, item):
+        type_name = item.__name__ if hasattr(item, "__name__") else str(item)
+        if (cached := cls._cache.get(type_name)) is not None:
             return cached
 
-        result = _create_list_type(item)
-        self._cache[type_name] = result
-        return result
+        element_type = item
+        new_cls = type(
+            f"{type_name.title()}List",
+            (list,),
+            {
+                "__get_pydantic_core_schema__": classmethod(
+                    lambda c, source_type, handler, _et=element_type: (
+                        core_schema.no_info_after_validator_function(
+                            source_type, handler(list[_et])
+                        )
+                    )
+                )
+            },
+        )
+        cls._cache[type_name] = new_cls
+        return new_cls
 
 
-class List[T](list[T], metaclass=ListMeta): ...
+class List(list, metaclass=ListMeta): ...
