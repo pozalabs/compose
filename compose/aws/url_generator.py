@@ -42,7 +42,7 @@ class S3UrlGenerator:
         return self.s3_client.generate_presigned_url(
             "get_object",
             Params=default_params | (params or {}),
-            ExpiresIn=expires_in or self.expires_in,
+            ExpiresIn=int(expires_in or self.expires_in),
         )
 
     def generate_upload_url(
@@ -58,5 +58,5 @@ class S3UrlGenerator:
         return self.s3_client.generate_presigned_url(
             "put_object",
             Params={"Bucket": bucket, "Key": key} | (params or {}),
-            ExpiresIn=expires_in or self.expires_in,
+            ExpiresIn=int(expires_in or self.expires_in),
         )
