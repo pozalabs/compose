@@ -2,7 +2,7 @@ from .consumer import MessageConsumer
 from .consumer_runner import FastAPIMessageConsumerRunner, ThreadMessageConsumerRunner
 from .event_bus import EventBus
 from .model import EventMessage, SqsEventMessage
-from .publisher import EventPublisher
+from .publisher import EventPublisher, MessagePushable
 from .queue.base import MessageQueue
 from .signal_handler import DefaultSignalHandler, SignalHandler, ThreadSignalHandler
 
@@ -13,6 +13,7 @@ __all__ = [
     "EventPublisher",
     "FastAPIMessageConsumerRunner",
     "MessageConsumer",
+    "MessagePushable",
     "MessageQueue",
     "SignalHandler",
     "SqsEventMessage",

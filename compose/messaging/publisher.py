@@ -1,14 +1,19 @@
 import logging
+from typing import Protocol
 
 from ..event import Event
 from .model import EventMessage
-from .queue.base import MessageQueue
+
+
+class MessagePushable(Protocol):
+    def push(self, message: EventMessage) -> None: ...
+
 
 logger = logging.getLogger("compose")
 
 
 class EventPublisher:
-    def __init__(self, message_queue: MessageQueue):
+    def __init__(self, message_queue: MessagePushable):
         self.message_queue = message_queue
 
     def publish(self, evt: Event) -> None:
