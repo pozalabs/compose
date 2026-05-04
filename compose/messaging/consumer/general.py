@@ -3,7 +3,7 @@ import logging
 
 from compose import types
 
-from .. import model
+from .. import EventMessage
 from ..event_bus import EventBus
 from ..queue.base import MessageQueue
 from ..signal_handler import DefaultSignalHandler, SignalHandler
@@ -12,7 +12,7 @@ from .hook import DEFAULT_HOOKS, Hook, HookArgType, HookEventType, default_hook
 logger = logging.getLogger("compose")
 
 
-class MessageConsumer[M: model.EventMessage = model.EventMessage]:
+class MessageConsumer[M: EventMessage = EventMessage]:
     def __init__(
         self,
         event_bus: EventBus,
