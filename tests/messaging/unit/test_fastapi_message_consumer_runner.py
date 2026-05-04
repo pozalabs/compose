@@ -21,8 +21,6 @@ class FakeMessageConsumer:
         while not self._shutdown_event.is_set():
             await asyncio.sleep(0.01)
 
-    async def consume(self, message: compose.messaging.EventMessage) -> None: ...
-
     def shutdown(self):
         self.shutdown_called = True
         self._shutdown_event.set()
