@@ -21,7 +21,7 @@ except ImportError:
     )
 
 
-class SqsMessageQueue(MessageQueue):
+class SqsMessageQueue(MessageQueue[model.SqsEventMessage]):
     def __init__(
         self,
         sqs_client: mypy_boto3_sqs.SQSClient,
@@ -52,7 +52,7 @@ class SqsMessageQueue(MessageQueue):
             },
         )
 
-    def push(self, message: model.SqsEventMessage) -> None:
+    def push(self, message: model.EventMessage) -> None:
         self.client.send_message(
             QueueUrl=self._queue_url,
             MessageBody=json.dumps(message.body.model_dump(mode="json", by_alias=True)),

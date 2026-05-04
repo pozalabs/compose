@@ -3,15 +3,15 @@ import abc
 from .. import model
 
 
-class MessageQueue(abc.ABC):
+class MessageQueue[M: model.EventMessage = model.EventMessage](abc.ABC):
     @abc.abstractmethod
     def push(self, message: model.EventMessage) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def peek(self) -> model.EventMessage | None:
+    def peek(self) -> M | None:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def delete(self, message: model.EventMessage) -> None:
+    def delete(self, message: M) -> None:
         raise NotImplementedError
