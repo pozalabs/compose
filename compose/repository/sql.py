@@ -63,7 +63,7 @@ class SQLRepository[T: SQLEntity](BaseRepository):
 
         if "updated_at" in row:
             now = pendulum.DateTime.utcnow()
-            entity.updated_at = now
+            entity.updated_at = now  # type: ignore[bad-assignment]
             row["updated_at"] = now.isoformat()
 
         session.execute(update(table).where(table.c.id == str(entity.id)).values(**row))
@@ -75,7 +75,7 @@ class SQLRepository[T: SQLEntity](BaseRepository):
     @functools.cached_property
     def _entity_type(self) -> type[T]:
         orig_base = next(
-            (base for base in self.__class__.__orig_bases__ if get_origin(base) is SQLRepository),
+            (base for base in self.__class__.__orig_bases__ if get_origin(base) is SQLRepository),  # type: ignore[missing-attribute]
             None,
         )
         if orig_base is None:

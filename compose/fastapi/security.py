@@ -39,6 +39,11 @@ class HTTPBasic[T](FastAPIHTTPBasic):
 
     async def __call__(self, request: Request) -> T:
         credentials = await super().__call__(request)
+        if credentials is None:
+            raise unauthorized_error(
+                detail="Not authenticated",
+                headers={"WWW-Authenticate": "Basic"},
+            )
         return self.authenticator(credentials.username, credentials.password)
 
     @classmethod
@@ -107,6 +112,9 @@ class HTTPBearer(FastAPIHTTPBearer):
         try:
             credentials = await super().__call__(request)
         except HTTPException:
+            raise self.error_handlers.get("on_credentials_missing", self._default_error_handler)()
+
+        if credentials is None:
             raise self.error_handlers.get("on_credentials_missing", self._default_error_handler)()
 
         return credentials.credentials
