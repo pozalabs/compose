@@ -15,10 +15,11 @@ class BaseError(Exception):
             message = message.value
         super().__init__(message)
 
-        if message is None and self.default_message is None:
+        resolved = str(message) if message is not None else self.default_message
+        if resolved is None:
             raise ValueError("`message` or `default_message` must not be None")
 
-        self.message = str(message) if message is not None else self.default_message
+        self.message = resolved
         self.detail = detail
         self.invalid_params = invalid_params
 

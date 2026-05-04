@@ -82,7 +82,7 @@ def init_sentry(
 
 def capture_error(handler: ExceptionHandler) -> ExceptionHandler:
     @functools.wraps(handler)
-    async def wrapper(request: Request, exc: Exception) -> Response | Awaitable[Response]:
+    async def wrapper(request: Request, exc: Exception) -> Response:
         sentry_sdk.capture_exception(exc)
         result = handler(request, exc)
         if isinstance(result, Awaitable):
