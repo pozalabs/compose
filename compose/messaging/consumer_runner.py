@@ -55,7 +55,7 @@ class ThreadMessageConsumerRunner:
         self._consumers.append(message_consumer)
         await message_consumer.run()
 
-    def handle_signal(self, signum: int, _: types.FrameType) -> None:
+    def handle_signal(self, signum: int, _: types.FrameType | None) -> None:
         logger.info(f"Received {signal.Signals(signum).name}, exiting gracefully")
         self._received_signal = True
 
