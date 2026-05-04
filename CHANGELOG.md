@@ -1,5 +1,33 @@
 # CHANGELOG
 
+## v2.7.0 (2026-05-04)
+
+### Features
+
+**mongodb**
+
+- `MongoRepository`의 ID 타입을 제네릭으로 확장
+  - `MongoRepository[T, ID]` 형태로 두 번째 타입 파라미터 추가
+  - 기본값이 `PyObjectId`이므로 기존 코드 변경 불필요
+  - `str`, `int` 등 다양한 ID 타입 사용 가능
+
+**messaging**
+
+- `MessageQueue` 제네릭 타입 파라미터 도입
+  - `push`는 `EventMessage`를 받고, `peek`/`delete`는 타입 파라미터 `M`으로 특화
+  - `MessagePushable` Protocol 도입으로 발행 전용 인터페이스 분리
+
+### Bug Fixes
+
+**s3**
+
+- presigned URL 생성 시 `ExpiresIn` 값을 `int`로 변환하여 시그니처 오류 방지
+
+### Internal
+
+- 사용처 없는 `LocalMessageQueue`, `MessageConsumerASGIMiddleware` 삭제
+- 본체 코드 타입 에러 수정
+
 ## v2.6.1 (2026-04-21)
 
 ### Breaking Changes
