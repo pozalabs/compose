@@ -27,7 +27,7 @@ class MongoDocument(dict[str, Any]):
         )
 
 
-class MongoRepository[T: Entity](BaseRepository):
+class MongoRepository[T: Entity, ID = types.PyObjectId](BaseRepository):
     """
     `MongoRepository` 추상 클래스
 
@@ -63,7 +63,7 @@ class MongoRepository[T: Entity](BaseRepository):
 
     def find_by_id(
         self,
-        entity_id: types.PyObjectId,
+        entity_id: ID,
         session: ClientSession | None = None,
         **kwargs,
     ) -> T | None:
@@ -217,9 +217,7 @@ class MongoRepository[T: Entity](BaseRepository):
         for entity in entities:
             self.update(entity=entity, session=session, **kwargs)
 
-    def delete(
-        self, entity_id: types.PyObjectId, session: ClientSession | None = None, **kwargs
-    ) -> None:
+    def delete(self, entity_id: ID, session: ClientSession | None = None, **kwargs) -> None:
         self.collection.delete_one({"_id": entity_id}, session=session, **kwargs)
 
     def paginate[R](
