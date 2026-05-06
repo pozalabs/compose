@@ -15,7 +15,9 @@ def validator(func: Callable[..., Any]) -> Callable[..., Any]:
 
 
 def _is_compose_validator(obj: Any) -> bool:
-    return isinstance(obj, classmethod) and getattr(obj, MARKER_IS_COMPOSE_VALIDATOR, False)
+    return isinstance(obj, classmethod) and getattr(
+        obj.__func__, MARKER_IS_COMPOSE_VALIDATOR, False
+    )
 
 
 def _get_pydantic_core_schema(
