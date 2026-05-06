@@ -16,6 +16,12 @@ def _is_compose_validator(obj: Any) -> bool:
     return isinstance(obj, classmethod) and getattr(obj, MARKER_IS_COMPOSE_VALIDATOR, False)
 
 
+def _get_pydantic_core_schema(
+    validated_type: Any, schema: core_schema.CoreSchema
+) -> core_schema.CoreSchema:
+    return core_schema.no_info_after_validator_function(validated_type, schema)
+
+
 class Str(str):
     _validators: list = []
 
@@ -38,7 +44,7 @@ class Str(str):
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
-        return core_schema.no_info_after_validator_function(source_type.validated, handler(str))
+        return _get_pydantic_core_schema(source_type.validated, handler(str))
 
 
 class Int(int):
@@ -63,7 +69,7 @@ class Int(int):
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
-        return core_schema.no_info_after_validator_function(source_type.validated, handler(int))
+        return _get_pydantic_core_schema(source_type.validated, handler(int))
 
 
 class Float(float):
@@ -88,7 +94,7 @@ class Float(float):
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
-        return core_schema.no_info_after_validator_function(source_type.validated, handler(float))
+        return _get_pydantic_core_schema(source_type.validated, handler(float))
 
 
 class ListMeta(type):
@@ -105,10 +111,8 @@ class ListMeta(type):
             (list,),
             {
                 "__get_pydantic_core_schema__": classmethod(
-                    lambda c, source_type, handler, _et=element_type: (
-                        core_schema.no_info_after_validator_function(
-                            source_type, handler(list[_et])
-                        )
+                    lambda c, source_type, handler, _et=element_type: _get_pydantic_core_schema(
+                        source_type, handler(list[_et])
                     )
                 )
             },
