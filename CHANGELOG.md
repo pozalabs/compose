@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v3.0.0 (2026-05-06)
+
+### Breaking Changes
+
+**types**
+
+- Pydantic v1 bridge 레이어 제거, Pydantic v2 네이티브 설계로 전환
+  - `CoreSchemaGettable`, `SupportsGetValidators`, `chain()`, `Validator`, `ValidatorGenerator` 등 호환 유틸리티 삭제
+  - `ValidatablePrimitive`, `TypedList`, `StrList`, `IntList` 등 레거시 타입 삭제
+  - `ListMeta` metaclass 기반 동적 타입 생성을 표준 제네릭 클래스(`List[T](list[T])`)로 대체
+- 검증 내부 구조 변경: `validated()` classmethod로 명시적 검증 경로 제공
+  - `__init_subclass__`로 MRO 순서대로 `@validator` 자동 수집
+  - `@validator` 데코레이터 인터페이스는 기존과 동일
+
 ## v2.7.0 (2026-05-04)
 
 ### Features
