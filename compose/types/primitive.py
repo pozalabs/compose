@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, ClassVar, Self
+from typing import TYPE_CHECKING, Any, ClassVar, Self, get_args
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
@@ -104,28 +104,17 @@ class Float(float):
         return _get_pydantic_core_schema(source_type.validated, handler(float))
 
 
-class ListMeta(type):
-    _cache: dict[str, type] = {}
-
-    def __getitem__(cls, item):
-        type_name = item.__name__ if hasattr(item, "__name__") else str(item)
-        if (cached := cls._cache.get(type_name)) is not None:
-            return cached
-
-        element_type = item
-        new_cls = type(
-            f"{type_name.title()}List",
-            (list,),
-            {
-                "__get_pydantic_core_schema__": classmethod(
-                    lambda c, source_type, handler, _et=element_type: _get_pydantic_core_schema(
-                        source_type, handler(list[_et])
-                    )
-                )
-            },
-        )
-        cls._cache[type_name] = new_cls
-        return new_cls
-
-
-class List[T](list[T], metaclass=ListMeta): ...
+class List[T](list[T]):
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: GetCoreSchemaHandler
+    ) -> core_schema.CoreSchema:
+        args = get_args(source_type)
+        if not args:
+            for base in getattr(source_type, "__orig_bases__", ()):
+                args = get_args(base)
+                if args:
+                    break
+        if args:
+            return _get_pydantic_core_schema(source_type, handler(list[args[0]]))
+        return _get_pydantic_core_schema(source_type, handler(list))

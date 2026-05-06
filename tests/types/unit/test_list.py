@@ -37,11 +37,11 @@ def test_list_int_invalid():
         TypeAdapter(CustomIntList).validate_python("test")
 
 
-def test_list_caching():
+def test_list_generic_alias_equality():
     type1 = compose.types.List[str]
     type2 = compose.types.List[str]
 
-    assert type1 is type2
+    assert type1 == type2
 
 
 class NonBlank(compose.types.Str):
@@ -59,7 +59,7 @@ class NonBlankList(compose.types.List[NonBlank]): ...
 def test_list_element_validation_via_pydantic():
     ta = TypeAdapter(NonBlankList)
 
-    assert ta.validate_python(["a", "b"]) == NonBlankList(["a", "b"])  # type: ignore[no-matching-overload]
+    assert ta.validate_python(["a", "b"]) == NonBlankList([NonBlank("a"), NonBlank("b")])
 
 
 def test_list_element_validation_reject_invalid_element():
