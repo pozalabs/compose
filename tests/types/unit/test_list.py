@@ -6,10 +6,10 @@ from pydantic import TypeAdapter, ValidationError
 import compose
 
 
-class CustomStrList(compose.types.List[str]): ...
+class CustomStrList(compose.types.List[str]): ...  # type: ignore[not-a-type]
 
 
-class CustomIntList(compose.types.List[int]): ...
+class CustomIntList(compose.types.List[int]): ...  # type: ignore[not-a-type]
 
 
 def test_list_str_valid():
@@ -53,7 +53,7 @@ class NonBlank(compose.types.Str):
         return cls(v)
 
 
-class NonBlankList(compose.types.List[NonBlank]): ...
+class NonBlankList(compose.types.List[NonBlank]): ...  # type: ignore[not-a-type]
 
 
 def test_list_element_validation_via_pydantic():
