@@ -1,8 +1,10 @@
 from collections.abc import Callable
-from typing import Any, Self
+from typing import Any, ClassVar, Self
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
+
+type Validators = list[Callable[..., Any]]
 
 MARKER_IS_COMPOSE_VALIDATOR = "_is_compose_validator"
 
@@ -23,7 +25,7 @@ def _get_pydantic_core_schema(
 
 
 class Str(str):
-    _validators: list = []
+    _validators: ClassVar[Validators] = []
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -48,7 +50,7 @@ class Str(str):
 
 
 class Int(int):
-    _validators: list = []
+    _validators: ClassVar[Validators] = []
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -73,7 +75,7 @@ class Int(int):
 
 
 class Float(float):
-    _validators: list = []
+    _validators: ClassVar[Validators] = []
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
