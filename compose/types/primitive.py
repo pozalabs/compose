@@ -1,12 +1,19 @@
+from collections.abc import Callable
 from typing import Any, Self
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
 
+MARKER_IS_COMPOSE_VALIDATOR = "_is_compose_validator"
 
-def validator(fn):
-    fn._is_validator = True
-    return fn
+
+def validator(func: Callable[..., Any]) -> Callable[..., Any]:
+    setattr(func, MARKER_IS_COMPOSE_VALIDATOR, True)
+    return func
+
+
+def _is_compose_validator(obj: Any) -> bool:
+    return isinstance(obj, classmethod) and getattr(obj, MARKER_IS_COMPOSE_VALIDATOR, False)
 
 
 class Str(str):
@@ -18,13 +25,13 @@ class Str(str):
             member.__func__
             for klass in reversed(cls.__mro__)
             for member in klass.__dict__.values()
-            if isinstance(member, classmethod) and getattr(member.__func__, "_is_validator", False)
+            if _is_compose_validator(member)
         ]
 
     @classmethod
     def validated(cls, v, /) -> Self:
-        for fn in cls._validators:
-            v = fn(cls, v)
+        for func in cls._validators:
+            v = func(cls, v)
         return cls(v)
 
     @classmethod
@@ -43,13 +50,13 @@ class Int(int):
             member.__func__
             for klass in reversed(cls.__mro__)
             for member in klass.__dict__.values()
-            if isinstance(member, classmethod) and getattr(member.__func__, "_is_validator", False)
+            if _is_compose_validator(member)
         ]
 
     @classmethod
     def validated(cls, v, /) -> Self:
-        for fn in cls._validators:
-            v = fn(cls, v)
+        for func in cls._validators:
+            v = func(cls, v)
         return cls(v)
 
     @classmethod
@@ -68,13 +75,13 @@ class Float(float):
             member.__func__
             for klass in reversed(cls.__mro__)
             for member in klass.__dict__.values()
-            if isinstance(member, classmethod) and getattr(member.__func__, "_is_validator", False)
+            if _is_compose_validator(member)
         ]
 
     @classmethod
     def validated(cls, v, /) -> Self:
-        for fn in cls._validators:
-            v = fn(cls, v)
+        for func in cls._validators:
+            v = func(cls, v)
         return cls(v)
 
     @classmethod
