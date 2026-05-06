@@ -32,8 +32,8 @@ class Str(str):
         super().__init_subclass__(**kwargs)
         cls._validators = [
             member.__func__
-            for klass in reversed(cls.__mro__)
-            for member in klass.__dict__.values()
+            for type_ in reversed(cls.__mro__)
+            for member in type_.__dict__.values()
             if _is_compose_validator(member)
         ]
 
@@ -58,8 +58,8 @@ class Int(int):
         super().__init_subclass__(**kwargs)
         cls._validators = [
             member.__func__
-            for klass in reversed(cls.__mro__)
-            for member in klass.__dict__.values()
+            for type_ in reversed(cls.__mro__)
+            for member in type_.__dict__.values()
             if _is_compose_validator(member)
         ]
 
@@ -84,8 +84,8 @@ class Float(float):
         super().__init_subclass__(**kwargs)
         cls._validators = [
             member.__func__
-            for klass in reversed(cls.__mro__)
-            for member in klass.__dict__.values()
+            for type_ in reversed(cls.__mro__)
+            for member in type_.__dict__.values()
             if _is_compose_validator(member)
         ]
 
