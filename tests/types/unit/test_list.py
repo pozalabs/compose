@@ -42,3 +42,28 @@ def test_list_caching():
     type2 = compose.types.List[str]
 
     assert type1 is type2
+
+
+class NonBlank(compose.types.Str):
+    @classmethod
+    @compose.types.validator
+    def check_not_blank(cls, v: str) -> str:
+        if not v or v.isspace():
+            raise ValueError("must not be blank")
+        return cls(v)
+
+
+class NonBlankList(compose.types.List[NonBlank]): ...
+
+
+def test_list_element_validation_via_pydantic():
+    ta = TypeAdapter(NonBlankList)
+
+    assert ta.validate_python(["a", "b"]) == NonBlankList(["a", "b"])
+
+
+def test_list_element_validation_reject_invalid_element():
+    ta = TypeAdapter(NonBlankList)
+
+    with pytest.raises(ValidationError):
+        ta.validate_python(["a", "  "])

@@ -50,3 +50,15 @@ def test_pydantic_raise_validation_error_on_validator_failure():
 
     with pytest.raises(ValidationError):
         ta.validate_python("   ")
+
+
+def test_cls_call_in_validator_not_cause_infinite_loop():
+    class Clamped(Str):
+        @classmethod
+        @validator
+        def clamp_length(cls, v: str) -> Self:
+            if len(v) > 5:
+                return cls(v[:5])
+            return cls(v)
+
+    assert Clamped.validated("abcdefgh") == Clamped("abcde")
