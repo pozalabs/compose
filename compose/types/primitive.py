@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Any, ClassVar, Self
+from typing import TYPE_CHECKING, Any, ClassVar, Self
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import core_schema
@@ -25,7 +25,8 @@ def _get_pydantic_core_schema(
 
 
 class Str(str):
-    _validators: ClassVar[Validators] = []
+    if TYPE_CHECKING:
+        _validators: ClassVar[Validators]
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -50,7 +51,8 @@ class Str(str):
 
 
 class Int(int):
-    _validators: ClassVar[Validators] = []
+    if TYPE_CHECKING:
+        _validators: ClassVar[Validators]
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -75,7 +77,8 @@ class Int(int):
 
 
 class Float(float):
-    _validators: ClassVar[Validators] = []
+    if TYPE_CHECKING:
+        _validators: ClassVar[Validators]
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
