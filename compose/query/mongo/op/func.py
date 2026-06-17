@@ -66,7 +66,7 @@ def Flatten(ops: Iterable[Expressionable]) -> list[Operator]:
 
 
 def Q(*ops: *tuple[Operator, ...]) -> DictExpression:
-    return Merge.dict(*ops).expression()
+    return Merge.into_dict(*ops).expression()
 
 
 def Pipeline(*ops: Operator) -> ListExpression:

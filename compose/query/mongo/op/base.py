@@ -80,7 +80,7 @@ class Merge[T](Operator):
         return functools.reduce(operator.or_, [op.expression() for op in self.ops], self.initial)
 
     @classmethod
-    def dict(cls, *ops: *tuple[Operator, ...]) -> Merge[dict[str, Any]]:
+    def into_dict(cls, *ops: *tuple[Operator, ...]) -> Merge[dict[str, Any]]:
         return cls(*ops, initial={})
 
 
