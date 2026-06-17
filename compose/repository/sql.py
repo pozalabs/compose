@@ -86,5 +86,5 @@ class SQLRepository[T: SQLEntity](BaseRepository):
         return get_args(orig_base)[0]
 
     @staticmethod
-    def _to_row(entity: T) -> dict[str, Any]:
+    def _to_row(entity: SQLEntity) -> dict[str, Any]:
         return entity.model_dump(mode="json")
