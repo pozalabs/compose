@@ -1,7 +1,8 @@
 from typing import Any
 
-from ..base import GeneralAggregationOperator, Operator, evaluate
+from ..base import Operator, evaluate
 from ..types import DictExpression
+from .base import GeneralAggregationOperator
 
 
 class SetUnion(GeneralAggregationOperator):

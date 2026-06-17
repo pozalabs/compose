@@ -1,11 +1,11 @@
 from typing import Any, Self, Unpack
 
-from .. import utils
 from ..base import Merge, Operator, deep_evaluate, evaluate
 from ..sort import SortBy
 from ..types import DictExpression, _String
+from .base import create_general_aggregation_operator
 
-AIn = utils.create_general_aggregation_operator(name="AIn", mongo_operator="$in")
+AIn = create_general_aggregation_operator(name="AIn", mongo_operator="$in")
 
 
 class ArrayElemAt(Operator):
