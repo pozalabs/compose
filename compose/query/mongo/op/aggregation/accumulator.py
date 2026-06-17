@@ -13,7 +13,7 @@ class First(Operator):
 
 
 class MergeObjects(Operator):
-    def __init__(self, *expressions: Any):
+    def __init__(self, *expressions: *tuple[Any, ...]):
         self._expressions = list(expressions)
 
     def expression(self) -> DictExpression:

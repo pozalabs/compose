@@ -1,4 +1,4 @@
-from typing import Any, Self, Unpack
+from typing import Any, Self
 
 from ..base import Merge, Operator, deep_evaluate, evaluate
 from ..sort import SortBy
@@ -84,7 +84,7 @@ class Reduce(Operator):
 
 
 class SortArray(Operator):
-    def __init__(self, input_: Any, *sort_by: Unpack[tuple[SortBy, ...]]):
+    def __init__(self, input_: Any, *sort_by: *tuple[SortBy, ...]):
         self.input = input_
         self.sort_by = sort_by
 
