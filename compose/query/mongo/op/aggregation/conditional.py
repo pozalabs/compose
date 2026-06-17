@@ -1,7 +1,8 @@
 from typing import Any
 
-from ..base import GeneralAggregationOperator, Operator, deep_evaluate
+from ..base import Operator, deep_evaluate
 from ..types import DictExpression
+from .base import GeneralAggregationOperator
 
 
 class IfNull(GeneralAggregationOperator):

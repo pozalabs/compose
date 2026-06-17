@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from typing import Any, cast
 
-from .base import GeneralAggregationOperator, Operator
+from .base import Operator
 
 
 def create_operator[T: Operator](
@@ -12,13 +12,4 @@ def create_operator[T: Operator](
     return cast(
         type[T],
         type(name, base, {"expression": expression_factory}),
-    )
-
-
-def create_general_aggregation_operator(
-    name: str, mongo_operator: str
-) -> type[GeneralAggregationOperator]:
-    return cast(
-        type[GeneralAggregationOperator],
-        type(name, (GeneralAggregationOperator,), {"mongo_operator": mongo_operator}),
     )

@@ -224,29 +224,6 @@ class Search(Stage[DictExpression]):
         return {"$search": {"index": self.index} | self.op.expression()}
 
 
-class OffsetPagination(Stage[DictExpression]):
-    def __init__(
-        self,
-        page: int,
-        per_page: int,
-        metadata_ops: list[Operator] | None = None,
-    ):
-        self.page = _PositiveInt(page)
-        self.per_page = _PositiveInt(per_page)
-        self.metadata_ops = metadata_ops or []
-
-    def expression(self) -> DictExpression:
-        return {
-            "$facet": {
-                "metadata": [{"$count": "total"}, *[op.expression() for op in self.metadata_ops]],
-                "items": [
-                    Skip((self.page - 1) * self.per_page).expression(),
-                    Limit(self.per_page).expression(),
-                ],
-            }
-        }
-
-
 class ReplaceRoot(Stage[DictExpression]):
     def __init__(self, new_root: Any):
         self.new_root = new_root

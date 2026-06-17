@@ -1,6 +1,7 @@
 from typing import Any
 
-from ..base import DictExpression, Operator, evaluate
+from ..base import Operator, evaluate
+from ..types import DictExpression
 
 
 class First(Operator):

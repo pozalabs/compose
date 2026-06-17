@@ -4,9 +4,9 @@ import abc
 import functools
 import operator
 from collections.abc import Callable
-from typing import Any, ClassVar, Self
+from typing import Any, Self
 
-from .types import DictExpression, ListExpression
+from .types import ListExpression
 
 
 class Operator(abc.ABC):
@@ -53,16 +53,6 @@ class LogicalOperator(Operator):
     @abc.abstractmethod
     def expression(self) -> dict[str, ListExpression]:
         raise NotImplementedError
-
-
-class GeneralAggregationOperator(Operator):
-    mongo_operator: ClassVar[str] = ""
-
-    def __init__(self, *expressions: Any):
-        self.expressions = list(expressions)
-
-    def expression(self) -> DictExpression:
-        return deep_evaluate({self.mongo_operator: self.expressions})
 
 
 class Stage[T](Operator):
