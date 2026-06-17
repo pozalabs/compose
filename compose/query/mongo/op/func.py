@@ -1,12 +1,11 @@
 from collections.abc import Callable, Iterable
-from typing import TypeAlias
 
 from .base import Merge, Operator
 from .pipeline import Pipeline as _Pipeline
 from .raw import Raw
 from .types import DictExpression, ListExpression
 
-Expressionable: TypeAlias = Operator | DictExpression | ListExpression
+type Expressionable = Operator | DictExpression | ListExpression
 
 
 class _Map[T]:
