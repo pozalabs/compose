@@ -44,7 +44,7 @@ class Sort(Stage[DictExpression]):
         self.criteria = list(criteria)
 
     def expression(self) -> DictExpression:
-        if not (merged := Merge.dict(*self.criteria).expression()):
+        if not (merged := Merge.into_dict(*self.criteria).expression()):
             raise ValueError("Sort requires at least one SortBy criterion")
         return {"$sort": merged}
 
@@ -75,7 +75,7 @@ class Project(Stage[DictExpression]):
         self.specs = list(specs)
 
     def expression(self) -> DictExpression:
-        return {"$project": Merge.dict(*self.specs).expression()}
+        return {"$project": Merge.into_dict(*self.specs).expression()}
 
     @classmethod
     def of(cls, **attrs: Any) -> Self:
@@ -170,7 +170,7 @@ class Set(Stage[DictExpression]):
         self.specs = list(specs)
 
     def expression(self) -> DictExpression:
-        return {"$set": Merge.dict(*self.specs).expression()}
+        return {"$set": Merge.into_dict(*self.specs).expression()}
 
 
 class FacetSubPipeline(Operator):
@@ -187,7 +187,7 @@ class Facet(Stage[DictExpression]):
         self.pipelines = list(pipelines)
 
     def expression(self) -> DictExpression:
-        return {"$facet": Merge.dict(*self.pipelines).expression()}
+        return {"$facet": Merge.into_dict(*self.pipelines).expression()}
 
 
 class Skip(Stage[DictExpression]):
@@ -264,7 +264,7 @@ class Group(Stage[DictExpression]):
         return {
             "$group": {
                 "_id": deep_evaluate(self.key),
-                **Merge.dict(*self.ops).expression(),
+                **Merge.into_dict(*self.ops).expression(),
             }
         }
 

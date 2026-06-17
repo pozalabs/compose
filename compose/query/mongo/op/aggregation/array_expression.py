@@ -80,7 +80,7 @@ class SortArray(Operator):
         return {
             "$sortArray": {
                 "input": deep_evaluate(self.input),
-                "sortBy": Merge.dict(*self.sort_by).expression(),
+                "sortBy": Merge.into_dict(*self.sort_by).expression(),
             }
         }
 
