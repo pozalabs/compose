@@ -227,7 +227,7 @@ class MongoRepository[T: Entity, ID = types.PyObjectId](BaseRepository):
         return qry.to_result(next(query_result, None))
 
     @functools.cached_property
-    def _entity_type(self) -> T:
+    def _entity_type(self) -> type[T]:
         orig_base = next(
             (base for base in self.__class__.__orig_bases__ if get_origin(base) is MongoRepository),  # type: ignore[missing-attribute]
             None,
