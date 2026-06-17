@@ -21,8 +21,14 @@ def Map[T](collection: Iterable[T], callback: Callable[[T], Operator]) -> list[O
     return _Map(collection, callback).eval()
 
 
+def _non_empty(op: Operator) -> bool:
+    return bool(op.expression())
+
+
 class _Filter:
-    def __init__(self, collection: list[Operator], predicate: Callable[[Operator], bool]):
+    def __init__(
+        self, collection: list[Operator], predicate: Callable[[Operator], bool] = _non_empty
+    ):
         self.collection = collection
         self.predicate = predicate
 
@@ -30,13 +36,10 @@ class _Filter:
         return [item for item in self.collection if self.predicate(item)]
 
 
-def Filter(collection: list[Operator], predicate: Callable[[Operator], bool]) -> list[Operator]:
+def Filter(
+    collection: list[Operator], predicate: Callable[[Operator], bool] = _non_empty
+) -> list[Operator]:
     return _Filter(collection, predicate=predicate).eval()
-
-
-class NonEmpty:
-    def __call__(self, op: Operator) -> bool:
-        return bool(op.expression())
 
 
 class _Flatten:
