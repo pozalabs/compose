@@ -6,10 +6,11 @@ import pymongo
 from compose.model import BaseModel
 
 from .aggregation import Push
+from .base import Operator
 from .comparison import Eq, Gt, Lt
 from .logical import And
 from .pipeline import Pipeline
-from .stage import EmptyStage, Group, Limit, Match, Project, Sort, Spec, Stage
+from .stage import EmptyStage, Group, Limit, Match, Project, Skip, Sort, Spec, Stage
 from .types import DictExpression, ListExpression, _PositiveInt
 
 
@@ -23,6 +24,29 @@ class Cursor(BaseModel):
     @classmethod
     def from_str(cls, cursor: str) -> Self:
         return cls.model_validate_json(json_data=base64.b64decode(cursor).decode())
+
+
+class OffsetPagination(Stage[DictExpression]):
+    def __init__(
+        self,
+        page: int,
+        per_page: int,
+        metadata_ops: list[Operator] | None = None,
+    ):
+        self.page = _PositiveInt(page)
+        self.per_page = _PositiveInt(per_page)
+        self.metadata_ops = metadata_ops or []
+
+    def expression(self) -> DictExpression:
+        return {
+            "$facet": {
+                "metadata": [{"$count": "total"}, *[op.expression() for op in self.metadata_ops]],
+                "items": [
+                    Skip((self.page - 1) * self.per_page).expression(),
+                    Limit(self.per_page).expression(),
+                ],
+            }
+        }
 
 
 class CursorPaginationClause(And):
