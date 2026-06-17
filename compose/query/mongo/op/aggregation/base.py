@@ -7,7 +7,7 @@ from ..types import DictExpression
 class GeneralAggregationOperator(Operator):
     mongo_operator: ClassVar[str] = ""
 
-    def __init__(self, *expressions: Any):
+    def __init__(self, *expressions: *tuple[Any, ...]):
         self.expressions = list(expressions)
 
     def expression(self) -> DictExpression:

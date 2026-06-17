@@ -10,7 +10,7 @@ class SetUnion(GeneralAggregationOperator):
 
 
 class SetIntersection(Operator):
-    def __init__(self, *values: Any):
+    def __init__(self, *values: *tuple[Any, ...]):
         self.values = list(values)
 
     def expression(self) -> DictExpression:

@@ -14,7 +14,7 @@ def openapi_tags(tag: type[enum.StrEnum]) -> list[dict[str, Any]]:
 
 
 def additional_responses(
-    *status_codes: int, schema_type: type[model.BaseModel] = schema.Error
+    *status_codes: *tuple[int, ...], schema_type: type[model.BaseModel] = schema.Error
 ) -> dict[int, dict[str, Any]]:
     return {int(status_code): {"model": schema_type} for status_code in sorted(status_codes)}
 

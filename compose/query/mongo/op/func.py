@@ -68,5 +68,5 @@ def Q(*ops: *tuple[Operator, ...]) -> DictExpression:
     return Merge.into_dict(*ops).expression()
 
 
-def Pipeline(*ops: Operator) -> ListExpression:
+def Pipeline(*ops: *tuple[Operator, ...]) -> ListExpression:
     return _Pipeline(*ops).expression()

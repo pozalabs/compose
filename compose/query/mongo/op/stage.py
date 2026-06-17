@@ -23,15 +23,15 @@ class Match(Stage[DictExpression]):
         return {"$match": expression}
 
     @classmethod
-    def and_(cls, *ops: Operator) -> Self:
+    def and_(cls, *ops: *tuple[Operator, ...]) -> Self:
         return cls(And(*ops))
 
     @classmethod
-    def or_(cls, *ops: Operator) -> Self:
+    def or_(cls, *ops: *tuple[Operator, ...]) -> Self:
         return cls(Or(*ops))
 
     @classmethod
-    def nor(cls, *ops: Operator) -> Self:
+    def nor(cls, *ops: *tuple[Operator, ...]) -> Self:
         return cls(Nor(*ops))
 
     @classmethod
@@ -40,7 +40,7 @@ class Match(Stage[DictExpression]):
 
 
 class Sort(Stage[DictExpression]):
-    def __init__(self, *criteria: SortBy):
+    def __init__(self, *criteria: *tuple[SortBy, ...]):
         self.criteria = list(criteria)
 
     def expression(self) -> DictExpression:
@@ -71,7 +71,7 @@ class Spec(Operator):
 
 
 class Project(Stage[DictExpression]):
-    def __init__(self, *specs: Spec):
+    def __init__(self, *specs: *tuple[Spec, ...]):
         self.specs = list(specs)
 
     def expression(self) -> DictExpression:
@@ -166,7 +166,7 @@ class Unwind(Stage[DictExpression]):
 
 
 class Set(Stage[DictExpression]):
-    def __init__(self, *specs: Spec):
+    def __init__(self, *specs: *tuple[Spec, ...]):
         self.specs = list(specs)
 
     def expression(self) -> DictExpression:
@@ -183,7 +183,7 @@ class FacetSubPipeline(Operator):
 
 
 class Facet(Stage[DictExpression]):
-    def __init__(self, *pipelines: FacetSubPipeline):
+    def __init__(self, *pipelines: *tuple[FacetSubPipeline, ...]):
         self.pipelines = list(pipelines)
 
     def expression(self) -> DictExpression:
@@ -233,7 +233,7 @@ class ReplaceRoot(Stage[DictExpression]):
 
 
 class Group(Stage[DictExpression]):
-    def __init__(self, *ops: Operator, key: Any | None = None):
+    def __init__(self, *ops: *tuple[Operator, ...], key: Any | None = None):
         self.ops = list(ops)
         self.key = key
 
@@ -246,7 +246,7 @@ class Group(Stage[DictExpression]):
         }
 
     @classmethod
-    def without_key(cls, *ops: Operator) -> Self:
+    def without_key(cls, *ops: *tuple[Operator, ...]) -> Self:
         return cls(*ops, key=None)
 
 

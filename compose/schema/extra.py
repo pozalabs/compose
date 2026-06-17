@@ -11,7 +11,7 @@ type JsonDict = dict[str, JsonValue]
 type JsonSchemaExtraCallable = Callable[[JsonDict], None] | Callable[[JsonDict, type[Any]], None]
 
 
-def schema_excludes(*excludes: str) -> JsonSchemaExtraCallable:
+def schema_excludes(*excludes: *tuple[str, ...]) -> JsonSchemaExtraCallable:
     """OpenAPI 문서에서 특정 필드를 제외합니다. 외부에 노출하지 않아도 되는 필드를 문서에서 제외할 때 사용합니다."""
 
     def wrapper(schema: dict[str, Any]) -> None:

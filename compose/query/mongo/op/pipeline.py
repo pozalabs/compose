@@ -2,7 +2,7 @@ from .base import ListExpression, Operator
 
 
 class Pipeline(Operator):
-    def __init__(self, *ops: Operator):
+    def __init__(self, *ops: *tuple[Operator, ...]):
         self.ops = list(ops)
 
     def expression(self) -> ListExpression:

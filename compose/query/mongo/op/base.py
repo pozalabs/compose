@@ -47,7 +47,7 @@ class EqualityOperator(ComparisonOperator):
 
 
 class LogicalOperator(Operator):
-    def __init__(self, *ops: Operator):
+    def __init__(self, *ops: *tuple[Operator, ...]):
         self.ops = list(ops)
 
     @abc.abstractmethod
@@ -62,7 +62,7 @@ class Stage[T](Operator):
 
 
 class Merge[T](Operator):
-    def __init__(self, *ops: Operator, initial: Any):
+    def __init__(self, *ops: *tuple[Operator, ...], initial: Any):
         self.ops = list(ops)
         self.initial = initial
 
