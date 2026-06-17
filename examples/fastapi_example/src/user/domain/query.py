@@ -10,7 +10,7 @@ class ListUsers(compose.query.MongoOffsetPaginationQuery):
     name: str
 
     def to_query(self) -> list[dict[str, Any]]:
-        return op.func.Pipeline(
+        return op.func.pipeline(
             op.Match.and_(op.Eq(field="name", value=self.name)),
             op.OffsetPagination(page=self.page, per_page=self.per_page),
         )
