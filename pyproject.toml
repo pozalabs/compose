@@ -16,6 +16,14 @@ dependencies = [
     "pydantic-settings>=2.12.0",
 ]
 
+[project.optional-dependencies]
+otel = [
+    "opentelemetry-api>=1.24.0,<2.0.0",
+    "opentelemetry-sdk>=1.24.0,<2.0.0",
+    "opentelemetry-exporter-otlp-proto-http>=1.24.0,<2.0.0",
+    "opentelemetry-instrumentation>=0.46b0,<1.0.0",
+]
+
 [tool.uv]
 exclude-newer-package = { pydantic = false, pydantic-core = false }
 
@@ -43,10 +51,6 @@ dev = [
     "loguru>=0.7.2,<0.8.0",
     "fastapi>=0.115.2,<0.116.0",
     "sentry-sdk[fastapi,loguru,pymongo]>=2.2.0,<3.0.0",
-    "opentelemetry-api>=1.24.0,<2.0.0",
-    "opentelemetry-sdk>=1.24.0,<2.0.0",
-    "opentelemetry-exporter-otlp-proto-http>=1.24.0,<2.0.0",
-    "opentelemetry-instrumentation>=0.46b0,<1.0.0",
     "bcrypt>=4.2.0,<5.0.0",
     "httpx>=0.27.2,<0.28.0",
     "pytest-asyncio>=1.0.0",

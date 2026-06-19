@@ -3,7 +3,7 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-06-12T02:31:45.969681Z"
+exclude-newer = "2026-06-12T02:34:23.724316Z"
 exclude-newer-span = "P7D"
 
 [options.exclude-newer-package]
@@ -818,6 +818,14 @@ dependencies = [
     { name = "pydantic-settings" },
 ]
 
+[package.optional-dependencies]
+otel = [
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-exporter-otlp-proto-http" },
+    { name = "opentelemetry-instrumentation" },
+    { name = "opentelemetry-sdk" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "authlib" },
@@ -831,10 +839,6 @@ dev = [
     { name = "httpx" },
     { name = "loguru" },
     { name = "moto", extra = ["s3"] },
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-exporter-otlp-proto-http" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "opentelemetry-sdk" },
     { name = "opentelemetry-test-utils" },
     { name = "pymongo", extra = ["aws"] },
     { name = "pyrefly" },
@@ -848,10 +852,15 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "opentelemetry-api", marker = "extra == 'otel'", specifier = ">=1.24.0,<2.0.0" },
+    { name = "opentelemetry-exporter-otlp-proto-http", marker = "extra == 'otel'", specifier = ">=1.24.0,<2.0.0" },
+    { name = "opentelemetry-instrumentation", marker = "extra == 'otel'", specifier = ">=0.46b0,<1.0.0" },
+    { name = "opentelemetry-sdk", marker = "extra == 'otel'", specifier = ">=1.24.0,<2.0.0" },
     { name = "pendulum", specifier = ">=3.1.0,<4.0.0" },
     { name = "pydantic", specifier = ">=2.13,<3.0.0" },
     { name = "pydantic-settings", specifier = ">=2.12.0" },
 ]
+provides-extras = ["otel"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -866,10 +875,6 @@ dev = [
     { name = "httpx", specifier = ">=0.27.2,<0.28.0" },
     { name = "loguru", specifier = ">=0.7.2,<0.8.0" },
     { name = "moto", extras = ["s3"], specifier = ">=5.0.0,<6.0.0" },
-    { name = "opentelemetry-api", specifier = ">=1.24.0,<2.0.0" },
-    { name = "opentelemetry-exporter-otlp-proto-http", specifier = ">=1.24.0,<2.0.0" },
-    { name = "opentelemetry-instrumentation", specifier = ">=0.46b0,<1.0.0" },
-    { name = "opentelemetry-sdk", specifier = ">=1.24.0,<2.0.0" },
     { name = "opentelemetry-test-utils", specifier = ">=0.46b0,<1.0.0" },
     { name = "pymongo", extras = ["aws"], specifier = ">=4.6.3,<5.0.0" },
     { name = "pyrefly", specifier = ">=0.52.0" },
