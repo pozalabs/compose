@@ -5,6 +5,8 @@ from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.sampling import Sampler
 
+from compose.fastapi.otel import NonInstrumentedUrls
+
 from .instrumentation.loguru.instrumentor import LoguruInstrumentor
 from .meter_provider import get_default_meter_provider
 from .tracer_provider import ServiceResourceAttrs, get_default_tracer_provider
@@ -31,8 +33,6 @@ def instrument_app(
     tracer_provider: TracerProvider | None = None,
     meter_provider: MeterProvider | None = None,
 ) -> None:
-    from compose.fastapi.otel import NonInstrumentedUrls
-
     if tracer_provider is None:
         tracer_provider = get_default_tracer_provider(
             resource_attrs=resource_attrs,
