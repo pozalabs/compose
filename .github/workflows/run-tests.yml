@@ -29,5 +29,7 @@ jobs:
           uv sync --all-extras
 
       - name: Run tests
+        env:
+          TEST_MARKER: ${{ inputs.unit }}
         run: |
-          uv run pytest -vv -s tests -m ${{ inputs.unit }}
+          uv run pytest -vv -s tests -m "$TEST_MARKER"
