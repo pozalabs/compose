@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## v3.1.0 (2026-06-19)
+
+### Breaking Changes
+
+**query.mongo**
+
+- `func.Q` → `func.q`, `func.Pipeline` → `func.pipeline`로 소문자 함수명 컨벤션에 맞게 변경
+- `Merge.dict` 팩토리 메서드를 `Merge.into_dict`로 리네임
+
+### Features
+
+**otel**
+
+- `ServiceResourceAttrs`를 `otel` 모듈에서 직접 import 가능
+- opentelemetry 의존성을 `otel` extra로 제공: `pip install pozalabs-compose[otel]`
+
+### Bug Fixes
+
+**repository**
+
+- `Repository` 제네릭 타입 어노테이션 오류 수정
+
 ## v3.0.0 (2026-05-06)
 
 ### Breaking Changes
