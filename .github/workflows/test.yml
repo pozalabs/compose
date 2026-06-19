@@ -16,7 +16,6 @@ jobs:
         python-version: [3.13, 3.14]
 
     uses: ./.github/workflows/run-tests.yml
-    secrets: inherit
     with:
       python-version: ${{ matrix.python-version }}
       unit: unit
@@ -27,7 +26,6 @@ jobs:
         python-version: [3.13, 3.14]
 
     uses: ./.github/workflows/run-tests.yml
-    secrets: inherit
     with:
       python-version: ${{ matrix.python-version }}
       unit: integration
