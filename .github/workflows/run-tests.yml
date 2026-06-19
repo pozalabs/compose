@@ -8,19 +8,22 @@ on:
       unit:
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
-          version: "0.10.11"
+          version: "0.11.2"
           cache-dependency-glob: "uv.lock"
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: ${{ inputs.python-version }}
 
@@ -29,5 +32,7 @@ jobs:
           uv sync --all-extras
 
       - name: Run tests
+        env:
+          TEST_MARKER: ${{ inputs.unit }}
         run: |
-          uv run pytest -vv -s tests -m ${{ inputs.unit }}
+          uv run pytest -vv -s tests -m "$TEST_MARKER"
