@@ -1,7 +1,7 @@
 try:
     from .instrumentation.loguru.instrumentor import LoguruInstrumentor
-    from .tracer_provider import get_default_tracer_provider
+    from .tracer_provider import ServiceResourceAttrs, get_default_tracer_provider
 except ImportError:
-    raise ImportError("Install `opentelemetry` extra to use otel features") from None
+    raise ImportError("Install the 'otel' extra to use otel features") from None
 
-__all__ = ["LoguruInstrumentor", "get_default_tracer_provider"]
+__all__ = ["LoguruInstrumentor", "ServiceResourceAttrs", "get_default_tracer_provider"]
