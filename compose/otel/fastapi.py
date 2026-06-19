@@ -13,7 +13,7 @@ try:
     from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 except ImportError:
     raise ImportError(
-        "Install `opentelemetry-instrumentation-fastapi` to use `compose.otel.fastapi`"
+        "Install 'opentelemetry-instrumentation-fastapi' to use 'compose.otel.fastapi'"
     ) from None
 
 if TYPE_CHECKING:
