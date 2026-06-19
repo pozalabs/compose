@@ -3,7 +3,7 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-06-12T02:25:27.048063Z"
+exclude-newer = "2026-06-12T02:31:45.969681Z"
 exclude-newer-span = "P7D"
 
 [options.exclude-newer-package]
@@ -700,6 +700,21 @@ wheels = [
 ]
 
 [[package]]
+name = "opentelemetry-instrumentation"
+version = "0.60b1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-semantic-conventions" },
+    { name = "packaging" },
+    { name = "wrapt" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/41/0f/7e6b713ac117c1f5e4e3300748af699b9902a2e5e34c9cf443dde25a01fa/opentelemetry_instrumentation-0.60b1.tar.gz", hash = "sha256:57ddc7974c6eb35865af0426d1a17132b88b2ed8586897fee187fd5b8944bd6a", size = 31706, upload-time = "2025-12-11T13:36:42.515Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/77/d2/6788e83c5c86a2690101681aeef27eeb2a6bf22df52d3f263a22cee20915/opentelemetry_instrumentation-0.60b1-py3-none-any.whl", hash = "sha256:04480db952b48fb1ed0073f822f0ee26012b7be7c3eac1a3793122737c78632d", size = 33096, upload-time = "2025-12-11T13:35:33.067Z" },
+]
+
+[[package]]
 name = "opentelemetry-proto"
 version = "1.39.1"
 source = { registry = "https://pypi.org/simple" }
@@ -818,6 +833,7 @@ dev = [
     { name = "moto", extra = ["s3"] },
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-otlp-proto-http" },
+    { name = "opentelemetry-instrumentation" },
     { name = "opentelemetry-sdk" },
     { name = "opentelemetry-test-utils" },
     { name = "pymongo", extra = ["aws"] },
@@ -852,6 +868,7 @@ dev = [
     { name = "moto", extras = ["s3"], specifier = ">=5.0.0,<6.0.0" },
     { name = "opentelemetry-api", specifier = ">=1.24.0,<2.0.0" },
     { name = "opentelemetry-exporter-otlp-proto-http", specifier = ">=1.24.0,<2.0.0" },
+    { name = "opentelemetry-instrumentation", specifier = ">=0.46b0,<1.0.0" },
     { name = "opentelemetry-sdk", specifier = ">=1.24.0,<2.0.0" },
     { name = "opentelemetry-test-utils", specifier = ">=0.46b0,<1.0.0" },
     { name = "pymongo", extras = ["aws"], specifier = ">=4.6.3,<5.0.0" },
