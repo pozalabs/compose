@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## v3.2.0 (2026-06-24)
+
+### Features
+
+**otel**
+
+- OTel meter provider 설정 및 FastAPI 통합 계측 함수 추가
+
+### Dependencies
+
+- httpx 상한을 0.29.0으로 확장
+- fastapi 상한을 0.138.0으로 확장
+- gunicorn 상한을 27.0.0으로 확장
+- pytest 상한을 10.0.0으로 확장
+
 ## v3.1.0 (2026-06-19)
 
 ### Breaking Changes
