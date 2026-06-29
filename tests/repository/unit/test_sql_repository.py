@@ -24,8 +24,6 @@ user_table = Table(
 class User(compose.entity.SQLEntity):
     name: str
 
-    updatable_fields: ClassVar[set[str]] = {"name"}
-
 
 class UserRepository(SQLRepository[User]):
     __table__: ClassVar[Table] = user_table
@@ -106,7 +104,7 @@ def test_update(repository: UserRepository, session: Session):
     session.commit()
 
     before_updated_at = user.updated_at
-    user.update(name="eve-updated")
+    user.name = "eve-updated"
     repository.update(user, session)
     session.commit()
 
