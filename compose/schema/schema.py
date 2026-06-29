@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import Any, Protocol, Self, get_args
 
 from pydantic import ConfigDict
@@ -27,8 +27,7 @@ class ListSchema[T](Schema):
     def from_result(
         cls,
         result: OffsetPaginationResult,
-        parser_name: str = "model_validate",
-        **parser_kwargs: Any,
+        parser: Callable[..., T] | None = None,
     ) -> Self:
         if not result.items:
             return cls(**result.model_dump())
@@ -40,13 +39,12 @@ class ListSchema[T](Schema):
             data = result.model_dump(exclude={"extra"}) | result.extra
             return cls(**data)
 
-        if (parser := getattr(item_type, parser_name, None)) is None:
-            raise AttributeError(f"{item_type.__name__} has no attribute: {parser_name}")
+        parse: Callable[..., Any] = parser or item_type.model_validate
 
         return cls(
             **result.model_dump(exclude={"items", "extra"}),
             **result.extra,
-            items=[parser(item, **parser_kwargs) for item in result.items],
+            items=[parse(item) for item in result.items],
         )
 
     @classmethod
@@ -62,8 +60,7 @@ class CursorListSchema[T](Schema):
     def from_result(
         cls,
         result: CursorPaginationResult,
-        parser_name: str = "model_validate",
-        **parser_kwargs: Any,
+        parser: Callable[..., T] | None = None,
     ) -> Self:
         if not result.items:
             return cls(items=[])
@@ -74,11 +71,10 @@ class CursorListSchema[T](Schema):
         if not issubclass(item_type, model.BaseModel):
             return cls(**result.model_dump())
 
-        if (parser := getattr(item_type, parser_name, None)) is None:
-            raise AttributeError(f"{item_type.__name__} has no attribute: {parser_name}")
+        parse: Callable[..., Any] = parser or item_type.model_validate
 
         return cls(
-            items=[parser(item, **parser_kwargs) for item in result.items],
+            items=[parse(item) for item in result.items],
             next_cursor=result.next_cursor,
         )
 
