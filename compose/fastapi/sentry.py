@@ -61,16 +61,13 @@ def create_before_send_hook(
 
 
 def init_sentry(
+    dsn: str,
     integrations: list[Integration],
     environment: str,
     tags: dict[str, str],
-    dsn: str | None = None,
     before_send: BeforeSendHook | None = None,
     **kwargs,
 ) -> None:
-    if dsn is None:
-        return
-
     sentry_sdk.init(
         dsn=dsn,
         integrations=integrations,
