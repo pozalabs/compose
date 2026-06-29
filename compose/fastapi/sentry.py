@@ -1,7 +1,7 @@
 import enum
 import functools
 from collections.abc import Awaitable, Callable
-from typing import Any, Self
+from typing import TYPE_CHECKING, Self
 
 from fastapi import Request, Response
 
@@ -13,7 +13,10 @@ try:
     import sentry_sdk
     from sentry_sdk.integrations import Integration
 except ImportError:
-    raise ImportError("Install 'sentry-sdk' to use sentry helpers")
+    raise ImportError("Install 'sentry' extra to use sentry features") from None
+
+if TYPE_CHECKING:
+    from sentry_sdk.types import Event, Hint
 
 
 class Level(enum.StrEnum):
@@ -38,20 +41,20 @@ class ErrorEvent(model.BaseModel):
         return cls(level=Level.ERROR)
 
 
-type SentryHook = Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]]
+type BeforeSendHook = Callable[["Event", "Hint"], "Event | None"]
 
 
 def create_before_send_hook(
     error: dict[str, ErrorEvent], default_error_level: Level = Level.WARNING
-) -> SentryHook:
-    def before_send(event: dict[str, Any], hint: dict[str, Any]) -> dict[str, Any]:
+) -> BeforeSendHook:
+    def before_send(event: "Event", hint: "Hint") -> "Event | None":
         exc_name = ""
         if "exc_info" in hint:
             exc_type, *_ = hint["exc_info"]
             exc_name = exc_type.__name__
 
         error_event = error.get(exc_name)
-        event["level"] = default_error_level if error_event is None else error_event.level
+        event["level"] = default_error_level if error_event is None else error_event.level  # type: ignore[bad-assignment]
         return event
 
     return before_send
@@ -62,7 +65,7 @@ def init_sentry(
     environment: str,
     tags: dict[str, str],
     dsn: str | None = None,
-    before_send: SentryHook | None = None,
+    before_send: BeforeSendHook | None = None,
     **kwargs,
 ) -> None:
     if dsn is None:
