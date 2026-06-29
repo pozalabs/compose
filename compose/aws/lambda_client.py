@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
@@ -10,19 +9,11 @@ if TYPE_CHECKING:
     import mypy_boto3_lambda
 
 
-@dataclass(frozen=True)
-class Success[T]:
-    payload: T
-
-
-@dataclass(frozen=True)
-class Failure:
-    error_type: str
-    message: str
-    raw: dict[str, Any]
-
-
-type InvocationResult[T] = Success[T] | Failure
+class LambdaInvocationError(Exception):
+    def __init__(self, error_type: str, message: str, raw: dict[str, Any]) -> None:
+        super().__init__(message)
+        self.error_type = error_type
+        self.raw = raw
 
 
 class LambdaClient:
@@ -35,7 +26,7 @@ class LambdaClient:
         payload: dict[str, Any] | BaseModel | None = None,
         *,
         qualifier: str | None = None,
-    ) -> InvocationResult[dict[str, Any]]:
+    ) -> dict[str, Any]:
         params: dict[str, Any] = {
             "FunctionName": function_name,
             "InvocationType": "RequestResponse",
@@ -50,13 +41,13 @@ class LambdaClient:
         response_payload = json.loads(response["Payload"].read())
 
         if "FunctionError" in response:
-            return Failure(
+            raise LambdaInvocationError(
                 error_type=response["FunctionError"],
                 message=response_payload.get("errorMessage", ""),
                 raw=response_payload,
             )
 
-        return Success(payload=response_payload)
+        return response_payload
 
     def invoke_async(
         self,

@@ -27,14 +27,14 @@ def boto_client():
     return mock.Mock()
 
 
-def test_invoke_return_success(boto_client: mock.Mock):
+def test_invoke_return_parsed_payload(boto_client: mock.Mock):
     response_payload = {"result": "ok"}
     boto_client.invoke.return_value = _make_response(response_payload)
     client = compose.aws.LambdaClient(boto_client)
 
     result = client.invoke("my-fn", payload={"key": "value"})
 
-    assert result == compose.aws.Success(payload=response_payload)
+    assert result == response_payload
 
 
 def test_invoke_without_payload(boto_client: mock.Mock):
@@ -57,32 +57,28 @@ def test_invoke_with_qualifier(boto_client: mock.Mock):
     assert call_kwargs["Qualifier"] == "v1"
 
 
-def test_invoke_return_failure_on_function_error(boto_client: mock.Mock):
+def test_invoke_raise_on_function_error(boto_client: mock.Mock):
     error_payload = {"errorMessage": "something went wrong", "errorType": "RuntimeError"}
     boto_client.invoke.return_value = _make_response(error_payload, function_error="Unhandled")
     client = compose.aws.LambdaClient(boto_client)
 
-    result = client.invoke("my-fn")
+    with pytest.raises(compose.aws.LambdaInvocationError, match="something went wrong") as exc_info:
+        client.invoke("my-fn")
 
-    assert result == compose.aws.Failure(
-        error_type="Unhandled",
-        message="something went wrong",
-        raw=error_payload,
-    )
+    assert exc_info.value.error_type == "Unhandled"
+    assert exc_info.value.raw == error_payload
 
 
-def test_invoke_return_failure_with_empty_error_message(boto_client: mock.Mock):
+def test_invoke_raise_with_empty_error_message(boto_client: mock.Mock):
     error_payload = {"errorType": "RuntimeError"}
     boto_client.invoke.return_value = _make_response(error_payload, function_error="Handled")
     client = compose.aws.LambdaClient(boto_client)
 
-    result = client.invoke("my-fn")
+    with pytest.raises(compose.aws.LambdaInvocationError) as exc_info:
+        client.invoke("my-fn")
 
-    assert result == compose.aws.Failure(
-        error_type="Handled",
-        message="",
-        raw=error_payload,
-    )
+    assert exc_info.value.error_type == "Handled"
+    assert str(exc_info.value) == ""
 
 
 def test_invoke_async_call_with_event_type(boto_client: mock.Mock):
