@@ -3,7 +3,7 @@ from __future__ import annotations
 import enum
 import functools
 import inspect
-from collections.abc import Callable, Sequence
+from collections.abc import Awaitable, Callable, Sequence
 from typing import TYPE_CHECKING, Self, cast
 
 from fastapi import Request, Response
@@ -89,7 +89,7 @@ def capture_error(handler: ExceptionHandler) -> ExceptionHandler:
         @functools.wraps(handler)
         async def async_wrapper(request: Request, exc: Exception) -> Response:
             sentry_sdk.capture_exception(exc)
-            return await handler(request, exc)
+            return await cast(Awaitable[Response], handler(request, exc))
 
         return async_wrapper
 
