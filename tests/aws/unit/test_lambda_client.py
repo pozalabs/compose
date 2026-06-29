@@ -10,11 +10,9 @@ from pydantic import BaseModel
 import compose
 
 
-def _make_response(
-    payload: dict, *, function_error: str | None = None, status_code: int = 200
-) -> dict:
+def _make_response(payload: dict, *, function_error: str | None = None) -> dict:
     response: dict = {
-        "StatusCode": status_code,
+        "StatusCode": 200,
         "Payload": io.BytesIO(json.dumps(payload).encode()),
     }
     if function_error is not None:
@@ -35,6 +33,16 @@ def test_invoke_return_parsed_payload(boto_client: mock.Mock):
     result = client.invoke("my-fn", payload={"key": "value"})
 
     assert result == response_payload
+
+
+def test_invoke_call_with_request_response_type(boto_client: mock.Mock):
+    boto_client.invoke.return_value = _make_response({"result": "ok"})
+    client = compose.aws.LambdaClient(boto_client)
+
+    client.invoke("my-fn")
+
+    call_kwargs = boto_client.invoke.call_args[1]
+    assert call_kwargs["InvocationType"] == "RequestResponse"
 
 
 def test_invoke_without_payload(boto_client: mock.Mock):
@@ -121,16 +129,6 @@ def test_invoke_with_pydantic_model_payload(boto_client: mock.Mock):
     client = compose.aws.LambdaClient(boto_client)
 
     client.invoke("my-fn", payload=Request(user_id=1, name="alice"))
-
-    call_kwargs = boto_client.invoke.call_args[1]
-    assert json.loads(call_kwargs["Payload"]) == {"user_id": 1, "name": "alice"}
-
-
-def test_invoke_async_with_pydantic_model_payload(boto_client: mock.Mock):
-    boto_client.invoke.return_value = {"StatusCode": 202}
-    client = compose.aws.LambdaClient(boto_client)
-
-    client.invoke_async("my-fn", payload=Request(user_id=1, name="alice"))
 
     call_kwargs = boto_client.invoke.call_args[1]
     assert json.loads(call_kwargs["Payload"]) == {"user_id": 1, "name": "alice"}
