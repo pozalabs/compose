@@ -8,7 +8,7 @@ import logging
 import os
 import sys
 import time
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Sequence
 from types import FrameType
 from typing import TYPE_CHECKING, Protocol, Self, Unpack
 
@@ -47,17 +47,20 @@ class InterceptHandler(logging.Handler):
         _logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
+DEFAULT_INTERCEPT_LOGGERS: tuple[str, ...] = (
+    "gunicorn.error",
+    "gunicorn.access",
+    "uvicorn.error",
+    "uvicorn.access",
+)
+
+
 def route_to_loguru(
     intercept_handler: InterceptHandler,
-    logger_names: Iterable[str] = (
-        "gunicorn.error",
-        "gunicorn.access",
-        "uvicorn.error",
-        "uvicorn.access",
-    ),
+    intercept_loggers: Sequence[str],
 ) -> None:
     logging.basicConfig(handlers=[intercept_handler], level=logging.INFO, force=True)
-    for name in logger_names:
+    for name in intercept_loggers:
         lg = logging.getLogger(name)
         lg.handlers = [intercept_handler]
         lg.propagate = False
@@ -113,12 +116,16 @@ class LogDisplayConfig:
         )
 
 
-def create_logger(serialize: bool = False, **config: Unpack[BasicHandlerConfig]) -> Logger:  # type: ignore[bad-function-definition]
+def create_logger(  # type: ignore[bad-function-definition]
+    serialize: bool = False,
+    intercept_loggers: Sequence[str] = DEFAULT_INTERCEPT_LOGGERS,
+    **config: Unpack[BasicHandlerConfig],
+) -> Logger:
     level = config.get("level", logging.INFO)
 
     intercept_handler = InterceptHandler()
     logging.basicConfig(handlers=[intercept_handler], level=level, force=True)
-    route_to_loguru(intercept_handler=intercept_handler)
+    route_to_loguru(intercept_handler=intercept_handler, intercept_loggers=intercept_loggers)
 
     _logger.configure(
         handlers=[  # type: ignore[bad-argument-type]
