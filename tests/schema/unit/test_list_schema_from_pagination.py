@@ -122,7 +122,7 @@ def expected_with_custom_parser() -> compose.schema.ListSchema[ItemWithCustomPar
         ),
         (
             compose.schema.ListSchema[ItemWithCustomParser],
-            dict(parser_name="from_"),
+            dict(parser=ItemWithCustomParser.from_),
             "pagination_with_custom_parser",
             "expected_with_custom_parser",
         ),
@@ -130,7 +130,7 @@ def expected_with_custom_parser() -> compose.schema.ListSchema[ItemWithCustomPar
     ids=(
         "스키마에 추가 필드를 정의하지 않으면 기본 필드만 매핑",
         "스키마에 추가 필드를 정의하면 `Pagination.extra`를 추가 필드로 매핑",
-        "별도로 정의한 파서 메서드명을 입력하면 스키마의 해당 메서드를 사용해 파싱",
+        "별도로 정의한 파서 함수를 입력하면 해당 함수를 사용해 파싱",
     ),
 )
 def test_from_result(
@@ -146,29 +146,3 @@ def test_from_result(
     actual = schema_type.from_result(pagination, **from_result_kwargs)
 
     assert actual == expected
-
-
-@pytest.mark.parametrize(
-    "schema_type, parser_name, pagination",
-    [
-        (
-            compose.schema.ListSchema[Item],
-            "undefined_parser",
-            "pagination_without_extra",
-        ),
-    ],
-    ids=("스키마에 정의되어 있지 않은 파서를 입력하면 오류가 발생",),
-)
-def test_from_result_with_undefined_parser(
-    schema_type: type[compose.schema.ListSchema[Item]],
-    parser_name: str,
-    pagination: str,
-    request: pytest.FixtureRequest,
-):
-    pagination: compose.pagination.OffsetPaginationResult = request.getfixturevalue(pagination)
-
-    with pytest.raises(AttributeError):
-        schema_type.from_result(
-            result=pagination,
-            parser_name=parser_name,
-        )
