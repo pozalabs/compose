@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 import functools
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 from typing import TYPE_CHECKING, Self
 
 from fastapi import Request, Response
@@ -31,15 +31,15 @@ class ErrorEvent(model.BaseModel):
     level: Level
 
     @classmethod
-    def for_info(cls) -> Self:
+    def info(cls) -> Self:
         return cls(level=Level.INFO)
 
     @classmethod
-    def for_warning(cls) -> Self:
+    def warning(cls) -> Self:
         return cls(level=Level.WARNING)
 
     @classmethod
-    def for_error(cls) -> Self:
+    def error(cls) -> Self:
         return cls(level=Level.ERROR)
 
 
@@ -47,7 +47,7 @@ type BeforeSendHook = Callable[[Event, Hint], Event | None]
 
 
 def create_before_send_hook(
-    error: dict[str, ErrorEvent], default_error_level: Level = Level.WARNING
+    errors: dict[str, ErrorEvent], default_error_level: Level = Level.WARNING
 ) -> BeforeSendHook:
     def before_send(event: Event, hint: Hint) -> Event | None:
         exc_name = ""
@@ -55,7 +55,7 @@ def create_before_send_hook(
             exc_type, *_ = hint["exc_info"]
             exc_name = exc_type.__name__
 
-        error_event = error.get(exc_name)
+        error_event = errors.get(exc_name)
         event["level"] = default_error_level if error_event is None else error_event.level  # type: ignore[bad-assignment]
         return event
 
@@ -64,7 +64,7 @@ def create_before_send_hook(
 
 def init_sentry(
     dsn: str,
-    integrations: list[Integration],
+    integrations: Sequence[Integration],
     environment: str,
     tags: dict[str, str],
     before_send: BeforeSendHook | None = None,
