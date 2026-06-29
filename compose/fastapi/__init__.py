@@ -56,7 +56,7 @@ __all__ = [
 
 
 try:
-    from .utils import (  # noqa: F401
+    from .sentry import (  # noqa: F401
         ErrorEvent,
         Level,
         capture_error,

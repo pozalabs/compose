@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import enum
 import functools
-from collections.abc import Awaitable, Callable
-from typing import Any, Self
+import inspect
+from collections.abc import Awaitable, Callable, Sequence
+from typing import TYPE_CHECKING, Self, cast
 
 from fastapi import Request, Response
 
@@ -13,7 +16,10 @@ try:
     import sentry_sdk
     from sentry_sdk.integrations import Integration
 except ImportError:
-    raise ImportError("Install 'sentry-sdk' to use sentry helpers")
+    raise ImportError("Install 'sentry' extra to use sentry features") from None
+
+if TYPE_CHECKING:
+    from sentry_sdk.types import Event, Hint
 
 
 class Level(enum.StrEnum):
@@ -26,48 +32,45 @@ class ErrorEvent(model.BaseModel):
     level: Level
 
     @classmethod
-    def for_info(cls) -> Self:
+    def info(cls) -> Self:
         return cls(level=Level.INFO)
 
     @classmethod
-    def for_warning(cls) -> Self:
+    def warning(cls) -> Self:
         return cls(level=Level.WARNING)
 
     @classmethod
-    def for_error(cls) -> Self:
+    def error(cls) -> Self:
         return cls(level=Level.ERROR)
 
 
-type SentryHook = Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]]
+type BeforeSendHook = Callable[[Event, Hint], Event | None]
 
 
 def create_before_send_hook(
-    error: dict[str, ErrorEvent], default_error_level: Level = Level.WARNING
-) -> SentryHook:
-    def before_send(event: dict[str, Any], hint: dict[str, Any]) -> dict[str, Any]:
+    errors: dict[str, ErrorEvent], default_error_level: Level = Level.WARNING
+) -> BeforeSendHook:
+    def before_send(event: Event, hint: Hint) -> Event | None:
         exc_name = ""
         if "exc_info" in hint:
             exc_type, *_ = hint["exc_info"]
             exc_name = exc_type.__name__
 
-        error_event = error.get(exc_name)
-        event["level"] = default_error_level if error_event is None else error_event.level
+        error_event = errors.get(exc_name)
+        event["level"] = default_error_level if error_event is None else error_event.level  # type: ignore[bad-assignment]
         return event
 
     return before_send
 
 
 def init_sentry(
-    integrations: list[Integration],
+    dsn: str,
+    integrations: Sequence[Integration],
     environment: str,
     tags: dict[str, str],
-    dsn: str | None = None,
-    before_send: SentryHook | None = None,
+    before_send: BeforeSendHook | None = None,
     **kwargs,
 ) -> None:
-    if dsn is None:
-        return
-
     sentry_sdk.init(
         dsn=dsn,
         integrations=integrations,
@@ -81,12 +84,18 @@ def init_sentry(
 
 
 def capture_error(handler: ExceptionHandler) -> ExceptionHandler:
+    if inspect.iscoroutinefunction(handler):
+
+        @functools.wraps(handler)
+        async def async_wrapper(request: Request, exc: Exception) -> Response:
+            sentry_sdk.capture_exception(exc)
+            return await cast(Awaitable[Response], handler(request, exc))
+
+        return async_wrapper
+
     @functools.wraps(handler)
     async def wrapper(request: Request, exc: Exception) -> Response:
         sentry_sdk.capture_exception(exc)
-        result = handler(request, exc)
-        if isinstance(result, Awaitable):
-            return await result
-        return result
+        return cast(Response, handler(request, exc))
 
     return wrapper
