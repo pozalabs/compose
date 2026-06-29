@@ -1,5 +1,45 @@
 # CHANGELOG
 
+## v3.3.0 (2026-06-29)
+
+### Breaking Changes
+
+**entity**
+
+- `Entity`의 `updatable_fields` 및 `update` 메서드 제거
+
+**sentry**
+
+- `compose.fastapi.sentry` 모듈을 `compose.sentry`로 이동
+- `SentryHook` → `BeforeSendHook` 리네이밍
+- `ErrorEvent.for_info()` → `ErrorEvent.info()`로 변경
+- `init_sentry`의 `dsn`을 필수 인자로 변경
+
+### Features
+
+**logging**
+
+- `create_logger`에 `intercept_loggers` 파라미터 추가하여 loguru 라우팅 대상 커스텀 가능
+- `DEFAULT_INTERCEPT_LOGGERS` 상수 노출
+
+**lambda**
+
+- Lambda 호출 결과 파싱 및 에러 처리 공통 패턴(`parse_lambda_result`) 추가
+
+**schema**
+
+- `ListSchema`/`CursorListSchema`의 `from_result`에 parser를 `Callable`로 직접 전달하는 방식으로 변경
+
+**gunicorn**
+
+- `GunicornSettings` 기본값을 ASGI 워커 기준으로 변경
+
+### Dependencies
+
+- bcrypt 기반 password 모듈 및 의존성 제거
+- 선택적 의존성 extra 선언 및 ImportError 메시지 정리
+- 의존성 하한 최신화 및 dependabot 제거
+
 ## v3.2.0 (2026-06-24)
 
 ### Features
