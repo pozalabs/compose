@@ -1,7 +1,4 @@
-import os
 from typing import Any
-
-from pydantic import Field
 
 from compose.model import BaseModel
 
@@ -9,8 +6,8 @@ from compose.model import BaseModel
 class GunicornSettings(BaseModel):
     wsgi_app: str
     bind: str = "0.0.0.0:80"
-    workers: int = Field(default_factory=lambda: (os.cpu_count() or 1) + 1)
-    worker_class: str = "uvicorn_worker.UvicornWorker"
+    workers: int = 1
+    worker_class: str = "asgi"
     timeout: int = 120
     max_requests: int | None = None
     max_requests_jitter: int | None = None
