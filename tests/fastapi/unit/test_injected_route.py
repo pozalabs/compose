@@ -39,7 +39,7 @@ def register(container):
     def _register(path, endpoint):
         router.add_api_route(path, endpoint, methods=["GET"])
         app.include_router(router)
-        return app.routes[-1]
+        return router.routes[-1]
 
     return _register
 

@@ -11,29 +11,29 @@ authors = [
 ]
 requires-python = ">=3.13,<3.15"
 dependencies = [
-    "pendulum>=3.1.0,<4.0.0",
-    "pydantic>=2.13,<3.0.0",
-    "pydantic-settings>=2.12.0",
+    "pendulum>=3.2.0,<4.0.0",
+    "pydantic>=2.13.4,<3.0.0",
+    "pydantic-settings>=2.14.2",
 ]
 
 [project.optional-dependencies]
-auth = ["authlib>=1.3.1,<2.0.0"]
-aws = ["boto3>=1.28.73,<2.0.0"]
-bcrypt = ["bcrypt>=4.2.0,<5.0.0"]
-dependency-injector = ["dependency-injector>=4.49.0,<5.0.0"]
-dishka = ["dishka>=1.9,<2"]
-fastapi = ["fastapi>=0.115.2,<0.138.0"]
-httpx = ["httpx>=0.27.2,<0.29.0"]
-loguru = ["loguru>=0.7.2,<0.8.0"]
-mongo = ["pymongo>=4.6.3,<5.0.0"]
+auth = ["authlib>=1.7.2,<2.0.0"]
+aws = ["boto3>=1.43.36,<2.0.0"]
+bcrypt = ["bcrypt>=5.0.0,<6.0.0"]
+dependency-injector = ["dependency-injector>=4.49.1,<5.0.0"]
+dishka = ["dishka>=1.10.1,<2"]
+fastapi = ["fastapi>=0.138.1,<0.139.0"]
+httpx = ["httpx>=0.28.1,<0.29.0"]
+loguru = ["loguru>=0.7.3,<0.8.0"]
+mongo = ["pymongo>=4.17.0,<5.0.0"]
 otel = [
-    "opentelemetry-api>=1.24.0,<2.0.0",
-    "opentelemetry-sdk>=1.24.0,<2.0.0",
-    "opentelemetry-exporter-otlp-proto-http>=1.24.0,<2.0.0",
-    "opentelemetry-instrumentation>=0.46b0,<1.0.0",
+    "opentelemetry-api>=1.43.0,<2.0.0",
+    "opentelemetry-sdk>=1.43.0,<2.0.0",
+    "opentelemetry-exporter-otlp-proto-http>=1.43.0,<2.0.0",
+    "opentelemetry-instrumentation>=0.64b0,<1.0.0",
 ]
-sentry = ["sentry-sdk>=2.2.0,<3.0.0"]
-sql = ["sqlalchemy>=2.0.0,<3.0.0"]
+sentry = ["sentry-sdk>=2.63.0,<3.0.0"]
+sql = ["sqlalchemy>=2.0.51,<3.0.0"]
 
 [tool.uv]
 exclude-newer-package = { pydantic = false, pydantic-core = false }
@@ -50,31 +50,21 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "authlib>=1.3.1,<2.0.0",
-    "pymongo[aws]>=4.6.3,<5.0.0",
-    "pytest>=8.2.2,<10.0.0",
-    "boto3-stubs-lite[essential,ssm]>=1.34.79,<2.0.0",
-    "uvicorn[standard]>=0.29.0,<1.0.0",
-    "gunicorn>=21.2.0,<27.0.0",
-    "opentelemetry-test-utils>=0.46b0,<1.0.0",
-    "opentelemetry-instrumentation-fastapi>=0.46b0,<1.0.0",
-    "testcontainers[mongodb]>=4.7.2,<5.0.0",
-    "boto3>=1.28.73,<2.0.0",
-    "loguru>=0.7.2,<0.8.0",
-    "fastapi>=0.115.2,<0.138.0",
-    "sentry-sdk[fastapi,loguru,pymongo]>=2.2.0,<3.0.0",
-    "bcrypt>=4.2.0,<5.0.0",
-    "httpx>=0.27.2,<0.29.0",
-    "pytest-asyncio>=1.0.0",
-    "moto[s3]>=5.0.0,<6.0.0",
-    "pyrefly>=0.52.0",
-    "sqlalchemy>=2.0.0,<3.0.0",
-    "dishka>=1.9,<2",
-    "dependency-injector>=4.49.0,<5.0.0",
+    "pozalabs-compose[auth,aws,bcrypt,dependency-injector,dishka,fastapi,httpx,loguru,mongo,otel,sentry,sql]",
+    "pymongo[aws]>=4.17.0,<5.0.0",
+    "pytest>=9.1.1,<10.0.0",
+    "boto3-stubs-lite[essential,ssm]>=1.43.36,<2.0.0",
+    "uvicorn[standard]>=0.49.0,<1.0.0",
+    "gunicorn>=26.0.0,<27.0.0",
+    "opentelemetry-test-utils>=0.64b0,<1.0.0",
+    "opentelemetry-instrumentation-fastapi>=0.64b0,<1.0.0",
+    "testcontainers[mongodb]>=4.14.2,<5.0.0",
+    "pytest-asyncio>=1.4.0",
+    "moto[s3]>=5.2.2,<6.0.0",
+    "pyrefly>=1.1.1",
 ]
 
 [tool.ruff]
-target-version = "py313"
 line-length = 100
 
 [tool.ruff.lint]
