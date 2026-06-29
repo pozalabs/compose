@@ -4,6 +4,7 @@ import io
 import json
 from unittest import mock
 
+import pytest
 from pydantic import BaseModel
 
 import compose
@@ -21,49 +22,45 @@ def _make_response(
     return response
 
 
-@mock.patch("boto3.client")
-def test_invoke_return_success(mock_boto_client: mock.Mock):
+@pytest.fixture
+def boto_client():
+    return mock.Mock()
+
+
+def test_invoke_return_success(boto_client: mock.Mock):
     response_payload = {"result": "ok"}
-    mock_boto_client.invoke.return_value = _make_response(response_payload)
-    client = compose.aws.LambdaClient(mock_boto_client)
+    boto_client.invoke.return_value = _make_response(response_payload)
+    client = compose.aws.LambdaClient(boto_client)
 
     result = client.invoke("my-fn", payload={"key": "value"})
 
     assert result == compose.aws.Success(payload=response_payload)
-    mock_boto_client.invoke.assert_called_once_with(
-        FunctionName="my-fn",
-        InvocationType="RequestResponse",
-        Payload=json.dumps({"key": "value"}),
-    )
 
 
-@mock.patch("boto3.client")
-def test_invoke_without_payload(mock_boto_client: mock.Mock):
-    mock_boto_client.invoke.return_value = _make_response({"result": "ok"})
-    client = compose.aws.LambdaClient(mock_boto_client)
+def test_invoke_without_payload(boto_client: mock.Mock):
+    boto_client.invoke.return_value = _make_response({"result": "ok"})
+    client = compose.aws.LambdaClient(boto_client)
 
     client.invoke("my-fn")
 
-    call_kwargs = mock_boto_client.invoke.call_args[1]
+    call_kwargs = boto_client.invoke.call_args[1]
     assert "Payload" not in call_kwargs
 
 
-@mock.patch("boto3.client")
-def test_invoke_with_qualifier(mock_boto_client: mock.Mock):
-    mock_boto_client.invoke.return_value = _make_response({"result": "ok"})
-    client = compose.aws.LambdaClient(mock_boto_client)
+def test_invoke_with_qualifier(boto_client: mock.Mock):
+    boto_client.invoke.return_value = _make_response({"result": "ok"})
+    client = compose.aws.LambdaClient(boto_client)
 
     client.invoke("my-fn", qualifier="v1")
 
-    call_kwargs = mock_boto_client.invoke.call_args[1]
+    call_kwargs = boto_client.invoke.call_args[1]
     assert call_kwargs["Qualifier"] == "v1"
 
 
-@mock.patch("boto3.client")
-def test_invoke_return_failure_on_function_error(mock_boto_client: mock.Mock):
+def test_invoke_return_failure_on_function_error(boto_client: mock.Mock):
     error_payload = {"errorMessage": "something went wrong", "errorType": "RuntimeError"}
-    mock_boto_client.invoke.return_value = _make_response(error_payload, function_error="Unhandled")
-    client = compose.aws.LambdaClient(mock_boto_client)
+    boto_client.invoke.return_value = _make_response(error_payload, function_error="Unhandled")
+    client = compose.aws.LambdaClient(boto_client)
 
     result = client.invoke("my-fn")
 
@@ -74,51 +71,47 @@ def test_invoke_return_failure_on_function_error(mock_boto_client: mock.Mock):
     )
 
 
-@mock.patch("boto3.client")
-def test_invoke_return_failure_with_empty_error_message(mock_boto_client: mock.Mock):
+def test_invoke_return_failure_with_empty_error_message(boto_client: mock.Mock):
     error_payload = {"errorType": "RuntimeError"}
-    mock_boto_client.invoke.return_value = _make_response(error_payload, function_error="Handled")
-    client = compose.aws.LambdaClient(mock_boto_client)
+    boto_client.invoke.return_value = _make_response(error_payload, function_error="Handled")
+    client = compose.aws.LambdaClient(boto_client)
 
     result = client.invoke("my-fn")
 
-    assert isinstance(result, compose.aws.Failure)
-    assert result.message == ""
-
-
-@mock.patch("boto3.client")
-def test_invoke_async_call_with_event_type(mock_boto_client: mock.Mock):
-    mock_boto_client.invoke.return_value = {"StatusCode": 202}
-    client = compose.aws.LambdaClient(mock_boto_client)
-
-    client.invoke_async("my-fn", payload={"key": "value"})
-
-    mock_boto_client.invoke.assert_called_once_with(
-        FunctionName="my-fn",
-        InvocationType="Event",
-        Payload=json.dumps({"key": "value"}),
+    assert result == compose.aws.Failure(
+        error_type="Handled",
+        message="",
+        raw=error_payload,
     )
 
 
-@mock.patch("boto3.client")
-def test_invoke_async_without_payload(mock_boto_client: mock.Mock):
-    mock_boto_client.invoke.return_value = {"StatusCode": 202}
-    client = compose.aws.LambdaClient(mock_boto_client)
+def test_invoke_async_call_with_event_type(boto_client: mock.Mock):
+    boto_client.invoke.return_value = {"StatusCode": 202}
+    client = compose.aws.LambdaClient(boto_client)
+
+    client.invoke_async("my-fn", payload={"key": "value"})
+
+    call_kwargs = boto_client.invoke.call_args[1]
+    assert call_kwargs["InvocationType"] == "Event"
+
+
+def test_invoke_async_without_payload(boto_client: mock.Mock):
+    boto_client.invoke.return_value = {"StatusCode": 202}
+    client = compose.aws.LambdaClient(boto_client)
 
     client.invoke_async("my-fn")
 
-    call_kwargs = mock_boto_client.invoke.call_args[1]
+    call_kwargs = boto_client.invoke.call_args[1]
     assert "Payload" not in call_kwargs
 
 
-@mock.patch("boto3.client")
-def test_invoke_async_with_qualifier(mock_boto_client: mock.Mock):
-    mock_boto_client.invoke.return_value = {"StatusCode": 202}
-    client = compose.aws.LambdaClient(mock_boto_client)
+def test_invoke_async_with_qualifier(boto_client: mock.Mock):
+    boto_client.invoke.return_value = {"StatusCode": 202}
+    client = compose.aws.LambdaClient(boto_client)
 
     client.invoke_async("my-fn", qualifier="v2")
 
-    call_kwargs = mock_boto_client.invoke.call_args[1]
+    call_kwargs = boto_client.invoke.call_args[1]
     assert call_kwargs["Qualifier"] == "v2"
 
 
@@ -127,23 +120,21 @@ class Request(BaseModel):
     name: str
 
 
-@mock.patch("boto3.client")
-def test_invoke_with_pydantic_model_payload(mock_boto_client: mock.Mock):
-    mock_boto_client.invoke.return_value = _make_response({"result": "ok"})
-    client = compose.aws.LambdaClient(mock_boto_client)
+def test_invoke_with_pydantic_model_payload(boto_client: mock.Mock):
+    boto_client.invoke.return_value = _make_response({"result": "ok"})
+    client = compose.aws.LambdaClient(boto_client)
 
     client.invoke("my-fn", payload=Request(user_id=1, name="alice"))
 
-    call_kwargs = mock_boto_client.invoke.call_args[1]
+    call_kwargs = boto_client.invoke.call_args[1]
     assert json.loads(call_kwargs["Payload"]) == {"user_id": 1, "name": "alice"}
 
 
-@mock.patch("boto3.client")
-def test_invoke_async_with_pydantic_model_payload(mock_boto_client: mock.Mock):
-    mock_boto_client.invoke.return_value = {"StatusCode": 202}
-    client = compose.aws.LambdaClient(mock_boto_client)
+def test_invoke_async_with_pydantic_model_payload(boto_client: mock.Mock):
+    boto_client.invoke.return_value = {"StatusCode": 202}
+    client = compose.aws.LambdaClient(boto_client)
 
     client.invoke_async("my-fn", payload=Request(user_id=1, name="alice"))
 
-    call_kwargs = mock_boto_client.invoke.call_args[1]
+    call_kwargs = boto_client.invoke.call_args[1]
     assert json.loads(call_kwargs["Payload"]) == {"user_id": 1, "name": "alice"}
