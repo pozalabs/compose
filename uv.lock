@@ -107,9 +107,6 @@ essential = [
     { name = "mypy-boto3-s3" },
     { name = "mypy-boto3-sqs" },
 ]
-lambda = [
-    { name = "mypy-boto3-lambda" },
-]
 ssm = [
     { name = "mypy-boto3-ssm" },
 ]
@@ -851,7 +848,7 @@ sql = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "boto3-stubs-lite", extra = ["essential", "lambda", "ssm"] },
+    { name = "boto3-stubs-lite", extra = ["essential", "ssm"] },
     { name = "gunicorn" },
     { name = "moto", extra = ["s3"] },
     { name = "opentelemetry-instrumentation-fastapi" },
@@ -889,7 +886,7 @@ provides-extras = ["auth", "aws", "dependency-injector", "dishka", "fastapi", "h
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "boto3-stubs-lite", extras = ["essential", "lambda", "ssm"], specifier = ">=1.43.36,<2.0.0" },
+    { name = "boto3-stubs-lite", extras = ["essential", "ssm"], specifier = ">=1.43.36,<2.0.0" },
     { name = "gunicorn", specifier = ">=26.0.0,<27.0.0" },
     { name = "moto", extras = ["s3"], specifier = ">=5.2.2,<6.0.0" },
     { name = "opentelemetry-instrumentation-fastapi", specifier = ">=0.64b0,<1.0.0" },
