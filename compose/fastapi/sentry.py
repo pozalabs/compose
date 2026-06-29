@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import enum
 import functools
 from collections.abc import Awaitable, Callable
@@ -41,13 +43,13 @@ class ErrorEvent(model.BaseModel):
         return cls(level=Level.ERROR)
 
 
-type BeforeSendHook = Callable[["Event", "Hint"], "Event | None"]
+type BeforeSendHook = Callable[[Event, Hint], Event | None]
 
 
 def create_before_send_hook(
     error: dict[str, ErrorEvent], default_error_level: Level = Level.WARNING
 ) -> BeforeSendHook:
-    def before_send(event: "Event", hint: "Hint") -> "Event | None":
+    def before_send(event: Event, hint: Hint) -> Event | None:
         exc_name = ""
         if "exc_info" in hint:
             exc_type, *_ = hint["exc_info"]
