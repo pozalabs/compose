@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Protocol, Self, Unpack
 try:
     from loguru import logger as _logger
 except ImportError:
-    raise ImportError("Install `loguru` extra to use logging features") from None
+    raise ImportError("Install 'loguru' extra to use logging features") from None
 
 if TYPE_CHECKING:
     from loguru import BasicHandlerConfig, Logger, Record
