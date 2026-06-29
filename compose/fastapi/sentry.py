@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import enum
 import functools
-from collections.abc import Awaitable, Callable, Sequence
-from typing import TYPE_CHECKING, Self
+import inspect
+from collections.abc import Callable, Sequence
+from typing import TYPE_CHECKING, Self, cast
 
 from fastapi import Request, Response
 
@@ -83,12 +84,18 @@ def init_sentry(
 
 
 def capture_error(handler: ExceptionHandler) -> ExceptionHandler:
+    if inspect.iscoroutinefunction(handler):
+
+        @functools.wraps(handler)
+        async def async_wrapper(request: Request, exc: Exception) -> Response:
+            sentry_sdk.capture_exception(exc)
+            return await handler(request, exc)
+
+        return async_wrapper
+
     @functools.wraps(handler)
     async def wrapper(request: Request, exc: Exception) -> Response:
         sentry_sdk.capture_exception(exc)
-        result = handler(request, exc)
-        if isinstance(result, Awaitable):
-            return await result
-        return result
+        return cast(Response, handler(request, exc))
 
     return wrapper
