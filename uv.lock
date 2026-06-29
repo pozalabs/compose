@@ -3,7 +3,7 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-06-17T04:17:18.430567Z"
+exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
 exclude-newer-span = "P7D"
 
 [options.exclude-newer-package]
@@ -860,11 +860,44 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+auth = [
+    { name = "authlib" },
+]
+aws = [
+    { name = "boto3" },
+]
+bcrypt = [
+    { name = "bcrypt" },
+]
+dependency-injector = [
+    { name = "dependency-injector" },
+]
+dishka = [
+    { name = "dishka" },
+]
+fastapi = [
+    { name = "fastapi" },
+]
+httpx = [
+    { name = "httpx" },
+]
+loguru = [
+    { name = "loguru" },
+]
+mongo = [
+    { name = "pymongo" },
+]
 otel = [
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-otlp-proto-http" },
     { name = "opentelemetry-instrumentation" },
     { name = "opentelemetry-sdk" },
+]
+sentry = [
+    { name = "sentry-sdk" },
+]
+sql = [
+    { name = "sqlalchemy" },
 ]
 
 [package.dev-dependencies]
@@ -894,6 +927,14 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "authlib", marker = "extra == 'auth'", specifier = ">=1.3.1,<2.0.0" },
+    { name = "bcrypt", marker = "extra == 'bcrypt'", specifier = ">=4.2.0,<5.0.0" },
+    { name = "boto3", marker = "extra == 'aws'", specifier = ">=1.28.73,<2.0.0" },
+    { name = "dependency-injector", marker = "extra == 'dependency-injector'", specifier = ">=4.49.0,<5.0.0" },
+    { name = "dishka", marker = "extra == 'dishka'", specifier = ">=1.9,<2" },
+    { name = "fastapi", marker = "extra == 'fastapi'", specifier = ">=0.115.2,<0.138.0" },
+    { name = "httpx", marker = "extra == 'httpx'", specifier = ">=0.27.2,<0.29.0" },
+    { name = "loguru", marker = "extra == 'loguru'", specifier = ">=0.7.2,<0.8.0" },
     { name = "opentelemetry-api", marker = "extra == 'otel'", specifier = ">=1.24.0,<2.0.0" },
     { name = "opentelemetry-exporter-otlp-proto-http", marker = "extra == 'otel'", specifier = ">=1.24.0,<2.0.0" },
     { name = "opentelemetry-instrumentation", marker = "extra == 'otel'", specifier = ">=0.46b0,<1.0.0" },
@@ -901,8 +942,11 @@ requires-dist = [
     { name = "pendulum", specifier = ">=3.1.0,<4.0.0" },
     { name = "pydantic", specifier = ">=2.13,<3.0.0" },
     { name = "pydantic-settings", specifier = ">=2.12.0" },
+    { name = "pymongo", marker = "extra == 'mongo'", specifier = ">=4.6.3,<5.0.0" },
+    { name = "sentry-sdk", marker = "extra == 'sentry'", specifier = ">=2.2.0,<3.0.0" },
+    { name = "sqlalchemy", marker = "extra == 'sql'", specifier = ">=2.0.0,<3.0.0" },
 ]
-provides-extras = ["otel"]
+provides-extras = ["auth", "aws", "bcrypt", "dependency-injector", "dishka", "fastapi", "httpx", "loguru", "mongo", "otel", "sentry", "sql"]
 
 [package.metadata.requires-dev]
 dev = [

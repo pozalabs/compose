@@ -4,4 +4,4 @@ try:
     from .hook import *  # noqa: F403
     from .param import *  # noqa: F403
 except ImportError:
-    raise ImportError("Install `pytest` to use testing fixtures") from None
+    raise ImportError("Install 'pytest' to use testing fixtures") from None

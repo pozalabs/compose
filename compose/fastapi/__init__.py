@@ -21,7 +21,7 @@ try:
     from .routing import APIRouter
     from .security import APIKeyHeader, CookieAuth, HTTPBasic, HTTPBearer, unauthorized_error
 except ImportError:
-    raise ImportError("Install `fastapi` to use `compose.fastapi` package") from None
+    raise ImportError("Install 'fastapi' to use 'compose.fastapi' package") from None
 
 __all__ = [
     "APIKeyHeader",

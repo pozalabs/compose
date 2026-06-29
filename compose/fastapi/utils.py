@@ -13,7 +13,7 @@ try:
     import sentry_sdk
     from sentry_sdk.integrations import Integration
 except ImportError:
-    raise ImportError("Install `sentry-sdk` to use sentry helpers")
+    raise ImportError("Install 'sentry-sdk' to use sentry helpers")
 
 
 class Level(enum.StrEnum):

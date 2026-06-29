@@ -104,7 +104,7 @@ class FromPath:
         cls, path: params.Path | None = None
     ) -> "tuple[type[types.PyObjectId], params.Path]":
         if not hasattr(types, "PyObjectId"):
-            raise ImportError("FromPath.object_id requires `bson`. Install `pymongo`")
+            raise ImportError("FromPath.object_id requires 'bson'. Install 'pymongo'")
         return types.PyObjectId, path or Path(...)
 
     @classmethod
