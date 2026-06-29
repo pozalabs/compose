@@ -39,8 +39,7 @@ class ListSchema[T](Schema):
             data = result.model_dump(exclude={"extra"}) | result.extra
             return cls(**data)
 
-        if parser is None:
-            parser = item_type.model_validate
+        parser = parser or item_type.model_validate
 
         return cls(
             **result.model_dump(exclude={"items", "extra"}),
@@ -72,8 +71,7 @@ class CursorListSchema[T](Schema):
         if not issubclass(item_type, model.BaseModel):
             return cls(**result.model_dump())
 
-        if parser is None:
-            parser = item_type.model_validate
+        parser = parser or item_type.model_validate
 
         return cls(
             items=[parser(item) for item in result.items],
