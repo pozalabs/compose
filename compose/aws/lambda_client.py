@@ -25,12 +25,6 @@ class Failure:
 type InvocationResult[T] = Success[T] | Failure
 
 
-def _serialize_payload(payload: dict[str, Any] | BaseModel) -> str:
-    if isinstance(payload, BaseModel):
-        return payload.model_dump_json()
-    return json.dumps(payload)
-
-
 class LambdaClient:
     def __init__(self, lambda_client: mypy_boto3_lambda.LambdaClient) -> None:
         self.client = lambda_client
@@ -81,3 +75,9 @@ class LambdaClient:
             params["Qualifier"] = qualifier
 
         self.client.invoke(**params)
+
+
+def _serialize_payload(payload: dict[str, Any] | BaseModel) -> str:
+    if isinstance(payload, BaseModel):
+        return payload.model_dump_json()
+    return json.dumps(payload)
