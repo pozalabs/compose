@@ -27,7 +27,7 @@ class ListSchema[T](Schema):
     def from_result(
         cls,
         result: OffsetPaginationResult,
-        parser: Callable[..., Any] | None = None,
+        parser: Callable[..., T] | None = None,
     ) -> Self:
         if not result.items:
             return cls(**result.model_dump())
@@ -39,12 +39,12 @@ class ListSchema[T](Schema):
             data = result.model_dump(exclude={"extra"}) | result.extra
             return cls(**data)
 
-        parser = parser or item_type.model_validate
+        parse: Callable[..., Any] = parser or item_type.model_validate
 
         return cls(
             **result.model_dump(exclude={"items", "extra"}),
             **result.extra,
-            items=[parser(item) for item in result.items],
+            items=[parse(item) for item in result.items],
         )
 
     @classmethod
@@ -60,7 +60,7 @@ class CursorListSchema[T](Schema):
     def from_result(
         cls,
         result: CursorPaginationResult,
-        parser: Callable[..., Any] | None = None,
+        parser: Callable[..., T] | None = None,
     ) -> Self:
         if not result.items:
             return cls(items=[])
@@ -71,10 +71,10 @@ class CursorListSchema[T](Schema):
         if not issubclass(item_type, model.BaseModel):
             return cls(**result.model_dump())
 
-        parser = parser or item_type.model_validate
+        parse: Callable[..., Any] = parser or item_type.model_validate
 
         return cls(
-            items=[parser(item) for item in result.items],
+            items=[parse(item) for item in result.items],
             next_cursor=result.next_cursor,
         )
 
