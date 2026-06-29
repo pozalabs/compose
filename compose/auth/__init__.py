@@ -16,10 +16,3 @@ try:
     __all__ += ["AuthorizationServer", "JWTDecoder", "JWTIssuer"]
 except ImportError:
     pass
-
-try:
-    from .password import HashedPassword  # noqa: F401
-
-    __all__.append("HashedPassword")
-except ImportError:
-    pass

@@ -19,7 +19,6 @@ dependencies = [
 [project.optional-dependencies]
 auth = ["authlib>=1.7.2,<2.0.0"]
 aws = ["boto3>=1.43.36,<2.0.0"]
-bcrypt = ["bcrypt>=5.0.0,<6.0.0"]
 dependency-injector = ["dependency-injector>=4.49.1,<5.0.0"]
 dishka = ["dishka>=1.10.1,<2"]
 fastapi = ["fastapi>=0.138.1,<0.139.0"]
@@ -50,7 +49,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pozalabs-compose[auth,aws,bcrypt,dependency-injector,dishka,fastapi,httpx,loguru,mongo,otel,sentry,sql]",
+    "pozalabs-compose[auth,aws,dependency-injector,dishka,fastapi,httpx,loguru,mongo,otel,sentry,sql]",
     "pymongo[aws]>=4.17.0,<5.0.0",
     "pytest>=9.1.1,<10.0.0",
     "boto3-stubs-lite[essential,ssm]>=1.43.36,<2.0.0",
