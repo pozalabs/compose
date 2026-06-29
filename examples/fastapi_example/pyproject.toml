@@ -7,11 +7,11 @@ requires-python = ">=3.13,<3.14"
 authors = []
 dependencies = [
     "pozalabs-compose",
-    "pymongo[aws]>=4.6.3,<5.0.0",
-    "uvicorn[standard]>=0.30.1",
-    "fastapi>=0.115.11,<0.116.0",
+    "pymongo[aws]>=4.17.0,<5.0.0",
+    "uvicorn[standard]>=0.49.0",
+    "fastapi>=0.138.1,<0.139.0",
     "loguru>=0.7.3,<0.8.0",
-    "dishka>=1.9,<2",
+    "dishka>=1.10.1,<2",
 ]
 
 [tool.uv.sources]
