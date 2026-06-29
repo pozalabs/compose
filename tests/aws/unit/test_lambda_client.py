@@ -4,6 +4,8 @@ import io
 import json
 from unittest import mock
 
+from pydantic import BaseModel
+
 import compose
 
 
@@ -118,3 +120,30 @@ def test_invoke_async_with_qualifier(mock_boto_client: mock.Mock):
 
     call_kwargs = mock_boto_client.invoke.call_args[1]
     assert call_kwargs["Qualifier"] == "v2"
+
+
+class Request(BaseModel):
+    user_id: int
+    name: str
+
+
+@mock.patch("boto3.client")
+def test_invoke_with_pydantic_model_payload(mock_boto_client: mock.Mock):
+    mock_boto_client.invoke.return_value = _make_response({"result": "ok"})
+    client = compose.aws.LambdaClient(mock_boto_client)
+
+    client.invoke("my-fn", payload=Request(user_id=1, name="alice"))
+
+    call_kwargs = mock_boto_client.invoke.call_args[1]
+    assert json.loads(call_kwargs["Payload"]) == {"user_id": 1, "name": "alice"}
+
+
+@mock.patch("boto3.client")
+def test_invoke_async_with_pydantic_model_payload(mock_boto_client: mock.Mock):
+    mock_boto_client.invoke.return_value = {"StatusCode": 202}
+    client = compose.aws.LambdaClient(mock_boto_client)
+
+    client.invoke_async("my-fn", payload=Request(user_id=1, name="alice"))
+
+    call_kwargs = mock_boto_client.invoke.call_args[1]
+    assert json.loads(call_kwargs["Payload"]) == {"user_id": 1, "name": "alice"}

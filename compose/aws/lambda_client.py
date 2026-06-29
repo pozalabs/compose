@@ -4,6 +4,8 @@ import json
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
+from pydantic import BaseModel
+
 if TYPE_CHECKING:
     import mypy_boto3_lambda
 
@@ -23,14 +25,20 @@ class Failure:
 type InvocationResult[T] = Success[T] | Failure
 
 
+def _serialize_payload(payload: dict[str, Any] | BaseModel) -> str:
+    if isinstance(payload, BaseModel):
+        return payload.model_dump_json()
+    return json.dumps(payload)
+
+
 class LambdaClient:
     def __init__(self, lambda_client: mypy_boto3_lambda.LambdaClient) -> None:
-        self._client = lambda_client
+        self.client = lambda_client
 
     def invoke(
         self,
         function_name: str,
-        payload: dict[str, Any] | None = None,
+        payload: dict[str, Any] | BaseModel | None = None,
         *,
         qualifier: str | None = None,
     ) -> InvocationResult[dict[str, Any]]:
@@ -39,11 +47,11 @@ class LambdaClient:
             "InvocationType": "RequestResponse",
         }
         if payload is not None:
-            params["Payload"] = json.dumps(payload)
+            params["Payload"] = _serialize_payload(payload)
         if qualifier is not None:
             params["Qualifier"] = qualifier
 
-        response = self._client.invoke(**params)
+        response = self.client.invoke(**params)
 
         response_payload = json.loads(response["Payload"].read())
 
@@ -59,7 +67,7 @@ class LambdaClient:
     def invoke_async(
         self,
         function_name: str,
-        payload: dict[str, Any] | None = None,
+        payload: dict[str, Any] | BaseModel | None = None,
         *,
         qualifier: str | None = None,
     ) -> None:
@@ -68,8 +76,8 @@ class LambdaClient:
             "InvocationType": "Event",
         }
         if payload is not None:
-            params["Payload"] = json.dumps(payload)
+            params["Payload"] = _serialize_payload(payload)
         if qualifier is not None:
             params["Qualifier"] = qualifier
 
-        self._client.invoke(**params)
+        self.client.invoke(**params)
