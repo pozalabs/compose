@@ -11,7 +11,7 @@ DEFAULT_EXPORTS = {
     "wsgi_app": "test.app:app",
     "bind": "0.0.0.0:80",
     "workers": 1,
-    "worker_class": "uvicorn_worker.UvicornWorker",
+    "worker_class": "asgi",
     "timeout": 60,
 }
 
