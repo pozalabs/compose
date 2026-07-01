@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v3.4.0 (2026-07-01)
+
+### Features
+
+**auth**
+
+- JOSE 라이브러리를 `joserfc`로 마이그레이션
+
+### Dependencies
+
+- `auth` extra를 `oauth`, `jwt`로 분리
+  - OAuth 사용 시: `pip install pozalabs-compose[oauth]`
+  - JWT 사용 시: `pip install pozalabs-compose[jwt]`
+
 ## v3.3.0 (2026-06-29)
 
 ### Breaking Changes
