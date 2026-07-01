@@ -28,7 +28,7 @@ class AuthorizationServer:
         )
 
     async def grant_authorization(self, redirect_uri: str, code: str) -> vo.AuthorizationGrant:
-        async with self.auth_client_factory() as client:
+        async with self.auth_client_factory() as client:  # pyrefly: ignore [bad-context-manager]
             response = await client.fetch_token(
                 url=self.access_token_url,
                 headers=self.headers,
@@ -41,7 +41,7 @@ class AuthorizationServer:
         return vo.AuthorizationGrant.model_validate(response)
 
     async def renew_token(self, token: str) -> vo.AuthorizationGrant:
-        async with self.auth_client_factory() as client:
+        async with self.auth_client_factory() as client:  # pyrefly: ignore [bad-context-manager]
             response = await client.fetch_token(
                 url=self.access_token_url,
                 headers=self.headers,

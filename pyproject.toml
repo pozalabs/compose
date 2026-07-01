@@ -17,7 +17,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-auth = ["authlib>=1.7.2,<2.0.0"]
+auth = [
+    "authlib>=1.7.2,<2.0.0",
+    "joserfc>=1.7.1",
+]
 aws = ["boto3>=1.43.36,<2.0.0"]
 dependency-injector = ["dependency-injector>=4.49.1,<5.0.0"]
 dishka = ["dishka>=1.10.1,<2"]
@@ -61,6 +64,7 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "moto[s3]>=5.2.2,<6.0.0",
     "pyrefly>=1.1.1",
+    "types-authlib>=1.6.11.20260518",
 ]
 
 [tool.ruff]
