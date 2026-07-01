@@ -2,7 +2,7 @@ from collections.abc import Callable
 from typing import Self
 
 import pendulum
-from authlib.jose import jwt
+from joserfc import jwk, jwt
 
 from .. import utils
 
@@ -16,7 +16,7 @@ class JWTIssuer:
         token_id_generator: Callable[[], str],
         clock: type[pendulum.DateTime],
     ):
-        self.secret_key = secret_key
+        self.secret_key = jwk.OctKey.import_key(secret_key)
         self.algorithm = algorithm
         self.issuer = issuer
         self.token_id_generator = token_id_generator
@@ -35,8 +35,8 @@ class JWTIssuer:
     def issue(self, sub: str, expires_in: int, **kwargs) -> str:
         iat = self.clock.utcnow()
         return jwt.encode(
-            header={"typ": "JWT", "alg": self.algorithm},
-            payload={
+            header={"alg": self.algorithm},
+            claims={
                 "sub": sub,
                 "iss": self.issuer,
                 "jti": self.token_id_generator(),
@@ -45,4 +45,4 @@ class JWTIssuer:
                 **kwargs,
             },
             key=self.secret_key,
-        ).decode()
+        )

@@ -9,10 +9,16 @@ __all__ = [
 ]
 
 try:
-    from .authorization_server import AuthorizationServer
     from .token_decoder import JWTDecoder
     from .token_issuer import JWTIssuer
 
-    __all__ += ["AuthorizationServer", "JWTDecoder", "JWTIssuer"]
+    __all__ += ["JWTDecoder", "JWTIssuer"]
+except ImportError:
+    pass
+
+try:
+    from .authorization_server import AuthorizationServer
+
+    __all__ += ["AuthorizationServer"]
 except ImportError:
     pass
