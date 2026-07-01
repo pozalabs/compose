@@ -3,7 +3,7 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
+exclude-newer = "2026-06-28T10:06:10.400178Z"
 exclude-newer-span = "P3D"
 
 [options.exclude-newer-package]
@@ -809,10 +809,6 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-auth = [
-    { name = "authlib" },
-    { name = "joserfc" },
-]
 aws = [
     { name = "boto3" },
 ]
@@ -828,11 +824,17 @@ fastapi = [
 httpx = [
     { name = "httpx" },
 ]
+jwt = [
+    { name = "joserfc" },
+]
 loguru = [
     { name = "loguru" },
 ]
 mongo = [
     { name = "pymongo" },
+]
+oauth = [
+    { name = "authlib" },
 ]
 otel = [
     { name = "opentelemetry-api" },
@@ -854,7 +856,7 @@ dev = [
     { name = "moto", extra = ["s3"] },
     { name = "opentelemetry-instrumentation-fastapi" },
     { name = "opentelemetry-test-utils" },
-    { name = "pozalabs-compose", extra = ["auth", "aws", "dependency-injector", "dishka", "fastapi", "httpx", "loguru", "mongo", "otel", "sentry", "sql"] },
+    { name = "pozalabs-compose", extra = ["aws", "dependency-injector", "dishka", "fastapi", "httpx", "jwt", "loguru", "mongo", "oauth", "otel", "sentry", "sql"] },
     { name = "pymongo", extra = ["aws"] },
     { name = "pyrefly" },
     { name = "pytest" },
@@ -866,13 +868,13 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "authlib", marker = "extra == 'auth'", specifier = ">=1.7.2,<2.0.0" },
+    { name = "authlib", marker = "extra == 'oauth'", specifier = ">=1.7.2,<2.0.0" },
     { name = "boto3", marker = "extra == 'aws'", specifier = ">=1.43.36,<2.0.0" },
     { name = "dependency-injector", marker = "extra == 'dependency-injector'", specifier = ">=4.49.1,<5.0.0" },
     { name = "dishka", marker = "extra == 'dishka'", specifier = ">=1.10.1,<2" },
     { name = "fastapi", marker = "extra == 'fastapi'", specifier = ">=0.138.1,<0.139.0" },
     { name = "httpx", marker = "extra == 'httpx'", specifier = ">=0.28.1,<0.29.0" },
-    { name = "joserfc", marker = "extra == 'auth'", specifier = ">=1.7.1" },
+    { name = "joserfc", marker = "extra == 'jwt'", specifier = ">=1.7.1,<2.0.0" },
     { name = "loguru", marker = "extra == 'loguru'", specifier = ">=0.7.3,<0.8.0" },
     { name = "opentelemetry-api", marker = "extra == 'otel'", specifier = ">=1.43.0,<2.0.0" },
     { name = "opentelemetry-exporter-otlp-proto-http", marker = "extra == 'otel'", specifier = ">=1.43.0,<2.0.0" },
@@ -885,7 +887,7 @@ requires-dist = [
     { name = "sentry-sdk", marker = "extra == 'sentry'", specifier = ">=2.63.0,<3.0.0" },
     { name = "sqlalchemy", marker = "extra == 'sql'", specifier = ">=2.0.51,<3.0.0" },
 ]
-provides-extras = ["auth", "aws", "dependency-injector", "dishka", "fastapi", "httpx", "loguru", "mongo", "otel", "sentry", "sql"]
+provides-extras = ["jwt", "oauth", "aws", "dependency-injector", "dishka", "fastapi", "httpx", "loguru", "mongo", "otel", "sentry", "sql"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -894,7 +896,7 @@ dev = [
     { name = "moto", extras = ["s3"], specifier = ">=5.2.2,<6.0.0" },
     { name = "opentelemetry-instrumentation-fastapi", specifier = ">=0.64b0,<1.0.0" },
     { name = "opentelemetry-test-utils", specifier = ">=0.64b0,<1.0.0" },
-    { name = "pozalabs-compose", extras = ["auth", "aws", "dependency-injector", "dishka", "fastapi", "httpx", "loguru", "mongo", "otel", "sentry", "sql"] },
+    { name = "pozalabs-compose", extras = ["jwt", "oauth", "aws", "dependency-injector", "dishka", "fastapi", "httpx", "loguru", "mongo", "otel", "sentry", "sql"] },
     { name = "pymongo", extras = ["aws"], specifier = ">=4.17.0,<5.0.0" },
     { name = "pyrefly", specifier = ">=1.1.1" },
     { name = "pytest", specifier = ">=9.1.1,<10.0.0" },
