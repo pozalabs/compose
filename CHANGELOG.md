@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v3.5.0 (2026-07-02)
+
+### Features
+
+**types**
+
+- `List` 타입에 `@validator` 메커니즘 추가 (`Str`/`Int`/`Float`와 동일한 방식으로 리스트 전체에 대한 검증/변환 정의 가능)
+
 ## v3.4.0 (2026-07-01)
 
 ### Features
