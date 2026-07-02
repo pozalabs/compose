@@ -85,24 +85,27 @@ class SortedIntList(compose.types.List[int]):
         return cls(sorted(v))
 
 
-class BoundedList(compose.types.List[int]):
+class Deduped(compose.types.List[int]):
+    @classmethod
+    @compose.types.validator
+    def deduplicate(cls, v: list[int]) -> Self:
+        return cls(list(dict.fromkeys(v)))
+
+
+class DedupedMaxLen2(Deduped):
     @classmethod
     @compose.types.validator
     def check_max_length(cls, v: list[int]) -> Self:
-        if len(v) > 3:
-            raise ValueError("length must be <= 3")
+        if len(v) > 2:
+            raise ValueError("length must be <= 2")
         return cls(v)
 
 
-class BoundedSortedList(BoundedList):
-    @classmethod
-    @compose.types.validator
-    def sort_values(cls, v: list[int]) -> Self:
-        return cls(sorted(v))
-
-
 def test_validated_apply_validator():
-    assert MaxLen2.validated([1, 2]) == MaxLen2([1, 2])
+    result = MaxLen2.validated([1, 2])
+
+    assert result == MaxLen2([1, 2])
+    assert type(result) is MaxLen2
 
 
 def test_validated_reject_invalid():
@@ -120,13 +123,10 @@ def test_validated_return_type():
     assert type(result) is SortedIntList
 
 
-def test_inherit_validators_in_base_to_derived_order():
-    assert BoundedSortedList.validated([3, 1, 2]) == BoundedSortedList([1, 2, 3])
-
-
 def test_derived_validator_see_result_of_base_validator():
-    with pytest.raises(ValueError, match="length must be <= 3"):
-        BoundedSortedList.validated([4, 3, 2, 1])
+    result = DedupedMaxLen2.validated([1, 1, 2, 2])
+
+    assert result == DedupedMaxLen2([1, 2])
 
 
 def test_pydantic_run_validator_on_deserialization():
@@ -140,5 +140,5 @@ def test_pydantic_run_validator_on_deserialization():
 def test_pydantic_raise_validation_error_on_validator_failure():
     ta = TypeAdapter(MaxLen2)
 
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValidationError, match="length must be <= 2"):
         ta.validate_python([1, 2, 3])
