@@ -105,6 +105,24 @@ class Float(float):
 
 
 class List[T](list[T]):
+    if TYPE_CHECKING:
+        _validators: ClassVar[Validators]
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls._validators = [
+            member.__func__
+            for type_ in reversed(cls.__mro__)
+            for member in type_.__dict__.values()
+            if _is_compose_validator(member)
+        ]
+
+    @classmethod
+    def validated(cls, v, /) -> Self:
+        for func in cls._validators:
+            v = func(cls, v)
+        return cls(v)
+
     @classmethod
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
@@ -116,5 +134,5 @@ class List[T](list[T]):
                 if args:
                     break
         if args:
-            return _get_pydantic_core_schema(source_type, handler(list[args[0]]))
-        return _get_pydantic_core_schema(source_type, handler(list))
+            return _get_pydantic_core_schema(source_type.validated, handler(list[args[0]]))
+        return _get_pydantic_core_schema(source_type.validated, handler(list))
