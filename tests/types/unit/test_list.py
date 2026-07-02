@@ -131,8 +131,10 @@ def test_derived_validator_see_result_of_base_validator():
 
 def test_pydantic_run_validator_on_deserialization():
     ta = TypeAdapter(SortedIntList)
+    result = ta.validate_python([3, 1, 2])
 
-    assert ta.validate_python([3, 1, 2]) == SortedIntList([1, 2, 3])
+    assert result == SortedIntList([1, 2, 3])
+    assert type(result) is SortedIntList
 
 
 def test_pydantic_raise_validation_error_on_validator_failure():
