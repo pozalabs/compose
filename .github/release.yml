@@ -5,7 +5,10 @@ changelog:
   categories:
     - title: Features
       labels:
-        - enhancement
+        - feature
+    - title: Improvements
+      labels:
+        - improvement
     - title: Fixes
       labels:
         - bug
