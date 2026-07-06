@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## v3.6.0 (2026-07-06)
+
+### Breaking Changes
+
+**settings**
+
+- `create_base_settings` → `create_ssm_base_settings`로 이름 변경하여 SSM 통합임을 명시
+- `prefix: str` 파라미터를 `service_name: str, app_env: AppEnv`로 변경
+
+  ```python
+  # Before
+  create_base_settings(ssm_client=client, prefix="/my-service/prod/")
+
+  # After
+  create_ssm_base_settings(ssm_client=client, service_name="my-service", app_env=AppEnv.PRD)
+  ```
+
+- SSM 소스 우선순위를 최하위로 변경 (`init > env > file_secret > SSM`), 환경변수로 SSM 값을 오버라이드 가능
+- `ParameterStoreParameterPrefix` 클래스 제거 (`create_ssm_base_settings`가 prefix 조립을 내부 처리)
+
 ## v3.5.0 (2026-07-02)
 
 ### Features
