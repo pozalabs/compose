@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any
 
 from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings as PydanticBaseSettings
@@ -16,12 +16,6 @@ if TYPE_CHECKING:
 
 type SettingPreprocessor = Callable[[str], str]
 type SettingPreprocessors = dict[str, SettingPreprocessor]
-
-
-class ParameterStoreParameterPrefix(str):
-    @classmethod
-    def create(cls, service_name: str, app_env: AppEnv) -> Self:
-        return cls(f"/{service_name}/{app_env.lower()}/")
 
 
 def get_parameters_from_ssm(
@@ -101,11 +95,14 @@ class AWSParameterStoreSettingsSource(PydanticBaseSettingsSource):
         return f"{self.__class__.__name__}(prefix={self.prefix})"
 
 
-def create_base_settings(
+def create_ssm_base_settings(
     ssm_client: mypy_boto3_ssm.SSMClient,
-    prefix: str,
+    service_name: str,
+    app_env: AppEnv,
     preprocessors: SettingPreprocessors | None = None,
 ) -> type[PydanticBaseSettings]:
+    prefix = f"/{service_name}/{app_env.lower()}/"
+
     class BaseSettings(PydanticBaseSettings):
         @classmethod
         def settings_customise_sources(
@@ -118,14 +115,14 @@ def create_base_settings(
         ) -> tuple[PydanticBaseSettingsSource, ...]:
             return (
                 init_settings,
+                env_settings,
+                file_secret_settings,
                 AWSParameterStoreSettingsSource(
                     settings_cls=settings_cls,
                     ssm_client=ssm_client,
                     prefix=prefix,
                     preprocessors=preprocessors,
                 ),
-                env_settings,
-                file_secret_settings,
             )
 
     return BaseSettings
