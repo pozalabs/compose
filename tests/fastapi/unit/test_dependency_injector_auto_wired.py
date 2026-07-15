@@ -11,6 +11,7 @@ from starlette.testclient import TestClient
 
 import compose
 from compose.di.dependency_injector import DeclarativeContainer, create_provider
+from compose.fastapi.dependency_injector import auto_wired
 
 
 class User(compose.BaseModel):
@@ -55,7 +56,7 @@ router = APIRouter()
 
 
 @router.get("/v1/users", response_model=list[User])
-@compose.fastapi.auto_wired(provide)
+@auto_wired(provide)
 def list_users(
     qry: Annotated[ListUsers, Query()],
     user_repository: UserRepository,
@@ -64,7 +65,7 @@ def list_users(
 
 
 @router.get("/v1/users/{name}", response_model=User)
-@compose.fastapi.auto_wired(provide)
+@auto_wired(provide)
 def retrieve_user(
     name: str,
     user_repository: UserRepository,
