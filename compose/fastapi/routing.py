@@ -3,6 +3,7 @@ from collections.abc import Callable
 from typing import Any
 
 from fastapi import APIRouter as _FastAPIRouter
+from fastapi.routing import APIRoute
 
 _OVERRIDE_DEFAULTS = {"response_model_by_alias": False}
 _OVERRIDE_METHODS = {
@@ -42,9 +43,7 @@ for _method_name in _OVERRIDE_METHODS:
 
 
 @functools.lru_cache(1)
-def create_auto_wired_route(provider: Any) -> type:
-    from fastapi.routing import APIRoute
-
+def create_auto_wired_route(provider: Any) -> type[APIRoute]:
     from .wiring import auto_wired
 
     class AutoWiredAPIRoute(APIRoute):
