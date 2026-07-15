@@ -12,12 +12,12 @@ from fastapi.routing import APIRoute
 def injected_route(container: AsyncContainer) -> type[APIRoute]:
     resolvable = _collect_resolvable_types(container)
 
-    class InjectedDishkaRoute(DishkaRoute):
+    class InjectedRoute(DishkaRoute):
         def __init__(self, path: str, endpoint: Callable[..., Any], **kwargs: Any):
             endpoint = _convert_signature(endpoint, resolvable)
             super().__init__(path, endpoint, **kwargs)
 
-    return InjectedDishkaRoute
+    return InjectedRoute
 
 
 def _collect_resolvable_types(container: AsyncContainer) -> set[type]:
