@@ -9,7 +9,6 @@ from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 from starlette.testclient import TestClient
 
-import compose
 from compose.fastapi.dishka import injected_route
 
 
@@ -104,7 +103,7 @@ def test_strip_default_from_resolvable_parameter(register):
 
 
 def test_http_round_trip(container):
-    route_class = compose.fastapi.injected_route(container)
+    route_class = injected_route(container)
     app = FastAPI()
     router = app.router.__class__(route_class=route_class)
 
