@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from starlette.testclient import TestClient
 
 import compose
+from compose.fastapi.dishka import injected_route
 
 
 class Greeter:
@@ -32,7 +33,7 @@ def container():
 
 @pytest.fixture
 def register(container):
-    route_class = compose.fastapi.injected_route(container)
+    route_class = injected_route(container)
     app = FastAPI()
     router = app.router.__class__(route_class=route_class)
 

@@ -75,18 +75,3 @@ try:
     )
 except ImportError:
     pass
-
-try:
-    from .routing import create_auto_wired_route  # noqa: F401
-    from .wiring import auto_wired  # noqa: F401
-
-    __all__.extend(["auto_wired", "create_auto_wired_route"])
-except ImportError:
-    pass
-
-try:
-    from .dishka import injected_route  # noqa: F401
-
-    __all__.append("injected_route")
-except ImportError:
-    pass

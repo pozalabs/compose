@@ -10,6 +10,7 @@ from starlette.testclient import TestClient
 
 import compose
 from compose.di.dependency_injector import DeclarativeContainer, create_provider
+from compose.fastapi.dependency_injector import injected_route
 
 
 class User(compose.BaseModel):
@@ -50,7 +51,7 @@ class ApplicationContainer(DeclarativeContainer):
 
 
 provide = create_provider(ApplicationContainer)
-router = APIRouter(route_class=compose.fastapi.create_auto_wired_route(provide))
+router = APIRouter(route_class=injected_route(provide))
 
 
 @router.get("/v1/users/{name}", response_model=User)
