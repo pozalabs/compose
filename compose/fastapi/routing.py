@@ -1,9 +1,7 @@
 import functools
 from collections.abc import Callable
-from typing import Any
 
 from fastapi import APIRouter as _FastAPIRouter
-from fastapi.routing import APIRoute
 
 _OVERRIDE_DEFAULTS = {"response_model_by_alias": False}
 _OVERRIDE_METHODS = {
@@ -40,18 +38,3 @@ for _method_name in _OVERRIDE_METHODS:
         _method_name,
         _with_default_overrides(getattr(_FastAPIRouter, _method_name)),
     )
-
-
-@functools.lru_cache(1)
-def create_auto_wired_route(provider: Any) -> type[APIRoute]:
-    from .wiring import auto_wired
-
-    class AutoWiredAPIRoute(APIRoute):
-        def __init__(self, path: str, endpoint: Callable[..., Any], **kwargs: Any):
-            super().__init__(
-                path=path,
-                endpoint=auto_wired(provider)(endpoint),
-                **kwargs,
-            )
-
-    return AutoWiredAPIRoute

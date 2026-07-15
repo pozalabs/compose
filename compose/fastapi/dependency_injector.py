@@ -4,8 +4,21 @@ from typing import Annotated, Any
 
 from dependency_injector.wiring import inject
 from fastapi import Depends
+from fastapi.routing import APIRoute
 
 from compose.di.dependency_injector.wiring import Provider
+
+
+def injected_route(provider: Any) -> type[APIRoute]:
+    class InjectedRoute(APIRoute):
+        def __init__(self, path: str, endpoint: Callable[..., Any], **kwargs: Any):
+            super().__init__(
+                path=path,
+                endpoint=auto_wired(provider)(endpoint),
+                **kwargs,
+            )
+
+    return InjectedRoute
 
 
 def auto_wired[F: Callable[..., Any]](provider: Provider) -> Callable[[F], F]:
