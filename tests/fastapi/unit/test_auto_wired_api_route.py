@@ -72,7 +72,6 @@ def container():
 @pytest.fixture
 def app(container: ApplicationContainer) -> FastAPI:
     app = FastAPI()
-    app.container = container
     app.include_router(router)
     return app
 
