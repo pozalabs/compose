@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 if TYPE_CHECKING:
     import mypy_boto3_lambda
+    from mypy_boto3_lambda.type_defs import InvocationRequestTypeDef
 
 
 class LambdaInvocationError(Exception):
@@ -27,7 +28,7 @@ class LambdaClient:
         *,
         qualifier: str | None = None,
     ) -> dict[str, Any]:
-        params: dict[str, Any] = {
+        params: InvocationRequestTypeDef = {
             "FunctionName": function_name,
             "InvocationType": "RequestResponse",
         }
@@ -56,7 +57,7 @@ class LambdaClient:
         *,
         qualifier: str | None = None,
     ) -> None:
-        params: dict[str, Any] = {
+        params: InvocationRequestTypeDef = {
             "FunctionName": function_name,
             "InvocationType": "Event",
         }
