@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from opentelemetry import metrics, trace
@@ -9,7 +10,6 @@ from opentelemetry.sdk.trace.sampling import Sampler
 
 from compose.fastapi.otel import NonInstrumentedUrls
 
-from .instrumentation.loguru.instrumentor import LoguruInstrumentor
 from .meter_provider import get_default_meter_provider
 from .tracer_provider import ServiceResourceAttrs, get_default_tracer_provider
 
@@ -22,6 +22,7 @@ except ImportError:
 
 if TYPE_CHECKING:
     from fastapi import FastAPI
+    from opentelemetry.instrumentation.instrumentor import BaseInstrumentor
 
 
 DEFAULT_OTLP_ENDPOINT = "http://localhost:4318"
@@ -34,6 +35,7 @@ def instrument_app(
     sampler: Sampler | None = None,
     tracer_provider: TracerProvider | None = None,
     meter_provider: MeterProvider | None = None,
+    instrumentors: Sequence[BaseInstrumentor] | None = None,
 ) -> None:
     if tracer_provider is None:
         tracer_provider = get_default_tracer_provider(
@@ -56,4 +58,7 @@ def instrument_app(
         meter_provider=meter_provider,
         excluded_urls=",".join(NonInstrumentedUrls.current()),
     )
-    LoguruInstrumentor().instrument()  # type: ignore[misc]
+
+    if instrumentors is not None:
+        for instrumentor in instrumentors:
+            instrumentor.instrument()
