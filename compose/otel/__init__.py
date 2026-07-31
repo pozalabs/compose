@@ -17,4 +17,4 @@ try:
 
     __all__.append("instrument_app")
 except ImportError:
-    raise
+    pass
