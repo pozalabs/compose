@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     import mypy_boto3_s3
 
 
-class S3ObjectStore:
+class S3Store:
     def __init__(self, s3_client: mypy_boto3_s3.S3Client, bucket: str) -> None:
         self._client = s3_client
         self._bucket = bucket
