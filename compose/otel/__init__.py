@@ -11,3 +11,10 @@ __all__ = [
     "get_default_meter_provider",
     "get_default_tracer_provider",
 ]
+
+try:
+    from .fastapi import instrument_app  # noqa: F401
+
+    __all__.append("instrument_app")
+except ImportError:
+    raise
