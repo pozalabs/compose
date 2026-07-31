@@ -8,9 +8,11 @@ def enum_values(e: type[enum.Enum], /) -> list[Any]:
     return [member.value for _, member in e.__members__.items()]
 
 
-def create_env_getter(key: str, /) -> Callable[[], str | None]:
-    def getter() -> str | None:
-        return os.getenv(key)
+def create_env_getter(name: str, /) -> Callable[[], str]:
+    def getter() -> str:
+        if (env := os.getenv(name)) is None:
+            raise ValueError(f"Cannot find environment variable {name}")
+        return env
 
     return getter
 
@@ -26,8 +28,8 @@ class AppEnv(enum.StrEnum):
     PRD = enum.auto()
 
     @classmethod
-    def current(cls, env_getter: Callable[[], str | None] = default_env_getter) -> Self:
-        if (env := env_getter()) is None or env not in set(enum_values(cls)):
+    def current(cls, env_getter: Callable[[], str] = default_env_getter) -> Self:
+        if (env := env_getter()) not in set(enum_values(cls)):
             raise ValueError(
                 f"Invalid value for {cls.__name__}: {env}. Valid values: {enum_values(cls)}"
             )
