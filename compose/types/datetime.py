@@ -20,7 +20,7 @@ class DateTime(pendulum.DateTime):
 
     @classmethod
     def _validate(cls, v: datetime.datetime) -> pendulum.DateTime:
-        return pendulum.instance(obj=v, tz=pendulum.UTC)
+        return pendulum.DateTime.instance(v, tz=pendulum.UTC)
 
 
 @dataclass
