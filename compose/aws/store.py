@@ -6,6 +6,7 @@ import botocore.exceptions
 
 if TYPE_CHECKING:
     import mypy_boto3_s3
+    from mypy_boto3_s3.type_defs import CopySourceTypeDef, PutObjectRequestTypeDef
 
 
 class S3Store:
@@ -13,8 +14,14 @@ class S3Store:
         self._client = s3_client
         self._bucket = bucket
 
-    def upload(self, key: str, body: bytes | IO[bytes], **params: Any) -> None:
-        self._client.put_object(Bucket=self._bucket, Key=key, Body=body, **params)
+    def upload(self, key: str, body: bytes | IO[bytes], **kwargs: Any) -> None:
+        params: PutObjectRequestTypeDef = {
+            "Bucket": self._bucket,
+            "Key": key,
+            "Body": body,
+            **kwargs,
+        }
+        self._client.put_object(**params)
 
     def download(self, key: str) -> bytes:
         response = self._client.get_object(Bucket=self._bucket, Key=key)
@@ -24,10 +31,11 @@ class S3Store:
         self._client.delete_object(Bucket=self._bucket, Key=key)
 
     def copy(self, src_key: str, dst_key: str) -> None:
+        copy_source: CopySourceTypeDef = {"Bucket": self._bucket, "Key": src_key}
         self._client.copy_object(
             Bucket=self._bucket,
             Key=dst_key,
-            CopySource={"Bucket": self._bucket, "Key": src_key},
+            CopySource=copy_source,
         )
 
     def exists(self, key: str) -> bool:
