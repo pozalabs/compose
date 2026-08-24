@@ -6,13 +6,13 @@
 
 ### 도메인 모델링
 
-- Pydantic 기반 모델 정의: `compose.BaseModel` / `TimeStampedModel`
+- Pydantic 기반 모델 정의: `compose.BaseModel`, `TimeStampedModel`
 - 도메인 엔티티 정의: `compose.entity` 모듈
-- 도메인 명령 정의: `compose.command.Command` / `UserCommand`
+- 도메인 명령 정의: `compose.command.Command`, `UserCommand`
 - 도메인 이벤트 정의: `compose.event.Event`
-- 검증된 원시 타입 정의: `compose.types.Str` / `Int` / `Float` / `List` / `Byte`
-- 날짜/시간 타입: `compose.types.DateTime` / `DateRange` / `Seconds` / `MilliSeconds`
-- 콘텐츠 타입 정보: `compose.types.MimeType` / `MimeTypeInfo` / `ContentDisposition`
+- 검증된 원시 타입 정의: `compose.types.Str`, `Int`, `Float`, `List`, `Byte`
+- 날짜/시간 타입: `compose.types.DateTime`, `DateRange`, `Seconds`, `MilliSeconds`
+- 콘텐츠 타입 정보: `compose.types.MimeType`, `MimeTypeInfo`, `ContentDisposition`
 - S3 오브젝트 URL 생성: `compose.types.create_s3_object_url`
 - MongoDB ObjectId 타입: `compose.types.PyObjectId` (mongo)
 - 커스텀 타입 검증 정의: `compose.types.validator`
@@ -23,65 +23,65 @@
 ### 영속성
 
 - 추상 저장소 인터페이스: `compose.repository.BaseRepository`
-- MongoDB 저장소: `compose.repository.MongoRepository` / `MongoDocument` (mongo)
+- MongoDB 저장소: `compose.repository.MongoRepository`, `MongoDocument` (mongo)
 - MongoDB 인덱스 설정: `compose.repository.setup_indexes` (mongo)
-- 선언적 필드 일치 조회 정의: `compose.repository.finder` / `lister` (mongo)
+- 선언적 필드 일치 조회 정의: `compose.repository.finder`, `lister` (mongo)
 - SQL 저장소: `compose.repository.SQLRepository` (sql)
 - 추상 쿼리 인터페이스: `compose.query.Query`
 - MongoDB 쿼리: `compose.query.MongoQuery` (mongo)
-- MongoDB 페이지네이션 쿼리: `compose.query.MongoPaginationQuery` / `MongoOffsetPaginationQuery` / `MongoCursorPaginationQuery` (mongo)
+- MongoDB 페이지네이션 쿼리: `compose.query.MongoPaginationQuery`, `MongoOffsetPaginationQuery`, `MongoCursorPaginationQuery` (mongo)
 - MongoDB 쿼리 연산자 조합: `compose.query.mongo.op` 모듈 (mongo)
-- MongoDB 트랜잭션 관리: `compose.uow.MongoUnitOfWork` / `mongo_transactional` (mongo)
-- SQL 트랜잭션 관리: `compose.uow.SQLUnitOfWork` / `sql_transactional` (sql)
+- MongoDB 트랜잭션 관리: `compose.uow.MongoUnitOfWork`, `mongo_transactional` (mongo)
+- SQL 트랜잭션 관리: `compose.uow.SQLUnitOfWork`, `sql_transactional` (sql)
 - 페이지네이션 결과 모델: `compose.pagination` 모듈
-- API 응답 스키마: `compose.schema.Schema` / `TimeStampedSchema`
-- 목록 응답 스키마: `compose.schema.ListSchema` / `CursorListSchema`
-- 에러/ID 응답 모델: `compose.schema.Error` / `InvalidParam` / `Id`
-- 스키마 필드 유틸리티: `compose.schema.schema_by_field_name` / `schema_excludes`
+- API 응답 스키마: `compose.schema.Schema`, `TimeStampedSchema`
+- 목록 응답 스키마: `compose.schema.ListSchema`, `CursorListSchema`
+- 에러/ID 응답 모델: `compose.schema.Error`, `InvalidParam`, `Id`
+- 스키마 필드 유틸리티: `compose.schema.schema_by_field_name`, `schema_excludes`
 
 ### 메시징
 
 - 이벤트 버스: `compose.messaging.EventBus`
-- 이벤트 발행: `compose.messaging.EventPublisher` / `MessagePushable`
-- 이벤트 메시지 모델: `compose.messaging.EventMessage` / `SqsEventMessage`
+- 이벤트 발행: `compose.messaging.EventPublisher`, `MessagePushable`
+- 이벤트 메시지 모델: `compose.messaging.EventMessage`, `SqsEventMessage`
 - 메시지 소비: `compose.messaging.MessageConsumer`
-- 컨슈머 실행: `compose.messaging.FastAPIMessageConsumerRunner` / `ThreadMessageConsumerRunner`
+- 컨슈머 실행: `compose.messaging.FastAPIMessageConsumerRunner`, `ThreadMessageConsumerRunner`
 - 메시지 큐 인터페이스: `compose.messaging.MessageQueue`
 - SQS 메시지 큐: `compose.messaging.SqsMessageQueue` (aws)
-- 시그널 핸들링: `compose.messaging.SignalHandler` / `DefaultSignalHandler` / `ThreadSignalHandler`
+- 시그널 핸들링: `compose.messaging.SignalHandler`, `DefaultSignalHandler`, `ThreadSignalHandler`
 
 ### 인프라
 
 - 의존성 주입 컨테이너: `compose.di` 모듈 (dependency-injector 또는 dishka)
 - 리소스 서버 인증: `compose.auth.ResourceServer`
-- 인증 값 객체: `compose.auth.AuthorizationGrant` / `TokenClaims` / `UserResource`
-- JWT 발급/검증: `compose.auth.JWTDecoder` / `JWTIssuer` (jwt)
+- 인증 값 객체: `compose.auth.AuthorizationGrant`, `TokenClaims`, `UserResource`
+- JWT 발급/검증: `compose.auth.JWTDecoder`, `JWTIssuer` (jwt)
 - OAuth 인가 서버: `compose.auth.AuthorizationServer` (oauth)
 - AWS Parameter Store 기반 설정 관리: `compose.settings` 모듈
 - 분산 락 실패 예외: `compose.lock.LockAcquisitionFailedError`
-- MongoDB 분산 락: `compose.lock.MongoLock` / `MongoLockAcquirer` (mongo)
+- MongoDB 분산 락: `compose.lock.MongoLock`, `MongoLockAcquirer` (mongo)
 - 구조화 로깅: `compose.logging` 모듈 (loguru)
 - HTTP 헤더 인증: `compose.httpx.HeaderAuth` (httpx)
 
 ### 프레임워크 통합
 
 - API 라우터: `compose.fastapi.APIRouter` (fastapi)
-- 헬스체크 엔드포인트: `compose.fastapi.add_health_check_endpoint` / `health_check` / `SpecialEndpoint` (fastapi)
-- 예외 핸들러: `compose.fastapi.ExceptionHandler` / `ExceptionHandlerInfo` / `create_exception_handler` / `default_exception_handlers` (fastapi)
-- OpenAPI 문서화: `compose.fastapi.add_doc_routes` / `OpenAPIDoc` / `OpenAPISchema` / `RedocHTML` / `SwaggerUIHTML` / `additional_responses` / `openapi_tags` (fastapi)
+- 헬스체크 엔드포인트: `compose.fastapi.add_health_check_endpoint`, `health_check`, `SpecialEndpoint` (fastapi)
+- 예외 핸들러: `compose.fastapi.ExceptionHandler`, `ExceptionHandlerInfo`, `create_exception_handler`, `default_exception_handlers` (fastapi)
+- OpenAPI 문서화: `compose.fastapi.add_doc_routes`, `OpenAPIDoc`, `OpenAPISchema`, `RedocHTML`, `SwaggerUIHTML`, `additional_responses`, `openapi_tags` (fastapi)
 - OTel 비계측 URL 설정: `compose.fastapi.NonInstrumentedUrls` (fastapi)
-- 요청 파라미터 추출: `compose.fastapi.FromAuth` / `FromPath` / `OffsetPaginationParams` / `as_query` / `with_fields` (fastapi)
-- HTTP 응답: `compose.fastapi.NoContentResponse` / `ZipStreamingResponse` (fastapi)
-- 인증 스킴: `compose.fastapi.HTTPBearer` / `HTTPBasic` / `APIKeyHeader` / `CookieAuth` / `unauthorized_error` (fastapi)
-- Sentry 연동: `compose.fastapi.init_sentry` / `capture_error` / `create_before_send_hook` / `ErrorEvent` / `Level` (fastapi, sentry)
-- Lambda 함수 호출: `compose.aws.LambdaClient` / `LambdaInvocationError` (aws)
+- 요청 파라미터 추출: `compose.fastapi.FromAuth`, `FromPath`, `OffsetPaginationParams`, `as_query`, `with_fields` (fastapi)
+- HTTP 응답: `compose.fastapi.NoContentResponse`, `ZipStreamingResponse` (fastapi)
+- 인증 스킴: `compose.fastapi.HTTPBearer`, `HTTPBasic`, `APIKeyHeader`, `CookieAuth`, `unauthorized_error` (fastapi)
+- Sentry 연동: `compose.fastapi.init_sentry`, `capture_error`, `create_before_send_hook`, `ErrorEvent`, `Level` (fastapi, sentry)
+- Lambda 함수 호출: `compose.aws.LambdaClient`, `LambdaInvocationError` (aws)
 - S3 오브젝트 저장소: `compose.aws.S3Store` (aws)
 - S3 Presigned URL 생성: `compose.aws.S3UrlGenerator` (aws)
 - S3 오브젝트 존재 확인: `compose.aws.s3_obj_exists` (aws)
-- 트레이서/미터 프로바이더 설정: `compose.otel.get_default_tracer_provider` / `get_default_meter_provider` / `ServiceResourceAttrs` (otel)
+- 트레이서/미터 프로바이더 설정: `compose.otel.get_default_tracer_provider`, `get_default_meter_provider`, `ServiceResourceAttrs` (otel)
 - Loguru OpenTelemetry 계측: `compose.otel.LoguruInstrumentor` (otel)
 - FastAPI 앱 계측: `compose.otel.instrument_app` (otel)
-- Gunicorn 설정: `compose.gunicorn.GunicornSettings` / `export_settings`
+- Gunicorn 설정: `compose.gunicorn.GunicornSettings`, `export_settings`
 - 테스트 유틸리티: `compose.testing` 모듈 (pytest)
 - MongoDB 테스트 컨테이너: `compose.testcontainers.MongoDbContainer` (testcontainers)
 
