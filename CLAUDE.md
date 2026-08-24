@@ -73,3 +73,8 @@ uv run pytest tests
 ### 주의사항
 
 - 테스트 실행 시 반드시 `tests` 폴더를 대상으로 지정 (examples 폴더와의 모듈명 충돌 방지)
+
+## AGENTS.md 유지
+
+- 서브패키지 `__init__`이 노출하는 심볼(재export 또는 `__all__`)을 추가/이동/삭제하거나 최상위 모듈을 추가/삭제하는 PR은 `compose/AGENTS.md`를 같은 PR에서 갱신
+- `[project.optional-dependencies]`를 변경하는 PR은 `compose/AGENTS.md` 선택적 의존성 섹션을 같은 PR에서 갱신
