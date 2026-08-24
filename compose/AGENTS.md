@@ -98,18 +98,20 @@
 
 ## 선택적 의존성
 
-- `jwt` (`uv add pozalabs-compose[jwt]`): `auth.JWTDecoder` / `JWTIssuer`
-- `oauth` (`uv add pozalabs-compose[oauth]`): `auth.AuthorizationServer`
-- `aws` (`uv add pozalabs-compose[aws]`): `aws` 모듈 전체, `messaging.SqsMessageQueue`
+- `jwt` (`uv add pozalabs-compose[jwt]`): `auth` 모듈의 JWT 발급/검증
+- `oauth` (`uv add pozalabs-compose[oauth]`): `auth` 모듈의 OAuth 인가 서버
+- `aws` (`uv add pozalabs-compose[aws]`): `aws` 모듈 전체, `messaging` 모듈의 SQS 큐
 - `dependency-injector` (`uv add pozalabs-compose[dependency-injector]`): `di.dependency_injector` 모듈
 - `dishka` (`uv add pozalabs-compose[dishka]`): `di.dishka` 모듈
 - `fastapi` (`uv add pozalabs-compose[fastapi]`): `fastapi` 모듈 전체
-- `httpx` (`uv add pozalabs-compose[httpx]`): `httpx.HeaderAuth`
+- `httpx` (`uv add pozalabs-compose[httpx]`): `httpx` 모듈 전체
 - `loguru` (`uv add pozalabs-compose[loguru]`): `logging` 모듈 전체
-- `mongo` (`uv add pozalabs-compose[mongo]`): `repository.MongoRepository` / `MongoDocument` / `setup_indexes` / `finder` / `lister`, `query.MongoQuery` / `MongoPaginationQuery` / `MongoOffsetPaginationQuery` / `MongoCursorPaginationQuery`, `query.mongo.op`, `uow.MongoUnitOfWork` / `mongo_transactional`, `entity.MongoEntity`, `types.PyObjectId`, `lock.MongoLock` / `MongoLockAcquirer`
+- `mongo` (`uv add pozalabs-compose[mongo]`): `repository`, `query`, `uow`, `entity`, `types`, `lock` 모듈의 MongoDB 관련 심볼
 - `otel` (`uv add pozalabs-compose[otel]`): `otel` 모듈 전체 (`instrument_app`은 fastapi도 필요)
-- `sentry` (`uv add pozalabs-compose[sentry]`): `fastapi.init_sentry` / `capture_error` / `create_before_send_hook` / `ErrorEvent` / `Level` (fastapi도 필요)
-- `sql` (`uv add pozalabs-compose[sql]`): `entity.SQLEntity`, `repository.SQLRepository`, `uow.SQLUnitOfWork` / `sql_transactional`
+- `sentry` (`uv add pozalabs-compose[sentry]`): `fastapi` 모듈의 Sentry 연동 (fastapi도 필요)
+- `sql` (`uv add pozalabs-compose[sql]`): `entity`, `repository`, `uow` 모듈의 SQL 관련 심볼
+
+심볼 단위 요구 extras는 모듈 지도의 각 항목 끝 괄호 참조
 
 extras가 아닌 선택적 의존성 (패키지를 직접 설치):
 
