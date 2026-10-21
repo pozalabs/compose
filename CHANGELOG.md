@@ -1,5 +1,64 @@
 # CHANGELOG
 
+## v3.7.0 (2026-10-22)
+
+### Breaking Changes
+
+**fastapi**
+
+- dependency-injector용 자동 주입 기능을 `compose.fastapi.dependency_injector` 모듈로 이동하고 route 생성 함수 이름을 `injected_route`로 통일
+  - `compose.fastapi.create_auto_wired_route` → `compose.fastapi.dependency_injector.injected_route`
+  - `compose.fastapi.auto_wired` → `compose.fastapi.dependency_injector.auto_wired`
+  - dishka용 `injected_route`는 `compose.fastapi`에서 더 이상 노출하지 않으므로 `compose.fastapi.dishka.injected_route`로 import
+
+  ```python
+  # Before
+  router = APIRouter(route_class=compose.fastapi.create_auto_wired_route(provide))
+  router = APIRouter(route_class=compose.fastapi.injected_route(container))
+
+  # After
+  from compose.fastapi.dependency_injector import injected_route
+  router = APIRouter(route_class=injected_route(provide))
+
+  from compose.fastapi.dishka import injected_route
+  router = APIRouter(route_class=injected_route(container))
+  ```
+
+**otel**
+
+- `instrument_app`이 `LoguruInstrumentor`를 자동 실행하지 않도록 변경
+  - 새 `instrumentors` 파라미터로 실행할 instrumentor를 지정
+  - 기존 동작을 유지하려면 `instrument_app(..., instrumentors=[LoguruInstrumentor()])`로 호출
+
+**aws**
+
+- `S3ObjectStore`의 이름을 `S3Store`로 변경 (모듈 경로: `compose.aws.object_store` → `compose.aws.store`)
+- `S3Store`의 `_client`, `_bucket` 속성 이름을 `client`, `bucket`으로 변경
+
+**enums**
+
+- `create_env_getter`가 반환한 getter는 환경 변수가 설정되지 않은 경우 `None` 대신 `ValueError`를 raise
+  - getter 반환 타입이 `str | None`에서 `str`로 변경되어 호출부의 `None` 처리 불필요
+
+### Features
+
+**otel**
+
+- `compose.otel`에서 `instrument_app`을 export하여 `compose.otel.instrument_app`으로 접근 가능 (fastapi 미설치 환경에서는 export 생략)
+
+### Bug Fixes
+
+**otel**
+
+- Python 3.13에서 `compose.otel.fastapi` import 시 `NameError`가 발생하던 문제 수정
+
+**pagination**
+
+- 커서 페이지네이션의 cursor를 query string이나 path parameter로 전달하면 디코딩/라우팅에 실패하던 문제 수정
+  - cursor 인코딩 방식을 표준 base64에서 URL-safe base64로 변경
+  - 변경 전에 발급한 표준 base64 cursor도 디코딩 가능
+  - 변경 후 발급한 cursor는 이전 버전에서 디코딩에 실패할 수 있으므로 혼합 배포나 롤백 시 주의 필요
+
 ## v3.6.0 (2026-07-06)
 
 ### Breaking Changes
