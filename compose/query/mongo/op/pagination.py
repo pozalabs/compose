@@ -13,17 +13,25 @@ from .pipeline import Pipeline
 from .stage import EmptyStage, Group, Limit, Match, Project, Skip, Sort, Spec, Stage
 from .types import DictExpression, ListExpression, _PositiveInt
 
+_BASE64_BLOCK_SIZE = 4
+
 
 class Cursor(BaseModel):
     def to_str(self) -> str:
-        return base64.b64encode(self.model_dump_json(by_alias=True).encode()).decode()
+        return (
+            base64.urlsafe_b64encode(self.model_dump_json(by_alias=True).encode())
+            .decode()
+            .rstrip("=")
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return self.model_dump(by_alias=True)
 
     @classmethod
     def from_str(cls, cursor: str) -> Self:
-        return cls.model_validate_json(json_data=base64.b64decode(cursor).decode())
+        missing_padding = -len(cursor) % _BASE64_BLOCK_SIZE
+        padded = cursor + "=" * missing_padding
+        return cls.model_validate_json(json_data=base64.urlsafe_b64decode(padded).decode())
 
 
 class OffsetPagination(Stage[DictExpression]):

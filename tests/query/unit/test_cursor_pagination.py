@@ -18,6 +18,11 @@ class TCursor(Cursor):
     id: compose.types.PyObjectId = compose.field.PyObjectIdField()
 
 
+class TitleCursor(Cursor):
+    title: str
+    id: compose.types.PyObjectId = compose.field.PyObjectIdField()
+
+
 def test_cursor_encode_decode():
     cursor = TCursor(
         created_at=pendulum.datetime(2024, 4, 1),
@@ -25,6 +30,20 @@ def test_cursor_encode_decode():
     )
 
     assert TCursor.from_str(cursor.to_str()) == cursor
+
+
+def test_encode_cursor_in_unpadded_url_safe_base64():
+    cursor = TitleCursor(title="꿈 ~", id=compose.types.PyObjectId("6ad880087a476ced8fea9ae5"))
+
+    assert cursor.to_str() == "eyJ0aXRsZSI6Iuq_iCB-IiwiX2lkIjoiNmFkODgwMDg3YTQ3NmNlZDhmZWE5YWU1In0"
+
+
+def test_decode_cursor_encoded_in_standard_base64():
+    encoded = "eyJ0aXRsZSI6Iuq/iCB+IiwiX2lkIjoiNmFkODgwMDg3YTQ3NmNlZDhmZWE5YWU1In0="
+
+    assert TitleCursor.from_str(encoded) == TitleCursor(
+        title="꿈 ~", id=compose.types.PyObjectId("6ad880087a476ced8fea9ae5")
+    )
 
 
 @pytest.mark.parametrize(
