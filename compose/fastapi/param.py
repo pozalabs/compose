@@ -6,7 +6,8 @@ from typing import Annotated, Any, cast, get_args
 
 import pydantic_core
 from fastapi import Depends, Path, Query, params
-from pydantic import BaseModel, Field, Json
+from fastapi.exceptions import RequestValidationError
+from pydantic import BaseModel, Field, Json, ValidationError, create_model
 
 from compose import query, types
 
@@ -75,14 +76,35 @@ def create_model_dependency_resolver[T: BaseModel](
     model_type: type[T],
     dependencies: dict[str, tuple[type, Any]],
 ) -> Callable[..., Any]:
-    dep_names = list(dependencies.keys())
+    body_fields: dict[str, Any] = {
+        name: (field.annotation, field)
+        for name, field in model_type.model_fields.items()
+        if name not in dependencies
+    }
+    body_model = create_model(
+        model_type.__name__, __config__=model_type.model_config, **body_fields
+    )
 
-    def wrapper(t, **kwargs) -> T:
-        return t.model_copy(update={name: kwargs[name] for name in dep_names}, deep=True)
+    def wrapper(t: BaseModel, **kwargs: Any) -> T:
+        values = {
+            **{name: getattr(t, name) for name in t.model_fields_set},
+            **(t.model_extra or {}),
+            **kwargs,
+        }
+        try:
+            return model_type.model_validate(values, by_name=True)
+        except ValidationError as exc:
+            # FastAPI가 의존성에서 발생한 ValidationError를 500으로 처리하므로 422로 변환
+            raise RequestValidationError(
+                [
+                    {**error, "loc": ("body", *error["loc"])}
+                    for error in exc.errors(include_url=False, include_input=False)
+                ]
+            ) from exc
 
     cast(Any, wrapper).__signature__ = inspect.Signature(
         parameters=[
-            inspect.Parameter("t", inspect.Parameter.POSITIONAL_OR_KEYWORD, annotation=model_type),
+            inspect.Parameter("t", inspect.Parameter.POSITIONAL_OR_KEYWORD, annotation=body_model),
             *(
                 inspect.Parameter(
                     name, inspect.Parameter.KEYWORD_ONLY, default=default, annotation=type_
