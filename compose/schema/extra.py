@@ -16,7 +16,7 @@ def schema_excludes(*excludes: *tuple[str, ...]) -> JsonSchemaExtraCallable:
 
     def wrapper(schema: dict[str, Any]) -> None:
         for exclude in excludes:
-            schema.get("properties", {}).pop(exclude)
+            schema.get("properties", {}).pop(exclude, None)
 
     return wrapper
 
