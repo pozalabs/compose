@@ -33,3 +33,17 @@ def expected() -> dict[str, Any]:
 
 def test_schema_excludes(model_type: type[compose.BaseModel], expected: dict[str, Any]):
     assert model_type.model_json_schema() == expected
+
+
+def test_ignore_exclude_absent_from_properties():
+    class Model(compose.BaseModel):
+        name: str
+
+        model_config = ConfigDict(json_schema_extra=compose.schema.schema_excludes("age"))
+
+    assert Model.model_json_schema() == {
+        "properties": {"name": {"title": "Name", "type": "string"}},
+        "required": ["name"],
+        "title": "Model",
+        "type": "object",
+    }
