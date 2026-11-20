@@ -1,5 +1,37 @@
 # CHANGELOG
 
+## v3.8.0 (2026-11-20)
+
+### Breaking Changes
+
+**fastapi**
+
+- `extra="forbid"`로 설정한 Command를 `with_fields`에 지정하면 FastAPI가 body에 주입 필드를 포함한 요청에 422(`extra_forbidden`) 반환
+  - 변경 전에는 `with_fields`가 body 값을 주입값으로 대체
+  - 클라이언트가 요청 body에서 주입 필드를 제거해야 함
+- `with_fields`에 지정한 Command를 다른 엔드포인트의 body나 응답으로도 사용하면 FastAPI가 Command와 `with_fields`가 생성한 같은 이름의 body 모델을 구분하기 위해 두 모델의 OpenAPI 스키마 이름을 `<module>__<Model>` 형태로 변경
+  - OpenAPI 스키마로 클라이언트 코드를 생성하는 경우 생성된 타입 이름 확인 필요
+
+### Features
+
+**fastapi**
+
+- `with_fields`의 주입 필드를 기본값 없이 선언 가능
+  - `with_fields`가 주입 필드를 제외한 body 모델을 생성하므로 `schema_excludes`를 지정하지 않아도 OpenAPI body 스키마에 주입 필드가 포함되지 않음
+  - 주입 필드의 기존 기본값과 `schema_excludes` 설정을 제거하지 않아도 `with_fields`가 그대로 동작
+
+### Bug Fixes
+
+**fastapi**
+
+- 주입값을 참조하는 Command 검증기를 클라이언트가 body에 포함한 값으로 통과할 수 있던 문제 수정
+  - `with_fields`가 주입값을 포함한 상태로 Command를 검증하고 검증 실패 시 422 반환
+  - 주입값을 참조하는 검증기는 `model_validator(mode="after")`로 작성 (`field_validator`의 `info.data`에는 먼저 선언한 필드만 포함됨)
+
+**schema**
+
+- `schema_excludes`에 스키마에 없는 필드를 지정하면 `KeyError`가 발생하던 문제 수정
+
 ## v3.7.0 (2026-10-22)
 
 ### Breaking Changes
