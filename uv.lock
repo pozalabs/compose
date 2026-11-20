@@ -3,7 +3,7 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-10-18T16:01:27.23882Z"
+exclude-newer = "2026-11-17T09:32:45.486843Z"
 exclude-newer-span = "P3D"
 
 [options.exclude-newer-package]
@@ -800,7 +800,7 @@ wheels = [
 
 [[package]]
 name = "pozalabs-compose"
-version = "3.7.0"
+version = "3.8.0"
 source = { editable = "." }
 dependencies = [
     { name = "pendulum" },
